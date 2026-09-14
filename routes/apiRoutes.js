@@ -50,7 +50,6 @@ const loginAttempts =
   new Map();
 
 
-
 function safeEqual(
   left,
   right
@@ -69,7 +68,8 @@ function safeEqual(
 
 
   return (
-    a.length === b.length &&
+    a.length === b.length
+    &&
     crypto.timingSafeEqual(
       a,
       b
@@ -77,7 +77,6 @@ function safeEqual(
   );
 
 }
-
 
 
 function getClientIp(req) {
@@ -102,7 +101,6 @@ function getClientIp(req) {
 }
 
 
-
 function loginAllowed(ip) {
 
   const now =
@@ -122,6 +120,7 @@ function loginAllowed(ip) {
       ip,
       {
         count: 0,
+
         resetAt:
           now +
           10 * 60 * 1000
@@ -139,7 +138,6 @@ function loginAllowed(ip) {
   );
 
 }
-
 
 
 function recordFailure(ip) {
@@ -169,7 +167,6 @@ function recordFailure(ip) {
 }
 
 
-
 function sessionToken(req) {
 
   return (
@@ -182,7 +179,6 @@ function sessionToken(req) {
   );
 
 }
-
 
 
 function requireAdmin(
@@ -216,7 +212,6 @@ function requireAdmin(
 }
 
 
-
 function normalizeText(value) {
 
   return String(
@@ -224,7 +219,6 @@ function normalizeText(value) {
   ).trim();
 
 }
-
 
 
 function removePublicImage(
@@ -277,7 +271,6 @@ function removePublicImage(
 }
 
 
-
 function findTourIndex(
   tours,
   id
@@ -289,7 +282,6 @@ function findTourIndex(
   );
 
 }
-
 
 
 function makeId(
@@ -305,14 +297,11 @@ function makeId(
 
   const slug =
     seed
-
       .toLowerCase()
-
       .replace(
         /[^a-z0-9\u10a0-\u10ff]+/g,
         '-'
       )
-
       .replace(
         /^-+|-+$/g,
         ''
@@ -330,10 +319,7 @@ function makeId(
 }
 
 
-
-function secureCookiePart(
-  req
-) {
+function secureCookiePart(req) {
 
   const forwardedProto =
     String(
@@ -354,7 +340,6 @@ function secureCookiePart(
   );
 
 }
-
 
 
 function buildTourFromFields(
@@ -461,7 +446,6 @@ function buildTourFromFields(
 }
 
 
-
 async function handleApi(
   req,
   res,
@@ -510,7 +494,6 @@ async function handleApi(
   }
 
 
-
   /*
    * ADMIN STATUS
    */
@@ -535,7 +518,6 @@ async function handleApi(
     return true;
 
   }
-
 
 
   /*
@@ -662,7 +644,6 @@ async function handleApi(
   }
 
 
-
   /*
    * LOGOUT
    */
@@ -695,7 +676,6 @@ async function handleApi(
   }
 
 
-
   /*
    * EVERYTHING BELOW
    * REQUIRES ADMIN
@@ -714,7 +694,6 @@ async function handleApi(
     return true;
 
   }
-
 
 
   /*
@@ -754,9 +733,11 @@ async function handleApi(
   }
 
 
-
   /*
    * CREATE TOUR
+   *
+   * Supports:
+   * FormData + image
    */
   if (
     req.method === 'POST' &&
@@ -774,8 +755,8 @@ async function handleApi(
 
 
     /*
-     * MULTIPART =
-     * TOUR + PHOTO
+     * MULTIPART:
+     * create tour + photo together
      */
     if (
       contentType.startsWith(
@@ -859,9 +840,8 @@ async function handleApi(
     }
 
 
-
     /*
-     * JSON COMPATIBILITY
+     * JSON compatibility
      */
     let body;
 
@@ -939,7 +919,6 @@ async function handleApi(
     return true;
 
   }
-
 
 
   /*
@@ -1138,7 +1117,6 @@ async function handleApi(
   }
 
 
-
   if (
     tourMatch &&
     req.method === 'DELETE'
@@ -1211,7 +1189,6 @@ async function handleApi(
   }
 
 
-
   /*
    * REPLACE / REMOVE IMAGE
    */
@@ -1278,16 +1255,10 @@ async function handleApi(
         tours[index].image;
 
 
-      /*
-       * STORE NEW UNIQUE IMAGE
-       */
       tours[index].image =
         uploaded.publicPath;
 
 
-      /*
-       * CHANGE VERSION
-       */
       tours[index].updatedAt =
         new Date()
           .toISOString();
@@ -1299,8 +1270,8 @@ async function handleApi(
 
 
       /*
-       * ONLY DELETE OLD IMAGE
-       * AFTER NEW ONE IS STORED
+       * Delete old photo only
+       * after new photo is stored.
        */
       removePublicImage(
         oldImage
@@ -1344,7 +1315,6 @@ async function handleApi(
     return true;
 
   }
-
 
 
   if (
