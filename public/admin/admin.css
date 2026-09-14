@@ -969,6 +969,16 @@ input[type="file"] {
 }
 
 
+.add-tour-form .full-create-field {
+  grid-column: 1 / -1;
+}
+
+
+.add-tour-form .full-create-field textarea {
+  min-height: 110px;
+}
+
+
 .add-button-wrap {
   display: flex;
 
