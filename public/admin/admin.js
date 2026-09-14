@@ -26,10 +26,6 @@ const addTourButton =
   document.getElementById('addTourButton');
 
 
-/* =========================================================
-   TRANSLATIONS
-========================================================= */
-
 const I18N = {
 
   en: {
@@ -107,7 +103,7 @@ const I18N = {
       'Changes update the public website',
 
     changesUpdateText:
-      'Edit a tour and press Save changes. Uploads and prices become visible on the public website after saving.',
+      'Edit a tour and press Save changes. Photos and prices update on the public website.',
 
     newPackage:
       'NEW PACKAGE',
@@ -116,7 +112,7 @@ const I18N = {
       'Add new tour',
 
     addNewTourText:
-      'Enter the tour information and photo, then create the package in one step.',
+      'Enter the tour information and photo, then create the complete package in one step.',
 
     englishTitle:
       'English title *',
@@ -142,9 +138,6 @@ const I18N = {
     creatingTour:
       'Creating tour...',
 
-    uploadingPhoto:
-      'Uploading photo...',
-
     yourContent:
       'YOUR CONTENT',
 
@@ -161,7 +154,7 @@ const I18N = {
       'No photo uploaded',
 
     noPhotoText:
-      'The public website shows a placeholder until the owner uploads a photo.',
+      'The public website shows a placeholder until a photo is uploaded.',
 
     uploadReplace:
       'Upload / replace photo',
@@ -221,7 +214,7 @@ const I18N = {
       'Choose an image first.',
 
     photoUploaded:
-      'Photo uploaded.',
+      'Photo updated. The public website will refresh automatically.',
 
     photoRemoved:
       'Photo removed.',
@@ -316,7 +309,7 @@ const I18N = {
       'ცვლილებები საჯარო ვებსაიტზე აისახება',
 
     changesUpdateText:
-      'შეცვალე ტური და დააჭირე „ცვლილებების შენახვას“. ფოტოები და ფასები შენახვის შემდეგ აისახება საჯარო ვებსაიტზე.',
+      'შეცვალე ტური და დააჭირე „ცვლილებების შენახვას“. ფოტოები და ფასები საჯარო ვებსაიტზე განახლდება.',
 
     newPackage:
       'ახალი პაკეტი',
@@ -325,7 +318,7 @@ const I18N = {
       'ახალი ტურის დამატება',
 
     addNewTourText:
-      'შეავსე ტურის ინფორმაცია, აირჩიე ფოტო და შექმენი პაკეტი ერთ ნაბიჯში.',
+      'შეავსე ტურის ინფორმაცია, აირჩიე ფოტო და შექმენი სრული პაკეტი ერთ ნაბიჯში.',
 
     englishTitle:
       'ინგლისური სათაური *',
@@ -351,9 +344,6 @@ const I18N = {
     creatingTour:
       'ტური იქმნება...',
 
-    uploadingPhoto:
-      'ფოტო იტვირთება...',
-
     yourContent:
       'შენი კონტენტი',
 
@@ -370,7 +360,7 @@ const I18N = {
       'ფოტო არ არის ატვირთული',
 
     noPhotoText:
-      'საჯარო ვებსაიტზე placeholder გამოჩნდება მანამ, სანამ მფლობელი ფოტოს არ ატვირთავს.',
+      'საჯარო ვებსაიტზე placeholder გამოჩნდება მანამ, სანამ ფოტო არ აიტვირთება.',
 
     uploadReplace:
       'ფოტოს ატვირთვა / შეცვლა',
@@ -430,7 +420,7 @@ const I18N = {
       'ჯერ აირჩიე ფოტო.',
 
     photoUploaded:
-      'ფოტო ატვირთულია.',
+      'ფოტო განახლებულია. საჯარო ვებსაიტიც ავტომატურად განახლდება.',
 
     photoRemoved:
       'ფოტო წაშლილია.',
@@ -452,17 +442,11 @@ const I18N = {
 };
 
 
-
 let language =
   localStorage.getItem(
     'est-admin-language'
   ) || 'en';
 
-
-
-/* =========================================================
-   TRANSLATION HELPERS
-========================================================= */
 
 function t(key) {
 
@@ -480,13 +464,13 @@ function escapeHtml(value = '') {
   return String(value)
     .replace(
       /[&<>"']/g,
-      (character) => ({
+      (char) => ({
         '&': '&amp;',
         '<': '&lt;',
         '>': '&gt;',
         '"': '&quot;',
         "'": '&#39;'
-      })[character]
+      })[char]
     );
 
 }
@@ -503,9 +487,7 @@ function applyTranslations() {
     .forEach((element) => {
 
       element.textContent =
-        t(
-          element.dataset.i18n
-        );
+        t(element.dataset.i18n);
 
     });
 
@@ -585,10 +567,6 @@ dashboardLangButton
 
 
 
-/* =========================================================
-   UI HELPERS
-========================================================= */
-
 function showToast(message) {
 
   toast.textContent =
@@ -643,10 +621,6 @@ function showLoginForExpiredSession() {
 
 
 
-/* =========================================================
-   PHOTO VALIDATION
-========================================================= */
-
 function validatePhoto(file) {
 
   if (!file) {
@@ -680,12 +654,9 @@ function validatePhoto(file) {
   }
 
 
-  const maxSize =
-    6 * 1024 * 1024;
-
-
   if (
-    file.size > maxSize
+    file.size >
+    6 * 1024 * 1024
   ) {
 
     return {
@@ -703,10 +674,6 @@ function validatePhoto(file) {
 }
 
 
-
-/* =========================================================
-   API HELPER
-========================================================= */
 
 async function api(
   url,
@@ -734,11 +701,7 @@ async function api(
 
   }
 
-  catch (_) {
-
-    payload = {};
-
-  }
+  catch (_) {}
 
 
   if (
@@ -771,10 +734,6 @@ async function api(
 }
 
 
-
-/* =========================================================
-   SESSION
-========================================================= */
 
 async function refreshSession() {
 
@@ -824,10 +783,6 @@ async function refreshSession() {
 
 
 
-/* =========================================================
-   LOGIN
-========================================================= */
-
 loginForm
   .addEventListener(
     'submit',
@@ -876,6 +831,7 @@ loginForm
                       .value
 
                 })
+
             }
           );
 
@@ -890,20 +846,16 @@ loginForm
 
         }
 
-        catch (_) {
-
-          payload = {};
-
-        }
+        catch (_) {}
 
 
-        if (!response.ok) {
+        if (
+          !response.ok
+        ) {
 
           loginError.textContent =
             response.status === 401
-
               ? t('invalidLogin')
-
               : (
                   payload.error ||
                   t('requestFailed')
@@ -937,10 +889,6 @@ loginForm
   );
 
 
-
-/* =========================================================
-   LOGOUT
-========================================================= */
 
 document
   .getElementById(
@@ -981,10 +929,6 @@ document
 
 
 
-/* =========================================================
-   REFRESH
-========================================================= */
-
 document
   .getElementById(
     'refreshButton'
@@ -996,10 +940,10 @@ document
 
 
 
-/* =========================================================
-   ADD TOUR + PHOTO
-========================================================= */
-
+/*
+ * CREATE TOUR + PHOTO
+ * IN ONE REQUEST
+ */
 document
   .getElementById(
     'addTourForm'
@@ -1027,7 +971,9 @@ document
         validatePhoto(photo);
 
 
-      if (!validation.valid) {
+      if (
+        !validation.valid
+      ) {
 
         showToast(
           validation.message
@@ -1038,55 +984,75 @@ document
       }
 
 
-      const body = {
-
-        titleEn:
-          document
-            .getElementById(
-              'newTitleEn'
-            )
-            .value
-            .trim(),
-
-        titleKa:
-          document
-            .getElementById(
-              'newTitleKa'
-            )
-            .value
-            .trim(),
-
-        price:
-          document
-            .getElementById(
-              'newPrice'
-            )
-            .value
-            .trim(),
-
-        durationEn:
-          document
-            .getElementById(
-              'newDurationEn'
-            )
-            .value
-            .trim(),
-
-        durationKa:
-          document
-            .getElementById(
-              'newDurationKa'
-            )
-            .value
-            .trim(),
-
-        active: true
-
-      };
+      const formData =
+        new FormData();
 
 
-      let createdTour =
-        null;
+      formData.append(
+        'titleEn',
+        document
+          .getElementById(
+            'newTitleEn'
+          )
+          .value
+          .trim()
+      );
+
+
+      formData.append(
+        'titleKa',
+        document
+          .getElementById(
+            'newTitleKa'
+          )
+          .value
+          .trim()
+      );
+
+
+      formData.append(
+        'price',
+        document
+          .getElementById(
+            'newPrice'
+          )
+          .value
+          .trim()
+      );
+
+
+      formData.append(
+        'durationEn',
+        document
+          .getElementById(
+            'newDurationEn'
+          )
+          .value
+          .trim()
+      );
+
+
+      formData.append(
+        'durationKa',
+        document
+          .getElementById(
+            'newDurationKa'
+          )
+          .value
+          .trim()
+      );
+
+
+      formData.append(
+        'active',
+        'true'
+      );
+
+
+      formData.append(
+        'image',
+        photo
+      );
 
 
       try {
@@ -1099,47 +1065,8 @@ document
           t('creatingTour');
 
 
-        /*
-         * 1. Create tour
-         */
-        createdTour =
-          await api(
-            '/api/admin/tours',
-            {
-              method: 'POST',
-
-              headers: {
-                'Content-Type':
-                  'application/json'
-              },
-
-              body:
-                JSON.stringify(
-                  body
-                )
-            }
-          );
-
-
-        /*
-         * 2. Upload photo
-         */
-        const formData =
-          new FormData();
-
-
-        formData.append(
-          'image',
-          photo
-        );
-
-
-        addTourButton.textContent =
-          t('uploadingPhoto');
-
-
         await api(
-          `/api/admin/tours/${encodeURIComponent(createdTour.id)}/image`,
+          '/api/admin/tours',
           {
             method: 'POST',
             body: formData
@@ -1147,9 +1074,6 @@ document
         );
 
 
-        /*
-         * Finished
-         */
         form.reset();
 
 
@@ -1163,33 +1087,6 @@ document
       }
 
       catch (error) {
-
-        /*
-         * Remove incomplete tour
-         * if the tour was created
-         * but the image failed.
-         */
-        if (
-          error.message !==
-            'Unauthorized' &&
-          createdTour?.id
-        ) {
-
-          try {
-
-            await api(
-              `/api/admin/tours/${encodeURIComponent(createdTour.id)}`,
-              {
-                method: 'DELETE'
-              }
-            );
-
-          }
-
-          catch (_) {}
-
-        }
-
 
         if (
           error.message !==
@@ -1219,10 +1116,6 @@ document
   );
 
 
-
-/* =========================================================
-   LOAD TOURS
-========================================================= */
 
 async function loadTours() {
 
@@ -1276,6 +1169,14 @@ async function loadTours() {
               'Tour';
 
 
+            const imageVersion =
+              encodeURIComponent(
+                tour.updatedAt ||
+                tour.id ||
+                '1'
+              );
+
+
             return `
               <article
                 class="tour-editor"
@@ -1293,7 +1194,7 @@ async function loadTours() {
 
                           ? `
                             <img
-                              src="${escapeHtml(tour.image)}"
+                              src="${escapeHtml(tour.image)}?v=${imageVersion}"
                               alt="${escapeHtml(title)}"
                             >
                           `
@@ -1367,11 +1268,9 @@ async function loadTours() {
                   </div>
 
 
-
                   <div>
 
                     <div class="fields-grid">
-
 
                       <label>
 
@@ -1590,10 +1489,6 @@ async function loadTours() {
 
 
 
-/* =========================================================
-   TOUR EDITOR ACTIONS
-========================================================= */
-
 function bindEditorActions() {
 
   document
@@ -1607,23 +1502,19 @@ function bindEditorActions() {
           card.dataset.id;
 
 
-        /*
-         * SAVE
-         */
         const saveButton =
           card.querySelector(
             '.save-button'
           );
 
 
+        /*
+         * SAVE TOUR TEXT / PRICE
+         */
         saveButton
           .addEventListener(
             'click',
             async () => {
-
-              const originalText =
-                saveButton.textContent;
-
 
               const body = {
 
@@ -1734,6 +1625,9 @@ function bindEditorActions() {
                   t('changesSaved')
                 );
 
+
+                await loadTours();
+
               }
 
               catch (error) {
@@ -1758,8 +1652,7 @@ function bindEditorActions() {
 
 
                 saveButton.textContent =
-                  t('saveChanges') ||
-                  originalText;
+                  t('saveChanges');
 
               }
 
@@ -1769,7 +1662,7 @@ function bindEditorActions() {
 
 
         /*
-         * UPLOAD / REPLACE PHOTO
+         * CHANGE PHOTO
          */
         card
           .querySelector(
@@ -1789,11 +1682,11 @@ function bindEditorActions() {
 
               if (!file) {
 
-                showToast(
-                  t('chooseImageFirst')
+                return showToast(
+                  t(
+                    'chooseImageFirst'
+                  )
                 );
-
-                return;
 
               }
 
@@ -1802,13 +1695,13 @@ function bindEditorActions() {
                 validatePhoto(file);
 
 
-              if (!validation.valid) {
+              if (
+                !validation.valid
+              ) {
 
-                showToast(
+                return showToast(
                   validation.message
                 );
-
-                return;
 
               }
 
@@ -1872,7 +1765,9 @@ function bindEditorActions() {
           );
 
 
-        if (removePhotoButton) {
+        if (
+          removePhotoButton
+        ) {
 
           removePhotoButton
             .addEventListener(
@@ -1998,10 +1893,6 @@ function bindEditorActions() {
 }
 
 
-
-/* =========================================================
-   START
-========================================================= */
 
 applyTranslations();
 
