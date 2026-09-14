@@ -1,37 +1,37 @@
 :root {
   --blue: #0798cc;
   --blue-dark: #006d9f;
-  --blue-deep: #005679;
-
+  --blue-deep: #005879;
   --blue-soft: #eaf8fd;
-  --blue-soft-2: #f5fbfe;
+  --blue-light: #f5fbfe;
 
   --ink: #20262c;
-  --muted: #6b737c;
+  --muted: #69737c;
+  --line: #e0e8ed;
 
-  --line: #e1e8ed;
-
-  --page: #f3f7f9;
   --white: #ffffff;
+  --page: #f3f7f9;
 
   --danger: #c94949;
   --danger-soft: #fff1f1;
+
+  --success: #42a567;
 
   --shadow:
     0 18px 45px rgba(7, 72, 102, 0.10);
 
   --shadow-small:
-    0 8px 24px rgba(7, 72, 102, 0.08);
+    0 8px 26px rgba(7, 72, 102, 0.08);
 
-  --radius-lg: 24px;
-  --radius-md: 16px;
-  --radius-sm: 12px;
+  --radius-large: 24px;
+  --radius-medium: 16px;
+  --radius-small: 12px;
 }
 
 
-/* ================================
+/* =========================================================
    GLOBAL
-================================ */
+========================================================= */
 
 * {
   box-sizing: border-box;
@@ -49,11 +49,7 @@ body {
   min-height: 100vh;
 
   font-family:
-    Inter,
-    ui-sans-serif,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
+    "Manrope",
     "Noto Sans Georgian",
     Arial,
     sans-serif;
@@ -63,8 +59,8 @@ body {
   background:
     radial-gradient(
       circle at 100% 0,
-      rgba(7, 152, 204, 0.10),
-      transparent 28rem
+      rgba(7, 152, 204, 0.11),
+      transparent 32rem
     ),
     var(--page);
 
@@ -103,16 +99,16 @@ a {
   margin: 0 auto;
 
   padding:
-    32px
+    28px
     0
-    72px;
+    70px;
 }
 
 
 
-/* ================================
-   LOGIN LAYOUT
-================================ */
+/* =========================================================
+   LOGIN
+========================================================= */
 
 .login-layout {
   width: min(
@@ -121,7 +117,7 @@ a {
   );
 
   min-height:
-    calc(100vh - 64px);
+    calc(100vh - 56px);
 
   margin: 0 auto;
 
@@ -129,13 +125,13 @@ a {
 
   grid-template-columns:
     1.05fr
-    0.95fr;
+    .95fr;
 
   overflow: hidden;
 
   border:
     1px solid
-    rgba(7, 152, 204, 0.11);
+    rgba(7, 152, 204, .11);
 
   border-radius: 30px;
 
@@ -146,9 +142,7 @@ a {
 
 
 
-/* ================================
-   LOGIN LEFT PANEL
-================================ */
+/* Left side */
 
 .login-brand-panel {
   position: relative;
@@ -159,8 +153,7 @@ a {
 
   flex-direction: column;
 
-  justify-content:
-    space-between;
+  justify-content: space-between;
 
   padding: 42px;
 
@@ -169,8 +162,8 @@ a {
   background:
     radial-gradient(
       circle at 90% 10%,
-      rgba(255,255,255,.18),
-      transparent 16rem
+      rgba(255, 255, 255, .18),
+      transparent 17rem
     ),
     linear-gradient(
       145deg,
@@ -186,26 +179,24 @@ a {
 
   position: absolute;
 
-  width: 360px;
-
-  height: 360px;
-
   right: -180px;
+  bottom: -170px;
 
-  bottom: -165px;
+  width: 360px;
+  height: 360px;
 
   border:
     58px solid
-    rgba(255,255,255,.08);
+    rgba(255, 255, 255, .08);
 
   border-radius: 50%;
 }
 
 
 
-/* ================================
+/* =========================================================
    BRAND
-================================ */
+========================================================= */
 
 .brand-lockup,
 .mobile-brand,
@@ -220,16 +211,9 @@ a {
 
 .brand-lockup img {
   width: 58px;
-
-  height: 72px;
+  height: 70px;
 
   object-fit: contain;
-
-  filter:
-    drop-shadow(
-      0 8px 14px
-      rgba(0,0,0,.08)
-    );
 }
 
 
@@ -261,9 +245,9 @@ a {
 
 
 
-/* ================================
-   LOGIN COPY
-================================ */
+/* =========================================================
+   LOGIN TEXT
+========================================================= */
 
 .login-brand-copy {
   position: relative;
@@ -287,9 +271,12 @@ a {
   letter-spacing: .13em;
 
   text-transform: uppercase;
+}
 
+
+.login-brand-panel .eyebrow {
   color:
-    rgba(255,255,255,.78);
+    rgba(255, 255, 255, .78);
 }
 
 
@@ -308,9 +295,9 @@ a {
       58px
     );
 
-  line-height: 1.02;
+  line-height: 1.03;
 
-  letter-spacing: -.035em;
+  letter-spacing: -.04em;
 }
 
 
@@ -323,16 +310,14 @@ a {
     0;
 
   color:
-    rgba(255,255,255,.80);
+    rgba(255, 255, 255, .82);
 
   font-size: 16px;
 }
 
 
 
-/* ================================
-   LOGIN FEATURES
-================================ */
+/* Login features */
 
 .login-feature-list {
   position: relative;
@@ -345,7 +330,7 @@ a {
 }
 
 
-.login-feature-list span {
+.login-feature-list > span {
   display: flex;
 
   gap: 10px;
@@ -353,32 +338,33 @@ a {
   align-items: center;
 
   color:
-    rgba(255,255,255,.90);
+    rgba(255, 255, 255, .92);
 
   font-size: 14px;
 }
 
 
 .login-feature-list b {
-  display: grid;
+  flex: 0 0 auto;
 
   width: 24px;
-
   height: 24px;
+
+  display: grid;
 
   place-items: center;
 
   border-radius: 50%;
 
   background:
-    rgba(255,255,255,.14);
+    rgba(255, 255, 255, .14);
 }
 
 
 
-/* ================================
+/* =========================================================
    LOGIN CARD
-================================ */
+========================================================= */
 
 .login-card-wrap {
   display: grid;
@@ -399,6 +385,20 @@ a {
 
 .mobile-brand {
   display: none;
+}
+
+
+.language-row {
+  display: flex;
+
+  justify-content: flex-end;
+
+  margin-bottom: 22px;
+}
+
+
+.language-button {
+  min-width: 92px;
 }
 
 
@@ -431,9 +431,9 @@ a {
 
 
 
-/* ================================
-   FORM
-================================ */
+/* =========================================================
+   FORMS
+========================================================= */
 
 label > span {
   display: block;
@@ -444,7 +444,7 @@ label > span {
 
   font-weight: 800;
 
-  color: #424b52;
+  color: #414b52;
 }
 
 
@@ -468,7 +468,8 @@ textarea {
 
   transition:
     border-color .18s ease,
-    box-shadow .18s ease;
+    box-shadow .18s ease,
+    background .18s ease;
 }
 
 
@@ -478,28 +479,37 @@ input {
 
 
 textarea {
-  resize: vertical;
+  min-height: 100px;
 
-  min-height: 96px;
+  resize: vertical;
 }
 
 
 input::placeholder,
 textarea::placeholder {
-  color: #a1a8ae;
+  color: #9ea7ad;
 }
 
 
 input:focus,
 textarea:focus {
-  outline: 0;
+  outline: none;
 
   border-color:
-    rgba(7,152,204,.60);
+    rgba(7, 152, 204, .60);
 
   box-shadow:
     0 0 0 4px
-    rgba(7,152,204,.10);
+    rgba(7, 152, 204, .10);
+}
+
+
+input[type="file"] {
+  padding: 10px;
+
+  background: #f9fbfc;
+
+  cursor: pointer;
 }
 
 
@@ -538,9 +548,9 @@ textarea:focus {
 
 
 
-/* ================================
+/* =========================================================
    BUTTONS
-================================ */
+========================================================= */
 
 .admin-button {
   min-height: 42px;
@@ -570,13 +580,13 @@ textarea:focus {
   transition:
     transform .16s ease,
     box-shadow .16s ease,
-    background .16s ease;
+    background .16s ease,
+    opacity .16s ease;
 }
 
 
 .admin-button:hover {
-  transform:
-    translateY(-1px);
+  transform: translateY(-1px);
 }
 
 
@@ -592,14 +602,14 @@ textarea:focus {
 
   box-shadow:
     0 9px 20px
-    rgba(7,152,204,.20);
+    rgba(7, 152, 204, .20);
 }
 
 
 .admin-button.primary:hover {
   box-shadow:
     0 12px 24px
-    rgba(7,152,204,.25);
+    rgba(7, 152, 204, .25);
 }
 
 
@@ -610,7 +620,7 @@ textarea:focus {
 
   border:
     1px solid
-    #d2eaf3;
+    #d1e9f2;
 }
 
 
@@ -624,12 +634,11 @@ textarea:focus {
 .admin-button.danger {
   color: var(--danger);
 
-  background:
-    var(--danger-soft);
+  background: var(--danger-soft);
 
   border:
     1px solid
-    #f2cccc;
+    #f0cccc;
 }
 
 
@@ -638,24 +647,34 @@ textarea:focus {
 }
 
 
+.admin-button:disabled {
+  opacity: .58;
 
-/* ================================
+  cursor: wait;
+
+  transform: none;
+
+  box-shadow: none;
+}
+
+
+
+/* =========================================================
    DASHBOARD HEADER
-================================ */
+========================================================= */
 
 .dashboard-header {
   position: sticky;
 
   top: 14px;
 
-  z-index: 10;
+  z-index: 20;
 
   display: flex;
 
   align-items: center;
 
-  justify-content:
-    space-between;
+  justify-content: space-between;
 
   gap: 18px;
 
@@ -665,25 +684,22 @@ textarea:focus {
 
   border:
     1px solid
-    rgba(7,152,204,.10);
+    rgba(7, 152, 204, .10);
 
   border-radius: 19px;
 
   background:
-    rgba(255,255,255,.92);
+    rgba(255, 255, 255, .94);
 
-  backdrop-filter:
-    blur(14px);
+  backdrop-filter: blur(14px);
 
-  box-shadow:
-    var(--shadow-small);
+  box-shadow: var(--shadow-small);
 }
 
 
 .admin-brand img {
   width: 42px;
-
-  height: 51px;
+  height: 50px;
 
   object-fit: contain;
 }
@@ -715,17 +731,16 @@ textarea:focus {
 
 
 
-/* ================================
-   DASHBOARD HERO
-================================ */
+/* =========================================================
+   DASHBOARD INTRO
+========================================================= */
 
 .dashboard-hero {
   display: flex;
 
   align-items: end;
 
-  justify-content:
-    space-between;
+  justify-content: space-between;
 
   gap: 24px;
 
@@ -734,11 +749,6 @@ textarea:focus {
   padding:
     0
     4px;
-}
-
-
-.dashboard-hero .eyebrow {
-  color: var(--blue-dark);
 }
 
 
@@ -775,7 +785,7 @@ textarea:focus {
 
   align-items: center;
 
-  gap: 8px;
+  gap: 9px;
 
   padding:
     10px
@@ -789,7 +799,7 @@ textarea:focus {
 
   background: #f5fbf7;
 
-  color: #3e7452;
+  color: #3d7551;
 
   font-size: 12px;
 
@@ -801,23 +811,22 @@ textarea:focus {
 
 .status-dot {
   width: 8px;
-
   height: 8px;
 
   border-radius: 50%;
 
-  background: #45a969;
+  background: var(--success);
 
   box-shadow:
     0 0 0 4px
-    rgba(69,169,105,.12);
+    rgba(66, 165, 103, .12);
 }
 
 
 
-/* ================================
+/* =========================================================
    NOTICE
-================================ */
+========================================================= */
 
 .notice {
   margin-top: 24px;
@@ -851,7 +860,6 @@ textarea:focus {
   flex: 0 0 auto;
 
   width: 28px;
-
   height: 28px;
 
   display: grid;
@@ -860,15 +868,11 @@ textarea:focus {
 
   border-radius: 50%;
 
-  background:
-    var(--blue-soft);
+  background: var(--blue-soft);
 
-  color:
-    var(--blue-dark);
+  color: var(--blue-dark);
 
-  font-family:
-    Georgia,
-    serif;
+  font-family: Georgia, serif;
 
   font-style: italic;
 
@@ -889,9 +893,9 @@ textarea:focus {
 
 
 
-/* ================================
+/* =========================================================
    ADD TOUR
-================================ */
+========================================================= */
 
 .add-tour-panel {
   margin-top: 22px;
@@ -902,14 +906,11 @@ textarea:focus {
     1px solid
     var(--line);
 
-  border-radius:
-    var(--radius-lg);
+  border-radius: var(--radius-large);
 
-  background:
-    var(--white);
+  background: var(--white);
 
-  box-shadow:
-    var(--shadow-small);
+  box-shadow: var(--shadow-small);
 }
 
 
@@ -929,8 +930,9 @@ textarea:focus {
 
 
 .panel-icon {
-  width: 42px;
+  flex: 0 0 auto;
 
+  width: 42px;
   height: 42px;
 
   display: grid;
@@ -939,15 +941,11 @@ textarea:focus {
 
   border-radius: 13px;
 
-  background:
-    var(--blue-soft);
+  background: var(--blue-soft);
 
-  color:
-    var(--blue-dark);
+  color: var(--blue-dark);
 
   font-size: 24px;
-
-  font-weight: 300;
 }
 
 
@@ -967,8 +965,7 @@ textarea:focus {
     0
     0;
 
-  color:
-    var(--muted);
+  color: var(--muted);
 
   font-size: 13px;
 }
@@ -997,9 +994,9 @@ textarea:focus {
 
 
 
-/* ================================
+/* =========================================================
    MANAGE TOURS
-================================ */
+========================================================= */
 
 .manage-section {
   margin-top: 32px;
@@ -1011,8 +1008,7 @@ textarea:focus {
 
   align-items: end;
 
-  justify-content:
-    space-between;
+  justify-content: space-between;
 
   gap: 16px;
 
@@ -1039,9 +1035,9 @@ textarea:focus {
 
 
 
-/* ================================
+/* =========================================================
    TOUR EDITOR
-================================ */
+========================================================= */
 
 .tour-editor {
   overflow: hidden;
@@ -1052,14 +1048,11 @@ textarea:focus {
     1px solid
     var(--line);
 
-  border-radius:
-    var(--radius-lg);
+  border-radius: var(--radius-large);
 
-  background:
-    var(--white);
+  background: var(--white);
 
-  box-shadow:
-    var(--shadow-small);
+  box-shadow: var(--shadow-small);
 }
 
 
@@ -1075,9 +1068,9 @@ textarea:focus {
 
 
 
-/* ================================
-   PHOTO
-================================ */
+/* =========================================================
+   TOUR PHOTO
+========================================================= */
 
 .photo-box {
   aspect-ratio: 4 / 3;
@@ -1099,13 +1092,12 @@ textarea:focus {
   background:
     linear-gradient(
       135deg,
-      rgba(255,255,255,.60),
-      rgba(255,255,255,.05)
+      rgba(255, 255, 255, .60),
+      rgba(255, 255, 255, .05)
     ),
     var(--blue-soft);
 
-  color:
-    var(--blue-dark);
+  color: var(--blue-dark);
 
   text-align: center;
 }
@@ -1113,7 +1105,6 @@ textarea:focus {
 
 .photo-box img {
   width: 100%;
-
   height: 100%;
 
   object-fit: cover;
@@ -1126,8 +1117,7 @@ textarea:focus {
     0
     0;
 
-  color:
-    var(--muted);
+  color: var(--muted);
 
   font-size: 12px;
 }
@@ -1158,9 +1148,9 @@ textarea:focus {
 
 
 
-/* ================================
+/* =========================================================
    EDIT FIELDS
-================================ */
+========================================================= */
 
 .fields-grid {
   display: grid;
@@ -1182,9 +1172,9 @@ textarea:focus {
 
 
 
-/* ================================
-   PUBLISH
-================================ */
+/* =========================================================
+   PUBLISH CHECKBOX
+========================================================= */
 
 .publish-row {
   margin-top: 14px;
@@ -1213,20 +1203,18 @@ textarea:focus {
 
 .publish-row input {
   width: 16px;
-
   min-height: 16px;
 
   margin: 0;
 
-  accent-color:
-    var(--blue);
+  accent-color: var(--blue);
 }
 
 
 
-/* ================================
-   EDITOR ACTIONS
-================================ */
+/* =========================================================
+   TOUR ACTIONS
+========================================================= */
 
 .editor-actions {
   display: flex;
@@ -1246,15 +1234,14 @@ textarea:focus {
 
 
 
-/* ================================
+/* =========================================================
    TOAST
-================================ */
+========================================================= */
 
 .toast {
   position: fixed;
 
   left: 50%;
-
   bottom: 20px;
 
   z-index: 100;
@@ -1281,7 +1268,7 @@ textarea:focus {
 
   box-shadow:
     0 10px 30px
-    rgba(0,0,0,.18);
+    rgba(0, 0, 0, .18);
 
   font-size: 13px;
 
@@ -1300,9 +1287,9 @@ textarea:focus {
 
 
 
-/* ================================
+/* =========================================================
    TABLET
-================================ */
+========================================================= */
 
 @media (max-width: 960px) {
 
@@ -1318,21 +1305,20 @@ textarea:focus {
 
   .login-card-wrap {
     min-height:
-      calc(100vh - 64px);
+      calc(100vh - 56px);
   }
 
 
   .mobile-brand {
     display: flex;
 
-    margin-bottom: 32px;
+    margin-bottom: 28px;
   }
 
 
   .mobile-brand img {
     width: 50px;
-
-    height: 62px;
+    height: 60px;
 
     object-fit: contain;
   }
@@ -1356,7 +1342,7 @@ textarea:focus {
     grid-template-columns:
       repeat(
         2,
-        minmax(0,1fr)
+        minmax(0, 1fr)
       );
   }
 
@@ -1364,16 +1350,16 @@ textarea:focus {
   .editor-grid {
     grid-template-columns:
       230px
-      minmax(0,1fr);
+      minmax(0, 1fr);
   }
 
 }
 
 
 
-/* ================================
+/* =========================================================
    SMALL TABLET
-================================ */
+========================================================= */
 
 @media (max-width: 760px) {
 
@@ -1431,9 +1417,9 @@ textarea:focus {
 
 
 
-/* ================================
+/* =========================================================
    MOBILE
-================================ */
+========================================================= */
 
 @media (max-width: 560px) {
 
@@ -1471,6 +1457,8 @@ textarea:focus {
     display: grid;
 
     grid-template-columns: 1fr;
+
+    width: 100%;
   }
 
 
@@ -1480,21 +1468,10 @@ textarea:focus {
   .admin-button {
     width: 100%;
   }
-  .new-photo-field input[type="file"] {
-  padding: 10px;
-  background: #f8fbfc;
-  cursor: pointer;
-}
 
-.add-button-wrap {
-  display: flex;
-  align-items: end;
-}
 
-.add-button-wrap .admin-button:disabled {
-  opacity: 0.65;
-  cursor: wait;
-  transform: none;
-}
+  .status-pill {
+    width: fit-content;
+  }
 
 }
