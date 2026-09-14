@@ -1,103 +1,136 @@
-const crypto = require('crypto');
-const { adminPassword } = require('../config');
-
-const SESSION_LIFETIME = 8 * 60 * 60 * 1000;
+const crypto =
+  require('crypto');
 
 
-/*
- * Creates a signed login token.
- *
- * Nothing needs to be stored in server memory,
- * so Railway restarts do not destroy the session.
- */
-function createSession() {
+const {
+  adminPassword
+} =
+  require('../config');
 
-  const expiresAt =
-    Date.now() + SESSION_LIFETIME;
 
-  const random =
-    crypto.randomBytes(24).toString('hex');
+const SESSION_LIFETIME =
+  8 * 60 * 60 * 1000;
 
-  const payload =
-    `${expiresAt}.${random}`;
 
-  const signature =
-    crypto
-      .createHmac(
-        'sha256',
-        adminPassword
-      )
-      .update(payload)
-      .digest('hex');
 
-  return `${payload}.${signature}`;
+function sign(
+  payload
+) {
+
+  return crypto
+    .createHmac(
+      'sha256',
+      adminPassword
+    )
+    .update(
+      payload
+    )
+    .digest(
+      'hex'
+    );
+
 }
 
 
-/*
- * Checks whether the token:
- *
- * 1. has the correct structure
- * 2. has not expired
- * 3. has a valid cryptographic signature
- */
-function isValidSession(token) {
+
+function createSession() {
+
+  const expiresAt =
+    Date.now() +
+    SESSION_LIFETIME;
+
+
+  const nonce =
+    crypto
+      .randomBytes(24)
+      .toString('hex');
+
+
+  const payload =
+    `${expiresAt}.${nonce}`;
+
+
+  return (
+    `${payload}.${sign(payload)}`
+  );
+
+}
+
+
+
+function isValidSession(
+  token
+) {
 
   if (!token) {
+
     return false;
+
   }
 
 
   const parts =
-    String(token).split('.');
+    String(token)
+      .split('.');
 
 
-  if (parts.length !== 3) {
+  if (
+    parts.length !== 3
+  ) {
+
     return false;
+
   }
 
 
   const [
-    expiresAtString,
-    random,
-    providedSignature
-  ] = parts;
+    expiresAtText,
+    nonce,
+    suppliedSignature
+  ] =
+    parts;
 
 
   const expiresAt =
-    Number(expiresAtString);
+    Number(
+      expiresAtText
+    );
 
 
   if (
-    !Number.isFinite(expiresAt) ||
-    Date.now() > expiresAt
+    !Number.isFinite(
+      expiresAt
+    )
+    ||
+    Date.now() >
+      expiresAt
+    ||
+    !nonce
   ) {
+
     return false;
+
   }
 
 
   const payload =
-    `${expiresAtString}.${random}`;
+    `${expiresAtText}.${nonce}`;
 
 
   const expectedSignature =
-    crypto
-      .createHmac(
-        'sha256',
-        adminPassword
-      )
-      .update(payload)
-      .digest('hex');
+    sign(
+      payload
+    );
 
 
-  const providedBuffer =
+  const supplied =
     Buffer.from(
-      providedSignature,
+      suppliedSignature,
       'utf8'
     );
 
 
-  const expectedBuffer =
+  const expected =
     Buffer.from(
       expectedSignature,
       'utf8'
@@ -105,34 +138,38 @@ function isValidSession(token) {
 
 
   if (
-    providedBuffer.length !==
-    expectedBuffer.length
+    supplied.length !==
+    expected.length
   ) {
+
     return false;
+
   }
 
 
-  return crypto.timingSafeEqual(
-    providedBuffer,
-    expectedBuffer
-  );
+  return crypto
+    .timingSafeEqual(
+      supplied,
+      expected
+    );
+
 }
+
 
 
 /*
- * Stateless sessions do not need anything
- * removed from server memory.
- *
- * Logout is handled by deleting the browser cookie
- * inside apiRoutes.js.
+ * Stateless session.
+ * Logout removes the cookie.
  */
-function destroySession() {
-  return;
-}
+function destroySession() {}
 
 
 module.exports = {
+
   createSession,
+
   isValidSession,
+
   destroySession
+
 };
