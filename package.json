@@ -1,0 +1,10 @@
+{
+  "name": "est-travel-owner-managed-site",
+  "version": "4.0.0",
+  "private": true,
+  "description": "Bilingual EST Travel site with owner-only tour management. Uses only built-in Node.js modules.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
