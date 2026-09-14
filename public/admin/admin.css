@@ -1480,5 +1480,21 @@ textarea:focus {
   .admin-button {
     width: 100%;
   }
+  .new-photo-field input[type="file"] {
+  padding: 10px;
+  background: #f8fbfc;
+  cursor: pointer;
+}
+
+.add-button-wrap {
+  display: flex;
+  align-items: end;
+}
+
+.add-button-wrap .admin-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+  transform: none;
+}
 
 }
