@@ -2,48 +2,120 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0a96c8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta
+    name="theme-color"
+    content="#0a96c8"
+  >
 
   <title>EST Travel — Owner Dashboard</title>
 
-  <link rel="icon" href="/assets/est-emblem.png">
-  <link rel="stylesheet" href="/admin/admin.css">
+  <link
+    rel="icon"
+    href="/assets/est-emblem.png"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <link
+    rel="stylesheet"
+    href="/admin/admin.css"
+  >
 </head>
 
 <body>
 
   <main class="admin-shell">
 
-    <!-- LOGIN -->
-    <section class="login-layout" id="loginView">
+    <!-- ======================================================
+         LOGIN
+    ======================================================= -->
+
+    <section
+      class="login-layout"
+      id="loginView"
+    >
 
       <div class="login-brand-panel">
 
         <div class="brand-lockup">
-          <img src="/assets/est-emblem.png" alt="EST Travel emblem">
+
+          <img
+            src="/assets/est-emblem.png"
+            alt="EST Travel emblem"
+          >
 
           <div>
             <strong>EST TRAVEL</strong>
             <span>Your journey starts here</span>
           </div>
+
         </div>
 
+
         <div class="login-brand-copy">
-          <p class="eyebrow">OWNER PORTAL</p>
 
-          <h1>Manage tours in one place.</h1>
+          <p
+            class="eyebrow"
+            data-i18n="ownerPortal"
+          >
+            OWNER PORTAL
+          </p>
 
-          <p>
+          <h1 data-i18n="loginHeroTitle">
+            Manage tours in one place.
+          </h1>
+
+          <p data-i18n="loginHeroText">
             Update prices, descriptions, visibility and tour photos.
             Changes appear on the public website.
           </p>
+
         </div>
 
+
         <div class="login-feature-list">
-          <span><b>✓</b> English & Georgian content</span>
-          <span><b>✓</b> Owner-only editing</span>
-          <span><b>✓</b> Photo upload & publishing controls</span>
+
+          <span>
+            <b>✓</b>
+            <span data-i18n="feature1">
+              English & Georgian content
+            </span>
+          </span>
+
+          <span>
+            <b>✓</b>
+            <span data-i18n="feature2">
+              Owner-only editing
+            </span>
+          </span>
+
+          <span>
+            <b>✓</b>
+            <span data-i18n="feature3">
+              Photo upload & publishing controls
+            </span>
+          </span>
+
         </div>
 
       </div>
@@ -54,61 +126,118 @@
         <section class="login-panel">
 
           <div class="mobile-brand">
-            <img src="/assets/est-emblem.png" alt="EST Travel emblem">
+
+            <img
+              src="/assets/est-emblem.png"
+              alt="EST Travel emblem"
+            >
 
             <div>
               <strong>EST TRAVEL</strong>
-              <span>Owner Dashboard</span>
+
+              <span data-i18n="ownerDashboard">
+                Owner Dashboard
+              </span>
             </div>
+
           </div>
 
-          <p class="eyebrow dark">SECURE ACCESS</p>
 
-          <h2>Owner login</h2>
+          <div class="language-row">
 
-          <p class="panel-copy">
+            <button
+              class="admin-button secondary language-button"
+              id="adminLangButton"
+              type="button"
+            >
+              ქართული
+            </button>
+
+          </div>
+
+
+          <p
+            class="eyebrow dark"
+            data-i18n="secureAccess"
+          >
+            SECURE ACCESS
+          </p>
+
+
+          <h2 data-i18n="ownerLogin">
+            Owner login
+          </h2>
+
+
+          <p
+            class="panel-copy"
+            data-i18n="loginText"
+          >
             Sign in to manage the content shown on the EST Travel website.
           </p>
 
-          <form id="loginForm" class="login-form">
+
+          <form
+            id="loginForm"
+            class="login-form"
+          >
 
             <label>
-              <span>Username</span>
+
+              <span data-i18n="username">
+                Username
+              </span>
 
               <input
                 id="username"
                 autocomplete="username"
+                data-i18n-placeholder="usernamePlaceholder"
                 placeholder="Enter username"
                 required
               >
+
             </label>
 
 
             <label>
-              <span>Password</span>
+
+              <span data-i18n="password">
+                Password
+              </span>
 
               <input
                 id="password"
                 type="password"
                 autocomplete="current-password"
+                data-i18n-placeholder="passwordPlaceholder"
                 placeholder="Enter password"
                 required
               >
+
             </label>
 
 
             <button
               class="admin-button primary full"
               type="submit"
+              data-i18n="loginButton"
             >
               Log in
             </button>
 
-            <p class="error" id="loginError"></p>
+
+            <p
+              class="error"
+              id="loginError"
+            ></p>
 
           </form>
 
-          <p class="security-note">
+
+          <p
+            class="security-note"
+            data-i18n="securityNote"
+          >
             🔒 Only authorized EST Travel staff can access this dashboard.
           </p>
 
@@ -120,7 +249,10 @@
 
 
 
-    <!-- DASHBOARD -->
+    <!-- ======================================================
+         DASHBOARD
+    ======================================================= -->
+
     <section
       class="dashboard hidden"
       id="dashboardView"
@@ -136,8 +268,15 @@
           >
 
           <div>
-            <strong>EST TRAVEL</strong>
-            <span>Owner Dashboard</span>
+
+            <strong>
+              EST TRAVEL
+            </strong>
+
+            <span data-i18n="ownerDashboard">
+              Owner Dashboard
+            </span>
+
           </div>
 
         </div>
@@ -145,27 +284,41 @@
 
         <div class="dashboard-actions">
 
+          <button
+            class="admin-button secondary"
+            id="dashboardLangButton"
+            type="button"
+          >
+            ქართული
+          </button>
+
+
           <a
             class="admin-button secondary"
             href="/"
             target="_blank"
             rel="noopener"
+            data-i18n="publicWebsite"
           >
             ↗ Public website
           </a>
+
 
           <button
             class="admin-button secondary"
             id="refreshButton"
             type="button"
+            data-i18n="refresh"
           >
             ↻ Refresh
           </button>
+
 
           <button
             class="admin-button dark"
             id="logoutButton"
             type="button"
+            data-i18n="logout"
           >
             Log out
           </button>
@@ -176,69 +329,100 @@
 
 
 
+      <!-- Dashboard intro -->
+
       <section class="dashboard-hero">
 
         <div>
-          <p class="eyebrow">CONTENT MANAGEMENT</p>
 
-          <h1>Tour management</h1>
+          <p
+            class="eyebrow dark"
+            data-i18n="contentManagement"
+          >
+            CONTENT MANAGEMENT
+          </p>
 
-          <p>
+          <h1 data-i18n="tourManagement">
+            Tour management
+          </h1>
+
+          <p data-i18n="tourManagementText">
             Manage public tour content from this private dashboard.
             Visitors cannot edit these fields.
           </p>
+
         </div>
 
 
         <div class="status-pill">
+
           <span class="status-dot"></span>
-          Owner access
+
+          <span data-i18n="ownerAccess">
+            Owner access
+          </span>
+
         </div>
 
       </section>
 
 
+
+      <!-- Information -->
 
       <section class="notice">
 
-        <div class="notice-icon">i</div>
+        <div class="notice-icon">
+          i
+        </div>
 
         <div>
-          <strong>
+
+          <strong data-i18n="changesUpdate">
             Changes update the public website
           </strong>
 
-          <p>
-            Edit a tour and press <b>Save changes</b>.
-            Uploads and prices are visible to customers only after
-            you publish them.
+          <p data-i18n="changesUpdateText">
+            Edit a tour and press Save changes.
+            Uploads and prices become visible on the public website after saving.
           </p>
+
         </div>
 
       </section>
 
 
 
-      <!-- ADD TOUR -->
+      <!-- ==================================================
+           ADD TOUR
+      =================================================== -->
+
       <section class="add-tour-panel">
 
         <div class="panel-heading">
 
-          <div class="panel-icon">＋</div>
+          <div class="panel-icon">
+            ＋
+          </div>
 
           <div>
-            <p class="eyebrow dark">
+
+            <p
+              class="eyebrow dark"
+              data-i18n="newPackage"
+            >
               NEW PACKAGE
             </p>
 
-            <h2>
+            <h2 data-i18n="addNewTour">
               Add new tour
             </h2>
 
-            <p>
-              Create the package first. After it appears below,
-              upload its photo and add descriptions.
+            <p data-i18n="addNewTourText">
+              Enter the tour information and photo,
+              then create the package in one step.
             </p>
+
           </div>
 
         </div>
@@ -250,53 +434,89 @@
         >
 
           <label>
-            <span>English title *</span>
+
+            <span data-i18n="englishTitle">
+              English title *
+            </span>
 
             <input
               id="newTitleEn"
               required
               placeholder="Istanbul City Break"
             >
+
           </label>
 
 
           <label>
-            <span>ქართული სათაური</span>
+
+            <span data-i18n="georgianTitle">
+              Georgian title
+            </span>
 
             <input
               id="newTitleKa"
               placeholder="სტამბოლი — City Break"
             >
+
           </label>
 
 
           <label>
-            <span>Price</span>
+
+            <span data-i18n="price">
+              Price
+            </span>
 
             <input
               id="newPrice"
               placeholder="From 699 GEL"
             >
+
           </label>
 
 
           <label>
-            <span>Duration EN</span>
+
+            <span data-i18n="durationEn">
+              Duration EN
+            </span>
 
             <input
               id="newDurationEn"
               placeholder="4 days"
             >
+
           </label>
 
 
           <label>
-            <span>ხანგრძლივობა KA</span>
+
+            <span data-i18n="durationKa">
+              Duration KA
+            </span>
 
             <input
               id="newDurationKa"
               placeholder="4 დღე"
             >
+
+          </label>
+
+
+          <label class="new-photo-field">
+
+            <span data-i18n="tourPhoto">
+              Tour photo *
+            </span>
+
+            <input
+              id="newTourPhoto"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              required
+            >
+
           </label>
 
 
@@ -304,7 +524,9 @@
 
             <button
               class="admin-button primary full"
+              id="addTourButton"
               type="submit"
+              data-i18n="addTourButton"
             >
               + Add tour
             </button>
@@ -317,22 +539,34 @@
 
 
 
-      <!-- MANAGE -->
+      <!-- ==================================================
+           MANAGE TOURS
+      =================================================== -->
+
       <section class="manage-section">
 
         <div class="section-title-row">
 
           <div>
-            <p class="eyebrow dark">
+
+            <p
+              class="eyebrow dark"
+              data-i18n="yourContent"
+            >
               YOUR CONTENT
             </p>
 
-            <h2>
+            <h2 data-i18n="manageTours">
               Manage tours
             </h2>
+
           </div>
 
-          <span class="upload-limit">
+
+          <span
+            class="upload-limit"
+            data-i18n="imageLimit"
+          >
             Images: JPG / PNG / WEBP · Max 6 MB
           </span>
 
