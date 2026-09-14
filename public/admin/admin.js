@@ -615,6 +615,22 @@ document
         );
 
         formData.append(
+          'descriptionEn',
+          document
+            .getElementById('newDescriptionEn')
+            .value
+            .trim()
+        );
+
+        formData.append(
+          'descriptionKa',
+          document
+            .getElementById('newDescriptionKa')
+            .value
+            .trim()
+        );
+
+        formData.append(
           'active',
           'true'
         );
