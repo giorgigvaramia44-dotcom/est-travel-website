@@ -28,8 +28,7 @@ let language =
   ) || 'en';
 
 
-let tours =
-  [];
+let tours = [];
 
 
 const SAMPLE_TOURS = [
@@ -106,7 +105,6 @@ const SAMPLE_TOURS = [
 ];
 
 
-
 function escapeHtml(
   value = ''
 ) {
@@ -137,7 +135,6 @@ function escapeHtml(
 }
 
 
-
 function t(
   key
 ) {
@@ -160,7 +157,6 @@ function t(
   );
 
 }
-
 
 
 function applyStaticTranslations() {
@@ -201,7 +197,6 @@ function applyStaticTranslations() {
 }
 
 
-
 function tourField(
   tour,
   enKey,
@@ -234,10 +229,7 @@ function tourField(
 }
 
 
-
 /*
- * PRICE TRANSLATION
- *
  * English:
  * From 999 GEL
  *
@@ -307,12 +299,12 @@ function formatPrice(
 }
 
 
-
 /*
- * IMAGE CACHE BUSTER
+ * updatedAt changes whenever
+ * photo is replaced.
  *
- * updatedAt changes every time
- * owner changes photo.
+ * This prevents the browser from
+ * using the old cached photo.
  */
 function imageUrl(
   tour
@@ -342,7 +334,6 @@ function imageUrl(
   );
 
 }
-
 
 
 function renderTours() {
@@ -542,7 +533,6 @@ function renderTours() {
 }
 
 
-
 async function loadTours(
   silent = false
 ) {
@@ -553,9 +543,7 @@ async function loadTours(
       `
         <div class="empty-state">
           ${escapeHtml(
-            t(
-              'loadingTours'
-            )
+            t('loadingTours')
           )}
         </div>
       `;
@@ -645,7 +633,6 @@ async function loadTours(
 }
 
 
-
 langButton
   .addEventListener(
     'click',
@@ -664,7 +651,6 @@ langButton
 
     }
   );
-
 
 
 menuButton
@@ -688,7 +674,6 @@ menuButton
 
     }
   );
-
 
 
 mobileMenu
@@ -721,12 +706,9 @@ mobileMenu
   );
 
 
-
 /*
- * IF ADMIN CHANGES PHOTO/PRICE:
- *
- * Public website reloads data
- * when visitor returns to tab.
+ * Reload tours after owner updates
+ * photos/prices in another tab.
  */
 document
   .addEventListener(
@@ -750,11 +732,6 @@ document
   );
 
 
-
-/*
- * Also refresh when window
- * receives focus.
- */
 window
   .addEventListener(
     'focus',
@@ -775,11 +752,6 @@ window
   );
 
 
-
-/*
- * Also refresh every
- * 15 seconds.
- */
 if (
   location.protocol !==
   'file:'
@@ -795,7 +767,6 @@ if (
   );
 
 }
-
 
 
 applyStaticTranslations();
