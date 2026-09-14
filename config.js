@@ -3,6 +3,11 @@ const path = require('path');
 
 const root = __dirname;
 
+
+/*
+ * Local configuration is only used
+ * when running on your computer.
+ */
 let localConfig = {};
 
 const localConfigPath =
@@ -13,9 +18,7 @@ const localConfigPath =
 
 
 if (
-  fs.existsSync(
-    localConfigPath
-  )
+  fs.existsSync(localConfigPath)
 ) {
 
   try {
@@ -30,10 +33,11 @@ if (
 
   }
 
-  catch (_) {
+  catch (error) {
 
-    console.warn(
-      'Could not read private-config.json.'
+    console.error(
+      'Could not read private-config.json:',
+      error.message
     );
 
   }
@@ -41,6 +45,13 @@ if (
 }
 
 
+/*
+ * Railway:
+ * STORAGE_DIR=/data
+ *
+ * Local computer:
+ * <project>/storage
+ */
 const storageDir =
   process.env.STORAGE_DIR
   ||
@@ -87,6 +98,10 @@ module.exports = {
       'public'
     ),
 
+  /*
+   * Original data from GitHub.
+   * Used ONLY once to initialize storage.
+   */
   seedToursFile:
     path.join(
       root,
@@ -94,18 +109,21 @@ module.exports = {
       'tours.json'
     ),
 
+  /*
+   * Persistent Railway storage.
+   */
   storageDir,
-
-  uploadsDir:
-    path.join(
-      storageDir,
-      'uploads'
-    ),
 
   toursFile:
     path.join(
       storageDir,
       'tours.json'
+    ),
+
+  uploadsDir:
+    path.join(
+      storageDir,
+      'uploads'
     )
 
 };
