@@ -1,37 +1,19 @@
-const loginView =
-  document.getElementById('loginView');
-
-const dashboardView =
-  document.getElementById('dashboardView');
-
-const loginForm =
-  document.getElementById('loginForm');
-
-const adminTours =
-  document.getElementById('adminTours');
-
-const toast =
-  document.getElementById('toast');
-
-const loginError =
-  document.getElementById('loginError');
-
-const adminLangButton =
-  document.getElementById('adminLangButton');
-
-const dashboardLangButton =
-  document.getElementById('dashboardLangButton');
-
-const addTourButton =
-  document.getElementById('addTourButton');
+const loginView = document.getElementById('loginView');
+const dashboardView = document.getElementById('dashboardView');
+const loginForm = document.getElementById('loginForm');
+const adminTours = document.getElementById('adminTours');
+const toast = document.getElementById('toast');
+const loginError = document.getElementById('loginError');
+const adminLangButton = document.getElementById('adminLangButton');
+const dashboardLangButton = document.getElementById('dashboardLangButton');
+const addTourButton = document.getElementById('addTourButton');
 
 
 const I18N = {
 
   en: {
 
-    ownerPortal:
-      'OWNER PORTAL',
+    ownerPortal: 'OWNER PORTAL',
 
     loginHeroTitle:
       'Manage tours in one place.',
@@ -443,9 +425,7 @@ const I18N = {
 
 
 let language =
-  localStorage.getItem(
-    'est-admin-language'
-  ) || 'en';
+  localStorage.getItem('est-admin-language') || 'en';
 
 
 function t(key) {
@@ -461,17 +441,16 @@ function t(key) {
 
 function escapeHtml(value = '') {
 
-  return String(value)
-    .replace(
-      /[&<>"']/g,
-      (char) => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;'
-      })[char]
-    );
+  return String(value).replace(
+    /[&<>"']/g,
+    (char) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[char]
+  );
 
 }
 
@@ -493,9 +472,7 @@ function applyTranslations() {
 
 
   document
-    .querySelectorAll(
-      '[data-i18n-placeholder]'
-    )
+    .querySelectorAll('[data-i18n-placeholder]')
     .forEach((element) => {
 
       element.placeholder =
@@ -566,7 +543,6 @@ dashboardLangButton
   );
 
 
-
 function showToast(message) {
 
   toast.textContent =
@@ -620,7 +596,6 @@ function showLoginForExpiredSession() {
 }
 
 
-
 function validatePhoto(file) {
 
   if (!file) {
@@ -672,7 +647,6 @@ function validatePhoto(file) {
   };
 
 }
-
 
 
 async function api(
@@ -734,7 +708,6 @@ async function api(
 }
 
 
-
 async function refreshSession() {
 
   const response =
@@ -782,7 +755,6 @@ async function refreshSession() {
 }
 
 
-
 loginForm
   .addEventListener(
     'submit',
@@ -791,8 +763,7 @@ loginForm
       event.preventDefault();
 
 
-      loginError.textContent =
-        '';
+      loginError.textContent = '';
 
 
       try {
@@ -817,17 +788,13 @@ loginForm
 
                   username:
                     document
-                      .getElementById(
-                        'username'
-                      )
+                      .getElementById('username')
                       .value
                       .trim(),
 
                   password:
                     document
-                      .getElementById(
-                        'password'
-                      )
+                      .getElementById('password')
                       .value
 
                 })
@@ -868,9 +835,7 @@ loginForm
 
 
         document
-          .getElementById(
-            'password'
-          )
+          .getElementById('password')
           .value = '';
 
 
@@ -889,11 +854,8 @@ loginForm
   );
 
 
-
 document
-  .getElementById(
-    'logoutButton'
-  )
+  .getElementById('logoutButton')
   .addEventListener(
     'click',
     async () => {
@@ -928,16 +890,12 @@ document
   );
 
 
-
 document
-  .getElementById(
-    'refreshButton'
-  )
+  .getElementById('refreshButton')
   .addEventListener(
     'click',
     loadTours
   );
-
 
 
 /*
@@ -945,9 +903,7 @@ document
  * IN ONE REQUEST
  */
 document
-  .getElementById(
-    'addTourForm'
-  )
+  .getElementById('addTourForm')
   .addEventListener(
     'submit',
     async (event) => {
@@ -961,9 +917,7 @@ document
 
       const photo =
         document
-          .getElementById(
-            'newTourPhoto'
-          )
+          .getElementById('newTourPhoto')
           .files[0];
 
 
@@ -991,9 +945,7 @@ document
       formData.append(
         'titleEn',
         document
-          .getElementById(
-            'newTitleEn'
-          )
+          .getElementById('newTitleEn')
           .value
           .trim()
       );
@@ -1002,9 +954,7 @@ document
       formData.append(
         'titleKa',
         document
-          .getElementById(
-            'newTitleKa'
-          )
+          .getElementById('newTitleKa')
           .value
           .trim()
       );
@@ -1013,9 +963,7 @@ document
       formData.append(
         'price',
         document
-          .getElementById(
-            'newPrice'
-          )
+          .getElementById('newPrice')
           .value
           .trim()
       );
@@ -1024,9 +972,7 @@ document
       formData.append(
         'durationEn',
         document
-          .getElementById(
-            'newDurationEn'
-          )
+          .getElementById('newDurationEn')
           .value
           .trim()
       );
@@ -1035,9 +981,7 @@ document
       formData.append(
         'durationKa',
         document
-          .getElementById(
-            'newDurationKa'
-          )
+          .getElementById('newDurationKa')
           .value
           .trim()
       );
@@ -1116,7 +1060,6 @@ document
   );
 
 
-
 async function loadTours() {
 
   try {
@@ -1151,7 +1094,8 @@ async function loadTours() {
       (a, b) =>
         Number(
           a.sortOrder || 0
-        ) -
+        )
+        -
         Number(
           b.sortOrder || 0
         )
@@ -1276,9 +1220,7 @@ async function loadTours() {
 
                         <span>
                           ${escapeHtml(
-                            t(
-                              'englishTitleLabel'
-                            )
+                            t('englishTitleLabel')
                           )}
                         </span>
 
@@ -1294,9 +1236,7 @@ async function loadTours() {
 
                         <span>
                           ${escapeHtml(
-                            t(
-                              'georgianTitleLabel'
-                            )
+                            t('georgianTitleLabel')
                           )}
                         </span>
 
@@ -1378,9 +1318,7 @@ async function loadTours() {
 
                         <span>
                           ${escapeHtml(
-                            t(
-                              'englishDescription'
-                            )
+                            t('englishDescription')
                           )}
                         </span>
 
@@ -1396,9 +1334,7 @@ async function loadTours() {
 
                         <span>
                           ${escapeHtml(
-                            t(
-                              'georgianDescription'
-                            )
+                            t('georgianDescription')
                           )}
                         </span>
 
@@ -1488,13 +1424,10 @@ async function loadTours() {
 }
 
 
-
 function bindEditorActions() {
 
   document
-    .querySelectorAll(
-      '.tour-editor'
-    )
+    .querySelectorAll('.tour-editor')
     .forEach(
       (card) => {
 
@@ -1503,13 +1436,11 @@ function bindEditorActions() {
 
 
         const saveButton =
-          card.querySelector(
-            '.save-button'
-          );
+          card.querySelector('.save-button');
 
 
         /*
-         * SAVE TOUR TEXT / PRICE
+         * SAVE
          */
         saveButton
           .addEventListener(
@@ -1520,74 +1451,56 @@ function bindEditorActions() {
 
                 titleEn:
                   card
-                    .querySelector(
-                      '.title-en'
-                    )
+                    .querySelector('.title-en')
                     .value
                     .trim(),
 
                 titleKa:
                   card
-                    .querySelector(
-                      '.title-ka'
-                    )
+                    .querySelector('.title-ka')
                     .value
                     .trim(),
 
                 price:
                   card
-                    .querySelector(
-                      '.price'
-                    )
+                    .querySelector('.price')
                     .value
                     .trim(),
 
                 durationEn:
                   card
-                    .querySelector(
-                      '.duration-en'
-                    )
+                    .querySelector('.duration-en')
                     .value
                     .trim(),
 
                 durationKa:
                   card
-                    .querySelector(
-                      '.duration-ka'
-                    )
+                    .querySelector('.duration-ka')
                     .value
                     .trim(),
 
                 descriptionEn:
                   card
-                    .querySelector(
-                      '.description-en'
-                    )
+                    .querySelector('.description-en')
                     .value
                     .trim(),
 
                 descriptionKa:
                   card
-                    .querySelector(
-                      '.description-ka'
-                    )
+                    .querySelector('.description-ka')
                     .value
                     .trim(),
 
                 sortOrder:
                   Number(
                     card
-                      .querySelector(
-                        '.sort-order'
-                      )
+                      .querySelector('.sort-order')
                       .value || 0
                   ),
 
                 active:
                   card
-                    .querySelector(
-                      '.active'
-                    )
+                    .querySelector('.active')
                     .checked
 
               };
@@ -1660,32 +1573,25 @@ function bindEditorActions() {
           );
 
 
-
         /*
-         * CHANGE PHOTO
+         * UPLOAD / REPLACE PHOTO
          */
         card
-          .querySelector(
-            '.upload-button'
-          )
+          .querySelector('.upload-button')
           .addEventListener(
             'click',
             async () => {
 
               const file =
                 card
-                  .querySelector(
-                    '.image-input'
-                  )
+                  .querySelector('.image-input')
                   .files[0];
 
 
               if (!file) {
 
                 return showToast(
-                  t(
-                    'chooseImageFirst'
-                  )
+                  t('chooseImageFirst')
                 );
 
               }
@@ -1755,14 +1661,11 @@ function bindEditorActions() {
           );
 
 
-
         /*
          * REMOVE PHOTO
          */
         const removePhotoButton =
-          card.querySelector(
-            '.remove-photo-button'
-          );
+          card.querySelector('.remove-photo-button');
 
 
         if (
@@ -1776,9 +1679,7 @@ function bindEditorActions() {
 
                 if (
                   !confirm(
-                    t(
-                      'confirmRemovePhoto'
-                    )
+                    t('confirmRemovePhoto')
                   )
                 ) {
 
@@ -1827,14 +1728,11 @@ function bindEditorActions() {
         }
 
 
-
         /*
          * DELETE TOUR
          */
         card
-          .querySelector(
-            '.delete-button'
-          )
+          .querySelector('.delete-button')
           .addEventListener(
             'click',
             async () => {
@@ -1891,7 +1789,6 @@ function bindEditorActions() {
     );
 
 }
-
 
 
 applyTranslations();
