@@ -32,7 +32,8 @@ const allowed = {
 
   'image/jpeg': {
 
-    ext: '.jpg',
+    ext:
+      '.jpg',
 
     check:
       (buffer) =>
@@ -46,13 +47,18 @@ const allowed = {
 
   'image/png': {
 
-    ext: '.png',
+    ext:
+      '.png',
 
     check:
       (buffer) =>
-        buffer.length > 8 &&
+        buffer.length > 8
+        &&
         buffer
-          .slice(0, 8)
+          .slice(
+            0,
+            8
+          )
           .equals(
             Buffer.from([
               0x89,
@@ -71,23 +77,32 @@ const allowed = {
 
   'image/webp': {
 
-    ext: '.webp',
+    ext:
+      '.webp',
 
     check:
       (buffer) =>
-        buffer.length > 12 &&
-        buffer
-          .slice(0, 4)
-          .toString() === 'RIFF'
+        buffer.length > 12
         &&
         buffer
-          .slice(8, 12)
-          .toString() === 'WEBP'
+          .slice(
+            0,
+            4
+          )
+          .toString() ===
+          'RIFF'
+        &&
+        buffer
+          .slice(
+            8,
+            12
+          )
+          .toString() ===
+          'WEBP'
 
   }
 
 };
-
 
 
 function boundaryFromContentType(
@@ -122,7 +137,6 @@ function boundaryFromContentType(
 }
 
 
-
 function parseMultipartForm(
   buffer,
   contentType
@@ -142,8 +156,13 @@ function parseMultipartForm(
 
   const parts =
     raw
-      .split(boundary)
-      .slice(1, -1);
+      .split(
+        boundary
+      )
+      .slice(
+        1,
+        -1
+      );
 
 
   const fields =
@@ -265,7 +284,8 @@ function parseMultipartForm(
     ) {
 
       if (
-        name === 'image' &&
+        name === 'image'
+        &&
         filenameMatch[1]
       ) {
 
@@ -276,7 +296,8 @@ function parseMultipartForm(
 
           mimeType:
             (
-              typeMatch?.[1] ||
+              typeMatch?.[1]
+              ||
               ''
             )
               .trim()
@@ -317,7 +338,6 @@ function parseMultipartForm(
   };
 
 }
-
 
 
 function validateAndSaveImage(
@@ -382,8 +402,10 @@ function validateAndSaveImage(
 
 
   /*
-   * ALWAYS CREATE
-   * A UNIQUE FILE NAME
+   * Always create a new unique filename.
+   *
+   * This prevents browser/CDN caching
+   * from showing an old replaced photo.
    */
   const fileName =
     `${Date.now()}-` +
@@ -416,7 +438,6 @@ function validateAndSaveImage(
   };
 
 }
-
 
 
 async function readMultipartRequest(
@@ -461,7 +482,6 @@ async function readMultipartRequest(
 }
 
 
-
 async function saveUploadedImage(
   req
 ) {
@@ -477,7 +497,6 @@ async function saveUploadedImage(
   );
 
 }
-
 
 
 async function readTourWithImage(
@@ -506,7 +525,6 @@ async function readTourWithImage(
   };
 
 }
-
 
 
 module.exports = {
