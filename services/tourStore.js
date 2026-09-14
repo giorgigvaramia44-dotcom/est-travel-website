@@ -5,13 +5,13 @@ const {
   toursFile,
   seedToursFile,
   storageDir,
-  uploadsDir,
-  publicDir
+  uploadsDir
 } = require('../config');
 
 
 /*
- * Create persistent storage folders.
+ * Create /data and /data/uploads
+ * if they do not exist.
  */
 function ensureStorage() {
 
@@ -34,11 +34,11 @@ function ensureStorage() {
 
 
 /*
- * Copy starter tours only once.
+ * Initialize tours.json ONLY ONCE.
  *
- * After /data/tours.json exists,
- * it is NEVER replaced with the
- * GitHub seed file.
+ * Very important:
+ * Existing tours.json is never replaced
+ * by the GitHub seed data.
  */
 function ensureTourFile() {
 
@@ -48,7 +48,9 @@ function ensureTourFile() {
   if (
     fs.existsSync(toursFile)
   ) {
+
     return;
+
   }
 
 
@@ -58,6 +60,12 @@ function ensureTourFile() {
 
     fs.copyFileSync(
       seedToursFile,
+      toursFile
+    );
+
+
+    console.log(
+      'Created persistent tours database from seed:',
       toursFile
     );
 
@@ -71,159 +79,61 @@ function ensureTourFile() {
       'utf8'
     );
 
-  }
 
-}
-
-
-/*
- * Helps migrate photos created by
- * an older version of the project.
- *
- * Old:
- * public/uploads/example.jpg
- *
- * New:
- * /data/uploads/example.jpg
- */
-function migrateLegacyImages(tours) {
-
-  const legacyUploadsDir =
-    path.join(
-      publicDir,
-      'uploads'
+    console.log(
+      'Created empty persistent tours database:',
+      toursFile
     );
 
-
-  if (
-    !fs.existsSync(
-      legacyUploadsDir
-    )
-  ) {
-    return;
-  }
-
-
-  for (
-    const tour of tours
-  ) {
-
-    if (
-      !tour.image ||
-      !tour.image.startsWith('/uploads/')
-    ) {
-      continue;
-    }
-
-
-    const fileName =
-      path.basename(
-        tour.image
-      );
-
-
-    const persistentFile =
-      path.join(
-        uploadsDir,
-        fileName
-      );
-
-
-    const legacyFile =
-      path.join(
-        legacyUploadsDir,
-        fileName
-      );
-
-
-    /*
-     * Only copy when the persistent
-     * version does not already exist.
-     */
-    if (
-      !fs.existsSync(
-        persistentFile
-      )
-      &&
-      fs.existsSync(
-        legacyFile
-      )
-    ) {
-
-      try {
-
-        fs.copyFileSync(
-          legacyFile,
-          persistentFile
-        );
-
-      }
-
-      catch (error) {
-
-        console.error(
-          'Could not migrate legacy image:',
-          fileName,
-          error.message
-        );
-
-      }
-
-    }
-
   }
 
 }
 
 
 /*
- * Read all tours.
+ * Read tours ONLY from the
+ * persistent database.
  */
 function readTours() {
 
   ensureTourFile();
 
 
-  let raw;
-
-
   try {
 
-    raw =
+    const raw =
       fs.readFileSync(
         toursFile,
         'utf8'
       );
 
-  }
 
-  catch (error) {
-
-    console.error(
-      'Could not read tours file:',
-      error
-    );
-
-
-    return [];
-
-  }
-
-
-  let data;
-
-
-  try {
-
-    data =
+    const data =
       JSON.parse(raw);
 
+
+    if (
+      !Array.isArray(data)
+    ) {
+
+      console.error(
+        'Persistent tours file is not an array.'
+      );
+
+
+      return [];
+
+    }
+
+
+    return data;
+
   }
 
   catch (error) {
 
     console.error(
-      'Invalid tours JSON:',
+      'Could not read persistent tours:',
       error
     );
 
@@ -231,33 +141,13 @@ function readTours() {
     return [];
 
   }
-
-
-  const tours =
-    Array.isArray(data)
-      ? data
-      : [];
-
-
-  migrateLegacyImages(
-    tours
-  );
-
-
-  return tours;
 
 }
 
 
 /*
- * Write safely.
- *
- * First write a temporary file,
- * then replace the real file.
- *
- * This prevents tours.json from
- * becoming half-written if something
- * goes wrong during saving.
+ * Write tours ONLY to the
+ * same persistent database.
  */
 function writeTours(tours) {
 
@@ -269,18 +159,24 @@ function writeTours(tours) {
   ) {
 
     throw new Error(
-      'Tours must be an array.'
+      'Tours data must be an array.'
     );
 
   }
 
 
-  const temporaryFile =
+  /*
+   * Write temporary file first.
+   *
+   * This protects tours.json if something
+   * goes wrong halfway through writing.
+   */
+  const tempFile =
     `${toursFile}.tmp`;
 
 
   fs.writeFileSync(
-    temporaryFile,
+    tempFile,
     JSON.stringify(
       tours,
       null,
@@ -291,8 +187,13 @@ function writeTours(tours) {
 
 
   fs.renameSync(
-    temporaryFile,
+    tempFile,
     toursFile
+  );
+
+
+  console.log(
+    `Saved ${tours.length} tours to ${toursFile}`
   );
 
 }
@@ -300,12 +201,12 @@ function writeTours(tours) {
 
 module.exports = {
 
-  readTours,
-
-  writeTours,
+  ensureStorage,
 
   ensureTourFile,
 
-  ensureStorage
+  readTours,
+
+  writeTours
 
 };
