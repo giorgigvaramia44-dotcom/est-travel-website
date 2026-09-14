@@ -1,158 +1,47 @@
 const tourGrid =
-  document.getElementById(
-    'tourGrid'
-  );
-
+  document.getElementById('tourGrid');
 
 const langButton =
-  document.getElementById(
-    'langButton'
-  );
-
+  document.getElementById('langButton');
 
 const menuButton =
-  document.getElementById(
-    'menuButton'
-  );
-
+  document.getElementById('menuButton');
 
 const mobileMenu =
-  document.getElementById(
-    'mobileMenu'
-  );
+  document.getElementById('mobileMenu');
 
 
 let language =
-  localStorage.getItem(
-    'est-language'
-  ) || 'en';
-
+  localStorage.getItem('est-language') || 'en';
 
 let tours = [];
 
 
-const SAMPLE_TOURS = [
+/* =========================================================
+   HELPERS
+========================================================= */
 
-  {
+function escapeHtml(value = '') {
 
-    id:
-      'sample-istanbul',
-
-    titleEn:
-      'Istanbul City Break',
-
-    titleKa:
-      'სტამბოლი — City Break',
-
-    descriptionEn:
-      'Flights, hotel and free time to explore the city.',
-
-    descriptionKa:
-      'ფრენა, სასტუმრო და თავისუფალი დრო ქალაქის დასათვალიერებლად.',
-
-    price:
-      'From 699 GEL',
-
-    durationEn:
-      '4 days',
-
-    durationKa:
-      '4 დღე',
-
-    image:
-      '',
-
-    sortOrder:
-      1
-
-  },
-
-
-  {
-
-    id:
-      'sample-dubai',
-
-    titleEn:
-      'Dubai Getaway',
-
-    titleKa:
-      'დუბაი',
-
-    descriptionEn:
-      'Sun, shopping and modern city experiences.',
-
-    descriptionKa:
-      'მზე, შოპინგი და თანამედროვე ქალაქის გამოცდილება.',
-
-    price:
-      'From 1199 GEL',
-
-    durationEn:
-      '5 days',
-
-    durationKa:
-      '5 დღე',
-
-    image:
-      '',
-
-    sortOrder:
-      2
-
-  }
-
-];
-
-
-function escapeHtml(
-  value = ''
-) {
-
-  return String(value)
-    .replace(
-      /[&<>"']/g,
-      (char) => ({
-
-        '&':
-          '&amp;',
-
-        '<':
-          '&lt;',
-
-        '>':
-          '&gt;',
-
-        '"':
-          '&quot;',
-
-        "'":
-          '&#39;'
-
-      })[char]
-    );
+  return String(value).replace(
+    /[&<>"']/g,
+    (char) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[char]
+  );
 
 }
 
 
-function t(
-  key
-) {
+function t(key) {
 
   return (
-    window
-      .EST_I18N[
-        language
-      ]?.[key]
-
-    ||
-
-    window
-      .EST_I18N
-      .en[key]
-
-    ||
-
+    window.EST_I18N?.[language]?.[key] ||
+    window.EST_I18N?.en?.[key] ||
     key
   );
 
@@ -161,26 +50,18 @@ function t(
 
 function applyStaticTranslations() {
 
-  document
-    .documentElement
-    .lang =
-      language;
+  document.documentElement.lang =
+    language;
 
 
   document
-    .querySelectorAll(
-      '[data-i18n]'
-    )
-    .forEach(
-      (element) => {
+    .querySelectorAll('[data-i18n]')
+    .forEach((element) => {
 
-        element.textContent =
-          t(
-            element.dataset.i18n
-          );
+      element.textContent =
+        t(element.dataset.i18n);
 
-      }
-    );
+    });
 
 
   langButton.textContent =
@@ -203,15 +84,11 @@ function tourField(
   kaKey
 ) {
 
-  if (
-    language === 'ka'
-  ) {
+  if (language === 'ka') {
 
     return (
-      tour[kaKey]
-      ||
-      tour[enKey]
-      ||
+      tour[kaKey] ||
+      tour[enKey] ||
       ''
     );
 
@@ -219,32 +96,22 @@ function tourField(
 
 
   return (
-    tour[enKey]
-    ||
-    tour[kaKey]
-    ||
+    tour[enKey] ||
+    tour[kaKey] ||
     ''
   );
 
 }
 
 
-/*
- * English:
- * From 999 GEL
- *
- * Georgian:
- * 999 ₾-დან
- */
-function formatPrice(
-  rawPrice
-) {
+/* =========================================================
+   PRICE TRANSLATION
+========================================================= */
+
+function formatPrice(rawPrice) {
 
   const raw =
-    String(
-      rawPrice || ''
-    )
-      .trim();
+    String(rawPrice || '').trim();
 
 
   if (!raw) {
@@ -254,15 +121,25 @@ function formatPrice(
   }
 
 
-  if (
-    language !== 'ka'
-  ) {
+  /*
+   * English:
+   * From 999 GEL
+   */
+  if (language !== 'ka') {
 
     return raw;
 
   }
 
 
+  /*
+   * Georgian:
+   * From 999 GEL
+   *
+   * becomes:
+   *
+   * 999 ₾-დან
+   */
   let value =
     raw.replace(
       /\bGEL\b/gi,
@@ -276,22 +153,24 @@ function formatPrice(
     );
 
 
-  if (
-    fromMatch
-  ) {
+  if (fromMatch) {
 
-    return (
-      `${fromMatch[1].trim()}-დან`
-    );
+    return `${fromMatch[1].trim()}-დან`;
 
   }
 
 
-  value =
-    value.replace(
-      /^Starting\s+from\s+(.+)$/i,
-      '$1-დან'
+  const startingFromMatch =
+    value.match(
+      /^Starting\s+from\s+(.+)$/i
     );
+
+
+  if (startingFromMatch) {
+
+    return `${startingFromMatch[1].trim()}-დან`;
+
+  }
 
 
   return value;
@@ -299,60 +178,57 @@ function formatPrice(
 }
 
 
-/*
- * updatedAt changes whenever
- * photo is replaced.
- *
- * This prevents the browser from
- * using the old cached photo.
- */
-function imageUrl(
-  tour
-) {
+/* =========================================================
+   IMAGE URL
+========================================================= */
 
-  if (
-    !tour.image
-  ) {
+function imageUrl(tour) {
+
+  if (!tour.image) {
 
     return '';
 
   }
 
 
+  /*
+   * updatedAt changes when:
+   * - text changes
+   * - price changes
+   * - image changes
+   *
+   * The query parameter forces the
+   * browser to use the newest image.
+   */
   const version =
     encodeURIComponent(
-      tour.updatedAt
-      ||
-      tour.id
-      ||
-      '1'
+      tour.updatedAt ||
+      Date.now()
     );
 
 
-  return (
-    `${tour.image}?v=${version}`
-  );
+  return `${tour.image}?v=${version}`;
 
 }
 
 
+/* =========================================================
+   RENDER TOURS
+========================================================= */
+
 function renderTours() {
 
   if (
-    !Array.isArray(tours)
-    ||
+    !Array.isArray(tours) ||
     tours.length === 0
   ) {
 
     tourGrid.innerHTML =
       `
         <div class="empty-state">
-          ${escapeHtml(
-            t('noTours')
-          )}
+          ${escapeHtml(t('noTours'))}
         </div>
       `;
-
 
     return;
 
@@ -360,114 +236,121 @@ function renderTours() {
 
 
   const sorted =
-    [...tours]
-      .sort(
-        (a, b) =>
-          Number(
-            a.sortOrder || 0
-          )
-          -
-          Number(
-            b.sortOrder || 0
-          )
-      );
+    [...tours].sort(
+      (a, b) =>
+        Number(a.sortOrder || 0) -
+        Number(b.sortOrder || 0)
+    );
 
 
   tourGrid.innerHTML =
     sorted
-      .map(
-        (tour) => {
+      .map((tour) => {
 
-          const title =
-            tourField(
-              tour,
-              'titleEn',
-              'titleKa'
-            );
-
-
-          const description =
-            tourField(
-              tour,
-              'descriptionEn',
-              'descriptionKa'
-            );
+        const title =
+          tourField(
+            tour,
+            'titleEn',
+            'titleKa'
+          );
 
 
-          const duration =
-            tourField(
-              tour,
-              'durationEn',
-              'durationKa'
-            );
+        const description =
+          tourField(
+            tour,
+            'descriptionEn',
+            'descriptionKa'
+          );
 
 
-          const price =
-            formatPrice(
-              tour.price
-            );
+        const duration =
+          tourField(
+            tour,
+            'durationEn',
+            'durationKa'
+          );
 
 
-          const subject =
-            encodeURIComponent(
-              `${
-                language === 'ka'
-                  ? 'ტურის მოთხოვნა'
-                  : 'Tour inquiry'
-              } — ${title}`
-            );
+        const price =
+          formatPrice(
+            tour.price
+          );
 
 
-          return `
-            <article class="tour-card">
-
-              <div class="tour-media">
-
-                ${
-                  tour.image
-
-                    ? `
-                      <img
-                        src="${escapeHtml(
-                          imageUrl(
-                            tour
-                          )
-                        )}"
-                        alt="${escapeHtml(
-                          title
-                        )}"
-                        loading="lazy"
-                      >
-                    `
-
-                    : `
-                      <div class="photo-placeholder">
-
-                        <span class="placeholder-icon">
-                          ✈
-                        </span>
-
-                        <strong>
-                          ${escapeHtml(
-                            t(
-                              'photoPlaceholder'
-                            )
-                          )}
-                        </strong>
-
-                      </div>
-                    `
-                }
+        const subject =
+          encodeURIComponent(
+            `${
+              language === 'ka'
+                ? 'ტურის მოთხოვნა'
+                : 'Tour inquiry'
+            } — ${title}`
+          );
 
 
-                ${
-                  price
+        return `
+          <article class="tour-card">
 
-                    ? `
-                      <span class="price-badge">
+            <div class="tour-media">
+
+              ${
+                tour.image
+
+                  ? `
+                    <img
+                      src="${escapeHtml(imageUrl(tour))}"
+                      alt="${escapeHtml(title)}"
+                      loading="lazy"
+                    >
+                  `
+
+                  : `
+                    <div class="photo-placeholder">
+
+                      <span class="placeholder-icon">
+                        ✈
+                      </span>
+
+                      <strong>
                         ${escapeHtml(
-                          price
+                          t('photoPlaceholder')
                         )}
+                      </strong>
+
+                    </div>
+                  `
+              }
+
+
+              ${
+                price
+
+                  ? `
+                    <span class="price-badge">
+                      ${escapeHtml(price)}
+                    </span>
+                  `
+
+                  : ''
+              }
+
+            </div>
+
+
+            <div class="tour-content">
+
+              <div class="tour-title-row">
+
+                <h3>
+                  ${escapeHtml(title)}
+                </h3>
+
+
+                ${
+                  duration
+
+                    ? `
+                      <span class="duration">
+                        ${escapeHtml(duration)}
                       </span>
                     `
 
@@ -477,61 +360,56 @@ function renderTours() {
               </div>
 
 
-              <div class="tour-content">
-
-                <div class="tour-title-row">
-
-                  <h3>
-                    ${escapeHtml(
-                      title
-                    )}
-                  </h3>
+              <p>
+                ${escapeHtml(description)}
+              </p>
 
 
-                  ${
-                    duration
+              <a
+                class="button button-primary button-full"
+                href="mailto:info.est.official@gmail.com?subject=${subject}"
+              >
+                ${escapeHtml(t('askTour'))}
+              </a>
 
-                      ? `
-                        <span class="duration">
-                          ${escapeHtml(
-                            duration
-                          )}
-                        </span>
-                      `
+            </div>
 
-                      : ''
-                  }
+          </article>
+        `;
 
-                </div>
-
-
-                <p>
-                  ${escapeHtml(
-                    description
-                  )}
-                </p>
-
-
-                <a
-                  class="button button-primary button-full"
-                  href="mailto:info.est.official@gmail.com?subject=${subject}"
-                >
-                  ${escapeHtml(
-                    t('askTour')
-                  )}
-                </a>
-
-              </div>
-
-            </article>
-          `;
-
-        }
-      )
+      })
       .join('');
 
 }
 
+
+/* =========================================================
+   CHECK WHETHER DATA CHANGED
+========================================================= */
+
+function toursChanged(newTours) {
+
+  try {
+
+    return (
+      JSON.stringify(newTours) !==
+      JSON.stringify(tours)
+    );
+
+  }
+
+  catch (_) {
+
+    return true;
+
+  }
+
+}
+
+
+/* =========================================================
+   LOAD TOURS FROM BACKEND
+========================================================= */
 
 async function loadTours(
   silent = false
@@ -553,28 +431,34 @@ async function loadTours(
 
   try {
 
-    const apiUrl =
-      location.protocol ===
-        'file:'
-
-        ? '/api/tours'
-
-        : `/api/tours?t=${Date.now()}`;
+    /*
+     * Timestamp prevents browser,
+     * Railway or proxy caching.
+     */
+    const url =
+      `/api/tours?refresh=${Date.now()}`;
 
 
     const response =
       await fetch(
-        apiUrl,
+        url,
         {
-          cache:
-            'no-store'
+          method: 'GET',
+
+          cache: 'no-store',
+
+          headers: {
+            'Cache-Control':
+              'no-cache, no-store, must-revalidate',
+
+            'Pragma':
+              'no-cache'
+          }
         }
       );
 
 
-    if (
-      !response.ok
-    ) {
+    if (!response.ok) {
 
       throw new Error(
         'Could not load tours.'
@@ -583,36 +467,34 @@ async function loadTours(
     }
 
 
-    tours =
+    const freshTours =
       await response.json();
 
 
-    renderTours();
+    /*
+     * Only redraw the cards if
+     * something actually changed.
+     */
+    if (
+      toursChanged(freshTours)
+    ) {
+
+      tours =
+        freshTours;
+
+
+      renderTours();
+
+    }
 
   }
 
   catch (error) {
 
     console.error(
+      'Tour refresh failed:',
       error
     );
-
-
-    if (
-      location.protocol ===
-      'file:'
-    ) {
-
-      tours =
-        SAMPLE_TOURS;
-
-
-      renderTours();
-
-
-      return;
-
-    }
 
 
     if (!silent) {
@@ -633,6 +515,10 @@ async function loadTours(
 }
 
 
+/* =========================================================
+   LANGUAGE SWITCH
+========================================================= */
+
 langButton
   .addEventListener(
     'click',
@@ -647,11 +533,20 @@ langButton
       applyStaticTranslations();
 
 
+      /*
+       * Tour data does not need
+       * fetching again just because
+       * language changed.
+       */
       renderTours();
 
     }
   );
 
+
+/* =========================================================
+   MOBILE MENU
+========================================================= */
 
 menuButton
   .addEventListener(
@@ -661,9 +556,7 @@ menuButton
       const open =
         mobileMenu
           .classList
-          .toggle(
-            'open'
-          );
+          .toggle('open');
 
 
       menuButton
@@ -681,50 +574,61 @@ mobileMenu
   .forEach(
     (link) => {
 
-      link
-        .addEventListener(
-          'click',
-          () => {
+      link.addEventListener(
+        'click',
+        () => {
 
-            mobileMenu
-              .classList
-              .remove(
-                'open'
-              );
+          mobileMenu
+            .classList
+            .remove('open');
 
 
-            menuButton
-              .setAttribute(
-                'aria-expanded',
-                'false'
-              );
+          menuButton
+            .setAttribute(
+              'aria-expanded',
+              'false'
+            );
 
-          }
-        );
+        }
+      );
 
     }
   );
 
 
+/* =========================================================
+   LIVE UPDATE
+========================================================= */
+
 /*
- * Reload tours after owner updates
- * photos/prices in another tab.
+ * Check backend every 3 seconds.
+ *
+ * The page itself does NOT reload.
+ * Only tour cards update.
+ */
+setInterval(
+  () => {
+
+    loadTours(true);
+
+  },
+
+  3000
+);
+
+
+/*
+ * Immediately check when visitor
+ * returns to the browser tab.
  */
 document
   .addEventListener(
     'visibilitychange',
     () => {
 
-      if (
-        !document.hidden
-        &&
-        location.protocol !==
-          'file:'
-      ) {
+      if (!document.hidden) {
 
-        loadTours(
-          true
-        );
+        loadTours(true);
 
       }
 
@@ -732,42 +636,41 @@ document
   );
 
 
+/*
+ * Also check when browser window
+ * receives focus.
+ */
 window
   .addEventListener(
     'focus',
     () => {
 
-      if (
-        location.protocol !==
-        'file:'
-      ) {
-
-        loadTours(
-          true
-        );
-
-      }
+      loadTours(true);
 
     }
   );
 
 
-if (
-  location.protocol !==
-  'file:'
-) {
+/*
+ * The browser back-forward cache
+ * can restore an old page.
+ *
+ * Refresh tour data after restore.
+ */
+window
+  .addEventListener(
+    'pageshow',
+    () => {
 
-  setInterval(
-    () =>
-      loadTours(
-        true
-      ),
+      loadTours(true);
 
-    15000
+    }
   );
 
-}
 
+/* =========================================================
+   START
+========================================================= */
 
 applyStaticTranslations();
 
