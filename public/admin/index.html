@@ -4,71 +4,360 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0a96c8">
-  <title>EST Travel — Owner Admin</title>
-  <link rel="icon" href="../assets/est-emblem.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./admin.css">
+
+  <title>EST Travel — Owner Dashboard</title>
+
+  <link rel="icon" href="/assets/est-emblem.png">
+  <link rel="stylesheet" href="/admin/admin.css">
 </head>
+
 <body>
+
   <main class="admin-shell">
-    <section class="login-panel" id="loginView">
-      <div class="admin-brand">
-        <img src="../assets/est-emblem.png" alt="EST Travel emblem">
-        <div><strong>EST TRAVEL</strong><span>Owner Admin</span></div>
+
+    <!-- LOGIN -->
+    <section class="login-layout" id="loginView">
+
+      <div class="login-brand-panel">
+
+        <div class="brand-lockup">
+          <img src="/assets/est-emblem.png" alt="EST Travel emblem">
+
+          <div>
+            <strong>EST TRAVEL</strong>
+            <span>Your journey starts here</span>
+          </div>
+        </div>
+
+        <div class="login-brand-copy">
+          <p class="eyebrow">OWNER PORTAL</p>
+
+          <h1>Manage tours in one place.</h1>
+
+          <p>
+            Update prices, descriptions, visibility and tour photos.
+            Changes appear on the public website.
+          </p>
+        </div>
+
+        <div class="login-feature-list">
+          <span><b>✓</b> English & Georgian content</span>
+          <span><b>✓</b> Owner-only editing</span>
+          <span><b>✓</b> Photo upload & publishing controls</span>
+        </div>
+
       </div>
-      <h1>Owner login</h1>
-      <p>Only the company owner can change tour prices, text, visibility and photos.</p>
-      <form id="loginForm">
-        <label>Username<input id="username" autocomplete="username" required></label>
-        <label>Password<input id="password" type="password" autocomplete="current-password" required></label>
-        <button class="admin-button primary" type="submit">Log in</button>
-        <p class="error" id="loginError"></p>
-      </form>
+
+
+      <div class="login-card-wrap">
+
+        <section class="login-panel">
+
+          <div class="mobile-brand">
+            <img src="/assets/est-emblem.png" alt="EST Travel emblem">
+
+            <div>
+              <strong>EST TRAVEL</strong>
+              <span>Owner Dashboard</span>
+            </div>
+          </div>
+
+          <p class="eyebrow dark">SECURE ACCESS</p>
+
+          <h2>Owner login</h2>
+
+          <p class="panel-copy">
+            Sign in to manage the content shown on the EST Travel website.
+          </p>
+
+          <form id="loginForm" class="login-form">
+
+            <label>
+              <span>Username</span>
+
+              <input
+                id="username"
+                autocomplete="username"
+                placeholder="Enter username"
+                required
+              >
+            </label>
+
+
+            <label>
+              <span>Password</span>
+
+              <input
+                id="password"
+                type="password"
+                autocomplete="current-password"
+                placeholder="Enter password"
+                required
+              >
+            </label>
+
+
+            <button
+              class="admin-button primary full"
+              type="submit"
+            >
+              Log in
+            </button>
+
+            <p class="error" id="loginError"></p>
+
+          </form>
+
+          <p class="security-note">
+            🔒 Only authorized EST Travel staff can access this dashboard.
+          </p>
+
+        </section>
+
+      </div>
+
     </section>
 
-    <section class="dashboard hidden" id="dashboardView">
+
+
+    <!-- DASHBOARD -->
+    <section
+      class="dashboard hidden"
+      id="dashboardView"
+    >
+
       <header class="dashboard-header">
+
         <div class="admin-brand">
-          <img src="../assets/est-emblem.png" alt="EST Travel emblem">
-          <div><strong>EST TRAVEL</strong><span>Owner Admin</span></div>
+
+          <img
+            src="/assets/est-emblem.png"
+            alt="EST Travel emblem"
+          >
+
+          <div>
+            <strong>EST TRAVEL</strong>
+            <span>Owner Dashboard</span>
+          </div>
+
         </div>
+
+
         <div class="dashboard-actions">
-          <a class="admin-button secondary" href="/" target="_blank" rel="noopener">Open public site</a>
-          <button class="admin-button secondary" id="refreshButton" type="button">Refresh</button>
-          <button class="admin-button dark" id="logoutButton" type="button">Log out</button>
+
+          <a
+            class="admin-button secondary"
+            href="/"
+            target="_blank"
+            rel="noopener"
+          >
+            ↗ Public website
+          </a>
+
+          <button
+            class="admin-button secondary"
+            id="refreshButton"
+            type="button"
+          >
+            ↻ Refresh
+          </button>
+
+          <button
+            class="admin-button dark"
+            id="logoutButton"
+            type="button"
+          >
+            Log out
+          </button>
+
         </div>
+
       </header>
 
-      <section class="notice">
-        <strong>Owner-only controls</strong>
-        <p>Visitors cannot edit these fields. Save here to update the public English and Georgian website.</p>
-      </section>
 
-      <section class="add-tour-panel">
+
+      <section class="dashboard-hero">
+
         <div>
-          <h2>Add new tour</h2>
-          <p>Create the tour first, then upload its photo in the card below.</p>
+          <p class="eyebrow">CONTENT MANAGEMENT</p>
+
+          <h1>Tour management</h1>
+
+          <p>
+            Manage public tour content from this private dashboard.
+            Visitors cannot edit these fields.
+          </p>
         </div>
-        <form class="add-tour-form" id="addTourForm">
-          <label>English title *<input id="newTitleEn" required placeholder="Istanbul City Break"></label>
-          <label>ქართული სათაური<input id="newTitleKa" placeholder="სტამბოლი — City Break"></label>
-          <label>Price<input id="newPrice" placeholder="From 699 GEL"></label>
-          <label>Duration EN<input id="newDurationEn" placeholder="4 days"></label>
-          <label>ხანგრძლივობა KA<input id="newDurationKa" placeholder="4 დღე"></label>
-          <button class="admin-button primary" type="submit">Add tour</button>
-        </form>
+
+
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          Owner access
+        </div>
+
       </section>
 
-      <section>
-        <div class="section-title-row"><h2>Manage tours</h2><span>Photo limit: 6 MB · JPG / PNG / WEBP</span></div>
-        <div class="admin-tours" id="adminTours"></div>
+
+
+      <section class="notice">
+
+        <div class="notice-icon">i</div>
+
+        <div>
+          <strong>
+            Changes update the public website
+          </strong>
+
+          <p>
+            Edit a tour and press <b>Save changes</b>.
+            Uploads and prices are visible to customers only after
+            you publish them.
+          </p>
+        </div>
+
       </section>
+
+
+
+      <!-- ADD TOUR -->
+      <section class="add-tour-panel">
+
+        <div class="panel-heading">
+
+          <div class="panel-icon">＋</div>
+
+          <div>
+            <p class="eyebrow dark">
+              NEW PACKAGE
+            </p>
+
+            <h2>
+              Add new tour
+            </h2>
+
+            <p>
+              Create the package first. After it appears below,
+              upload its photo and add descriptions.
+            </p>
+          </div>
+
+        </div>
+
+
+        <form
+          class="add-tour-form"
+          id="addTourForm"
+        >
+
+          <label>
+            <span>English title *</span>
+
+            <input
+              id="newTitleEn"
+              required
+              placeholder="Istanbul City Break"
+            >
+          </label>
+
+
+          <label>
+            <span>ქართული სათაური</span>
+
+            <input
+              id="newTitleKa"
+              placeholder="სტამბოლი — City Break"
+            >
+          </label>
+
+
+          <label>
+            <span>Price</span>
+
+            <input
+              id="newPrice"
+              placeholder="From 699 GEL"
+            >
+          </label>
+
+
+          <label>
+            <span>Duration EN</span>
+
+            <input
+              id="newDurationEn"
+              placeholder="4 days"
+            >
+          </label>
+
+
+          <label>
+            <span>ხანგრძლივობა KA</span>
+
+            <input
+              id="newDurationKa"
+              placeholder="4 დღე"
+            >
+          </label>
+
+
+          <div class="add-button-wrap">
+
+            <button
+              class="admin-button primary full"
+              type="submit"
+            >
+              + Add tour
+            </button>
+
+          </div>
+
+        </form>
+
+      </section>
+
+
+
+      <!-- MANAGE -->
+      <section class="manage-section">
+
+        <div class="section-title-row">
+
+          <div>
+            <p class="eyebrow dark">
+              YOUR CONTENT
+            </p>
+
+            <h2>
+              Manage tours
+            </h2>
+          </div>
+
+          <span class="upload-limit">
+            Images: JPG / PNG / WEBP · Max 6 MB
+          </span>
+
+        </div>
+
+
+        <div
+          class="admin-tours"
+          id="adminTours"
+        ></div>
+
+      </section>
+
     </section>
+
   </main>
 
-  <div class="toast" id="toast"></div>
-  <script src="./admin.js"></script>
+
+  <div
+    class="toast"
+    id="toast"
+  ></div>
+
+
+  <script src="/admin/admin.js"></script>
+
 </body>
 </html>
