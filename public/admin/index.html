@@ -30,6 +30,7 @@
       <div class="login-brand-panel">
 
         <div class="brand-lockup">
+
           <img
             src="/assets/est-emblem.png"
             alt="EST Travel emblem"
@@ -39,6 +40,7 @@
             <strong>EST TRAVEL</strong>
             <span>Your journey starts here</span>
           </div>
+
         </div>
 
 
@@ -67,6 +69,7 @@
 
           <span>
             <b>✓</b>
+
             <span data-i18n="feature1">
               English & Georgian content
             </span>
@@ -74,6 +77,7 @@
 
           <span>
             <b>✓</b>
+
             <span data-i18n="feature2">
               Owner-only editing
             </span>
@@ -81,6 +85,7 @@
 
           <span>
             <b>✓</b>
+
             <span data-i18n="feature3">
               Photo upload & publishing controls
             </span>
@@ -89,7 +94,6 @@
         </div>
 
       </div>
-
 
 
       <div class="login-card-wrap">
@@ -219,7 +223,6 @@
     </section>
 
 
-
     <!-- DASHBOARD -->
     <section
       class="dashboard hidden"
@@ -236,11 +239,15 @@
           >
 
           <div>
-            <strong>EST TRAVEL</strong>
+
+            <strong>
+              EST TRAVEL
+            </strong>
 
             <span data-i18n="ownerDashboard">
               Owner Dashboard
             </span>
+
           </div>
 
         </div>
@@ -292,7 +299,6 @@
       </header>
 
 
-
       <section class="dashboard-hero">
 
         <div>
@@ -329,7 +335,6 @@
       </section>
 
 
-
       <section class="notice">
 
         <div class="notice-icon">
@@ -352,7 +357,6 @@
       </section>
 
 
-
       <!-- ADD TOUR -->
       <section class="add-tour-panel">
 
@@ -361,6 +365,7 @@
           <div class="panel-icon">
             ＋
           </div>
+
 
           <div>
 
@@ -376,14 +381,13 @@
             </h2>
 
             <p data-i18n="addNewTourText">
-              Enter the tour information and photo,
+              Enter the tour information, descriptions and photo,
               then create the complete package in one step.
             </p>
 
           </div>
 
         </div>
-
 
 
         <form
@@ -462,36 +466,6 @@
           </label>
 
 
-          <label class="full-create-field">
-
-            <span data-i18n="englishDescription">
-              English description
-            </span>
-
-            <textarea
-              id="newDescriptionEn"
-              rows="4"
-              placeholder="A short city escape with culture, shopping and beautiful views."
-            ></textarea>
-
-          </label>
-
-
-          <label class="full-create-field">
-
-            <span data-i18n="georgianDescription">
-              Georgian description
-            </span>
-
-            <textarea
-              id="newDescriptionKa"
-              rows="4"
-              placeholder="მოკლე აღწერა ტურის, სასტუმროს, აქტივობებისა და სხვა დეტალების შესახებ."
-            ></textarea>
-
-          </label>
-
-
           <label class="new-photo-field">
 
             <span data-i18n="tourPhoto">
@@ -504,6 +478,38 @@
               accept="image/jpeg,image/png,image/webp"
               required
             >
+
+          </label>
+
+
+          <!-- NEW ENGLISH DESCRIPTION -->
+          <label class="full-create-field">
+
+            <span data-i18n="englishDescription">
+              English description
+            </span>
+
+            <textarea
+              id="newDescriptionEn"
+              rows="4"
+              placeholder="Write the English tour description..."
+            ></textarea>
+
+          </label>
+
+
+          <!-- NEW GEORGIAN DESCRIPTION -->
+          <label class="full-create-field">
+
+            <span data-i18n="georgianDescription">
+              Georgian description
+            </span>
+
+            <textarea
+              id="newDescriptionKa"
+              rows="4"
+              placeholder="ჩაწერეთ ტურის ქართული აღწერა..."
+            ></textarea>
 
           </label>
 
@@ -524,7 +530,6 @@
         </form>
 
       </section>
-
 
 
       <!-- MANAGE TOURS -->
