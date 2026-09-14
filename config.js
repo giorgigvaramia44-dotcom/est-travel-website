@@ -2,15 +2,26 @@ const fs = require('fs');
 const path = require('path');
 
 const root = __dirname;
-const configPath = path.join(root, 'private-config.json');
-const privateConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+let localConfig = {};
+const localConfigPath = path.join(root, 'private-config.json');
+if (fs.existsSync(localConfigPath)) {
+  try {
+    localConfig = JSON.parse(fs.readFileSync(localConfigPath, 'utf8'));
+  } catch (_) {
+    console.warn('private-config.json exists but could not be read. Environment variables will be used.');
+  }
+}
+
+const storageDir = process.env.STORAGE_DIR || path.join(root, 'storage');
 
 module.exports = {
   root,
-  port: Number(privateConfig.port || 3000),
-  adminUsername: String(privateConfig.adminUsername || 'owner'),
-  adminPassword: String(privateConfig.adminPassword || ''),
+  port: Number(process.env.PORT || localConfig.port || 3000),
+  adminUsername: String(process.env.ADMIN_USERNAME || localConfig.adminUsername || 'owner'),
+  adminPassword: String(process.env.ADMIN_PASSWORD || localConfig.adminPassword || ''),
   publicDir: path.join(root, 'public'),
-  uploadsDir: path.join(root, 'public', 'uploads'),
-  toursFile: path.join(root, 'data', 'tours.json')
+  seedToursFile: path.join(root, 'data', 'tours.json'),
+  storageDir,
+  uploadsDir: path.join(storageDir, 'uploads'),
+  toursFile: path.join(storageDir, 'tours.json')
 };

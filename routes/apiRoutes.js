@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
-const { adminUsername, adminPassword, publicDir } = require('../config');
+const { adminUsername, adminPassword, uploadsDir } = require('../config');
 const { readTours, writeTours } = require('../services/tourStore');
 const { createSession, isValidSession, destroySession } = require('../services/sessionStore');
 const { saveUploadedImage } = require('../services/uploadParser');
@@ -51,7 +51,8 @@ function normalizeText(value) {
 
 function removePublicImage(imagePath) {
   if (!imagePath || !imagePath.startsWith('/uploads/')) return;
-  const fullPath = path.join(publicDir, imagePath.replace(/^\//, ''));
+  const fileName = path.basename(imagePath);
+  const fullPath = path.join(uploadsDir, fileName);
   if (fs.existsSync(fullPath)) {
     try { fs.unlinkSync(fullPath); } catch (_) {}
   }

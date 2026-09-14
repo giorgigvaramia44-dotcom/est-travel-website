@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="EST Travel — airline tickets, hotels, insurance and tours from Tbilisi, Georgia.">
+  <meta name="theme-color" content="#0a96c8">
+  <title>EST Travel — Your journey starts here</title>
+  <link rel="icon" href="./assets/est-emblem.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/site.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <span data-i18n="officeAddress">38 Budapest Street, Tbilisi</span>
+      <div class="topbar-links">
+        <a href="tel:+995550500200">+995 550 500 200</a>
+        <span>•</span>
+        <span data-i18n="hours">Mon–Fri · 11:00–19:00</span>
+      </div>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="container nav-row">
+      <a class="brand" href="#home" aria-label="EST Travel home">
+        <img class="brand-emblem" src="./assets/est-emblem.png" alt="EST Travel emblem">
+        <span class="brand-words">
+          <strong>EST TRAVEL</strong>
+          <small>Your journey starts here</small>
+        </span>
+      </a>
+
+      <nav class="desktop-nav" aria-label="Primary navigation">
+        <a href="#home" data-i18n="navHome">Home</a>
+        <a href="#services" data-i18n="navServices">Services</a>
+        <a href="#tours" data-i18n="navTours">Tours</a>
+        <a href="#contact" data-i18n="navContact">Contact</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="language-button" id="langButton" type="button">ქართული</button>
+        <a class="button button-primary desktop-offer" href="#contact" data-i18n="ctaOffer">Get an offer</a>
+        <button class="menu-button" id="menuButton" type="button" aria-expanded="false" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+
+    <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile navigation">
+      <a href="#home" data-i18n="navHome">Home</a>
+      <a href="#services" data-i18n="navServices">Services</a>
+      <a href="#tours" data-i18n="navTours">Tours</a>
+      <a href="#contact" data-i18n="navContact">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-decoration hero-decoration-one"></div>
+      <div class="hero-decoration hero-decoration-two"></div>
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow" data-i18n="heroEyebrow">Explore • Discover • Travel</p>
+          <h1 data-i18n="heroTitle">Your next journey starts here.</h1>
+          <p class="hero-text" data-i18n="heroText">Flights, hotels, travel insurance and tailored tour packages from EST Travel.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#tours" data-i18n="heroTours">Explore tours</a>
+            <a class="button button-ghost" href="#contact" data-i18n="heroContact">Contact us</a>
+          </div>
+          <div class="trust-row">
+            <span data-i18n="trust1">Personal travel support</span>
+            <span data-i18n="trust2">Flexible tour planning</span>
+            <span data-i18n="trust3">Tbilisi-based team</span>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-label="EST Travel brand panel">
+          <div class="hero-logo-panel">
+            <img src="./assets/est-emblem.png" alt="EST Travel emblem">
+            <strong>EST TRAVEL</strong>
+            <span>Your journey starts here</span>
+          </div>
+          <div class="floating-card floating-card-one">✈ <span data-i18n="serviceFlights">Airline tickets</span></div>
+          <div class="floating-card floating-card-two">🧳 <span data-i18n="serviceTours">Tours</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="services">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow dark" data-i18n="servicesEyebrow">Everything in one place</p>
+            <h2 data-i18n="servicesTitle">Travel services made simple</h2>
+          </div>
+          <p data-i18n="servicesText">Choose what you need and contact EST Travel for the current available options.</p>
+        </div>
+
+        <div class="services-grid">
+          <article class="service-card">
+            <div class="service-icon">✈</div>
+            <h3 data-i18n="serviceFlights">Airline tickets</h3>
+            <p data-i18n="serviceFlightsText">Flight options for your route, dates and budget.</p>
+          </article>
+          <article class="service-card">
+            <div class="service-icon">▣</div>
+            <h3 data-i18n="serviceHotels">Hotels</h3>
+            <p data-i18n="serviceHotelsText">Accommodation matched to your trip and comfort level.</p>
+          </article>
+          <article class="service-card">
+            <div class="service-icon">◇</div>
+            <h3 data-i18n="serviceInsurance">Travel insurance</h3>
+            <p data-i18n="serviceInsuranceText">Add travel insurance to your booking.</p>
+          </article>
+          <article class="service-card">
+            <div class="service-icon">◎</div>
+            <h3 data-i18n="serviceTours">Tours</h3>
+            <p data-i18n="serviceToursText">Individual, couple, family and group travel packages.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section tours-section" id="tours">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow dark" data-i18n="toursEyebrow">Featured packages</p>
+            <h2 data-i18n="toursTitle">Choose your next destination</h2>
+          </div>
+          <p data-i18n="toursText">Prices and photos are controlled only by the EST Travel owner through the private admin panel.</p>
+        </div>
+
+        <div class="tour-grid" id="tourGrid">
+          <div class="empty-state" data-i18n="loadingTours">Loading tours…</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section contact-section" id="contact">
+      <div class="container contact-grid">
+        <div class="contact-intro">
+          <p class="eyebrow dark" data-i18n="contactEyebrow">Contact EST Travel</p>
+          <h2 data-i18n="contactTitle">Let’s plan your next trip</h2>
+          <p data-i18n="contactText">Call, email or message EST Travel on Instagram.</p>
+        </div>
+        <div class="contact-cards">
+          <a class="contact-card" href="tel:+995550500200">
+            <span data-i18n="phone">Phone</span>
+            <strong>+995 550 500 200</strong>
+          </a>
+          <a class="contact-card" href="mailto:info.est.official@gmail.com">
+            <span data-i18n="email">Email</span>
+            <strong>info.est.official@gmail.com</strong>
+          </a>
+          <a class="contact-card" href="https://www.instagram.com/esttravel.official/?hl=en" target="_blank" rel="noopener">
+            <span data-i18n="instagram">Instagram</span>
+            <strong>@esttravel.official</strong>
+          </a>
+          <a class="contact-card" href="https://www.google.com/maps/search/38+Budapest+Street+Tbilisi" target="_blank" rel="noopener">
+            <span data-i18n="office">Office</span>
+            <strong data-i18n="officeAddress">38 Budapest Street, Tbilisi</strong>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-row">
+      <div class="brand footer-brand">
+        <img class="brand-emblem" src="./assets/est-emblem.png" alt="EST Travel emblem">
+        <span class="brand-words"><strong>EST TRAVEL</strong><small>Your journey starts here</small></span>
+      </div>
+      <span>© 2026 EST Travel</span>
+    </div>
+  </footer>
+
+  <script src="./js/i18n.js"></script>
+  <script src="./js/site.js"></script>
+</body>
+</html>

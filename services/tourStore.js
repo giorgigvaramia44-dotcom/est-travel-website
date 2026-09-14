@@ -1,14 +1,27 @@
 const fs = require('fs');
-const { toursFile } = require('../config');
+const path = require('path');
+const { toursFile, seedToursFile, storageDir } = require('../config');
+
+function ensureTourFile() {
+  fs.mkdirSync(storageDir, { recursive: true });
+  if (!fs.existsSync(toursFile)) {
+    if (fs.existsSync(seedToursFile)) fs.copyFileSync(seedToursFile, toursFile);
+    else fs.writeFileSync(toursFile, '[]', 'utf8');
+  }
+}
 
 function readTours() {
+  ensureTourFile();
   const raw = fs.readFileSync(toursFile, 'utf8');
   const data = JSON.parse(raw);
   return Array.isArray(data) ? data : [];
 }
 
 function writeTours(tours) {
-  fs.writeFileSync(toursFile, JSON.stringify(tours, null, 2), 'utf8');
+  ensureTourFile();
+  const temp = `${toursFile}.tmp`;
+  fs.writeFileSync(temp, JSON.stringify(tours, null, 2), 'utf8');
+  fs.renameSync(temp, toursFile);
 }
 
-module.exports = { readTours, writeTours };
+module.exports = { readTours, writeTours, ensureTourFile };
