@@ -5,6 +5,10 @@
   "description": "Bilingual EST Travel site with owner-only tour management. Uses only built-in Node.js modules.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "db:up": "docker compose up -d"
+  },
+  "dependencies": {
+    "pg": "^8.16.3"
   }
 }

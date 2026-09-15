@@ -21,11 +21,15 @@ This is the corrected structure for a website you can sell to the company owner.
 - The site is responsive: large desktop → 4 tour cards, tablet → 2, phone → 1.
 - If the owner has not uploaded a tour image, the public site displays a designed photo placeholder.
 
-## Important: this version has no npm dependencies
+## Important: local run
 
-You do **not** need `npm install`.
+1. Start Postgres: `docker compose up -d`
+2. Install packages once: `npm install`
+3. Start the site: `node server.js` or `START_WEBSITE.bat`
 
-You only need Node.js installed.
+Tours live in the `tours` Postgres table. Admin add/edit/delete writes there. The JSON files are only used to seed an empty database.
+
+You need Node.js and Docker installed.
 
 ### Windows — easiest start
 
@@ -85,11 +89,14 @@ est-travel-final/
 ├─ lib/
 │  └─ http.js                   # HTTP/static-file helpers
 ├─ services/
-│  ├─ tourStore.js              # tour data storage
+│  ├─ tourStore.js              # tour data in Postgres
+│  ├─ db.js                     # Postgres connection
 │  ├─ sessionStore.js           # owner login sessions
 │  └─ uploadParser.js           # secure photo upload handling
+├─ db/
+│  └─ init.sql                  # tours table for Docker Postgres
 ├─ data/
-│  └─ tours.json                # saved tour data
+│  └─ tours.json                # seed data for an empty database
 ├─ public/
 │  ├─ index.html                # public website
 │  ├─ css/

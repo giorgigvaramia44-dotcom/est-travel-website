@@ -17,8 +17,11 @@ const {
 
 
 const {
-  readTours,
-  writeTours
+  listTours,
+  getTour,
+  createTour,
+  updateTour,
+  deleteTour
 } =
   require('../services/tourStore');
 
@@ -271,19 +274,6 @@ function removePublicImage(
 }
 
 
-function findTourIndex(
-  tours,
-  id
-) {
-
-  return tours.findIndex(
-    (tour) =>
-      tour.id === id
-  );
-
-}
-
-
 function makeId(
   titleEn,
   titleKa
@@ -461,25 +451,9 @@ async function handleApi(
   ) {
 
     const tours =
-      readTours()
-
-        .filter(
-          (tour) =>
-            tour.active !== false
-        )
-
-        .sort(
-          (a, b) =>
-            Number(
-              a.sortOrder || 0
-            )
-
-            -
-
-            Number(
-              b.sortOrder || 0
-            )
-        );
+      await listTours({
+        activeOnly: true
+      });
 
 
     sendJson(
@@ -706,19 +680,7 @@ async function handleApi(
   ) {
 
     const tours =
-      readTours()
-        .sort(
-          (a, b) =>
-            Number(
-              a.sortOrder || 0
-            )
-
-            -
-
-            Number(
-              b.sortOrder || 0
-            )
-        );
+      await listTours();
 
 
     sendJson(
@@ -787,24 +749,16 @@ async function handleApi(
           );
 
 
-        const tours =
-          readTours();
-
-
-        tours.push(
-          tour
-        );
-
-
-        writeTours(
-          tours
-        );
+        const created =
+          await createTour(
+            tour
+          );
 
 
         sendJson(
           res,
           201,
-          tour
+          created
         );
 
       }
@@ -879,24 +833,16 @@ async function handleApi(
         );
 
 
-      const tours =
-        readTours();
-
-
-      tours.push(
-        tour
-      );
-
-
-      writeTours(
-        tours
-      );
+      const created =
+        await createTour(
+          tour
+        );
 
 
       sendJson(
         res,
         201,
-        tour
+        created
       );
 
     }
@@ -941,19 +887,12 @@ async function handleApi(
       );
 
 
-    const tours =
-      readTours();
-
-
-    const index =
-      findTourIndex(
-        tours,
-        id
-      );
+    const current =
+      await getTour(id);
 
 
     if (
-      index === -1
+      !current
     ) {
 
       sendJson(
@@ -996,10 +935,6 @@ async function handleApi(
       return true;
 
     }
-
-
-    const current =
-      tours[index];
 
 
     const updated = {
@@ -1096,19 +1031,16 @@ async function handleApi(
     }
 
 
-    tours[index] =
-      updated;
-
-
-    writeTours(
-      tours
-    );
+    const saved =
+      await updateTour(
+        updated
+      );
 
 
     sendJson(
       res,
       200,
-      updated
+      saved
     );
 
 
@@ -1128,19 +1060,12 @@ async function handleApi(
       );
 
 
-    const tours =
-      readTours();
-
-
-    const index =
-      findTourIndex(
-        tours,
-        id
-      );
+    const removed =
+      await deleteTour(id);
 
 
     if (
-      index === -1
+      !removed
     ) {
 
       sendJson(
@@ -1158,20 +1083,8 @@ async function handleApi(
     }
 
 
-    const [removed] =
-      tours.splice(
-        index,
-        1
-      );
-
-
     removePublicImage(
       removed.image
-    );
-
-
-    writeTours(
-      tours
     );
 
 
@@ -1209,19 +1122,12 @@ async function handleApi(
       );
 
 
-    const tours =
-      readTours();
-
-
-    const index =
-      findTourIndex(
-        tours,
-        id
-      );
+    const current =
+      await getTour(id);
 
 
     if (
-      index === -1
+      !current
     ) {
 
       sendJson(
@@ -1252,21 +1158,18 @@ async function handleApi(
 
 
       const oldImage =
-        tours[index].image;
+        current.image;
 
 
-      tours[index].image =
-        uploaded.publicPath;
-
-
-      tours[index].updatedAt =
-        new Date()
-          .toISOString();
-
-
-      writeTours(
-        tours
-      );
+      const saved =
+        await updateTour({
+          ...current,
+          image:
+            uploaded.publicPath,
+          updatedAt:
+            new Date()
+              .toISOString()
+        });
 
 
       /*
@@ -1281,7 +1184,7 @@ async function handleApi(
       sendJson(
         res,
         200,
-        tours[index]
+        saved
       );
 
     }
@@ -1328,19 +1231,12 @@ async function handleApi(
       );
 
 
-    const tours =
-      readTours();
-
-
-    const index =
-      findTourIndex(
-        tours,
-        id
-      );
+    const current =
+      await getTour(id);
 
 
     if (
-      index === -1
+      !current
     ) {
 
       sendJson(
@@ -1359,21 +1255,17 @@ async function handleApi(
 
 
     const oldImage =
-      tours[index].image;
+      current.image;
 
 
-    tours[index].image =
-      '';
-
-
-    tours[index].updatedAt =
-      new Date()
-        .toISOString();
-
-
-    writeTours(
-      tours
-    );
+    const saved =
+      await updateTour({
+        ...current,
+        image: '',
+        updatedAt:
+          new Date()
+            .toISOString()
+      });
 
 
     removePublicImage(
@@ -1384,7 +1276,7 @@ async function handleApi(
     sendJson(
       res,
       200,
-      tours[index]
+      saved
     );
 
 

@@ -18,7 +18,7 @@ const {
 } = require('./lib/http');
 
 const {
-  ensureTourFile
+  initTourStore
 } = require('./services/tourStore');
 
 
@@ -38,9 +38,6 @@ fs.mkdirSync(
     recursive: true
   }
 );
-
-
-ensureTourFile();
 
 
 const server = http.createServer(
@@ -169,14 +166,24 @@ const server = http.createServer(
 
 
 
-server.listen(
-  port,
-  '0.0.0.0',
-  () => {
-
-    console.log(
-      `EST Travel is running on port ${port}.`
-    );
-
+async function start() {
+  try {
+    await initTourStore();
+  } catch (error) {
+    console.error(error.message || error);
+    process.exit(1);
   }
-);
+
+  server.listen(
+    port,
+    '0.0.0.0',
+    () => {
+      console.log(
+        `EST Travel is running on port ${port}.`
+      );
+    }
+  );
+}
+
+
+start();

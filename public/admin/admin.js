@@ -1816,7 +1816,7 @@ async function saveAllDirtyTours() {
    * SEQUENTIAL SAVE
    *
    * Avoid two cards changing
-   * tours.json simultaneously.
+   * the same tours at once.
    */
   for (
     const card of
