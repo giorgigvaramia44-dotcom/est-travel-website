@@ -11,10 +11,14 @@ const mobileMenu =
   document.getElementById('mobileMenu');
 
 
+const DESCRIPTION_PREVIEW_LIMIT = 170;
+
 let language =
   localStorage.getItem('est-language') || 'en';
 
 let tours = [];
+
+let openTourId = null;
 
 
 /* =========================================================
@@ -22,7 +26,6 @@ let tours = [];
 ========================================================= */
 
 function escapeHtml(value = '') {
-
   return String(value).replace(
     /[&<>"']/g,
     (char) => ({
@@ -33,48 +36,41 @@ function escapeHtml(value = '') {
       "'": '&#39;'
     })[char]
   );
-
 }
 
 
 function t(key) {
-
   return (
-    window.EST_I18N?.[language]?.[key] ||
-    window.EST_I18N?.en?.[key] ||
+    window.EST_I18N?.[language]?.[key]
+    ||
+    window.EST_I18N?.en?.[key]
+    ||
     key
   );
-
 }
 
 
 function applyStaticTranslations() {
-
-  document.documentElement.lang =
-    language;
-
+  document.documentElement.lang = language;
 
   document
     .querySelectorAll('[data-i18n]')
     .forEach((element) => {
-
       element.textContent =
         t(element.dataset.i18n);
-
     });
 
-
-  langButton.textContent =
-    language === 'en'
-      ? 'ქართული'
-      : 'EN';
-
+  if (langButton) {
+    langButton.textContent =
+      language === 'en'
+        ? 'ქართული'
+        : 'EN';
+  }
 
   localStorage.setItem(
     'est-language',
     language
   );
-
 }
 
 
@@ -83,177 +79,179 @@ function tourField(
   enKey,
   kaKey
 ) {
-
   if (language === 'ka') {
-
     return (
-      tour[kaKey] ||
-      tour[enKey] ||
+      tour[kaKey]
+      ||
+      tour[enKey]
+      ||
       ''
     );
-
   }
 
-
   return (
-    tour[enKey] ||
-    tour[kaKey] ||
+    tour[enKey]
+    ||
+    tour[kaKey]
+    ||
     ''
   );
-
 }
 
 
 /* =========================================================
-   PRICE TRANSLATION
+   PRICE
 ========================================================= */
 
 function formatPrice(rawPrice) {
-
   const raw =
     String(rawPrice || '').trim();
 
-
   if (!raw) {
-
     return '';
-
   }
 
-
-  /*
-   * English:
-   * From 999 GEL
-   */
   if (language !== 'ka') {
-
     return raw;
-
   }
 
-
-  /*
-   * Georgian:
-   * From 999 GEL
-   *
-   * becomes:
-   *
-   * 999 ₾-დან
-   */
   let value =
     raw.replace(
       /\bGEL\b/gi,
       '₾'
     );
 
-
   const fromMatch =
-    value.match(
-      /^From\s+(.+)$/i
-    );
-
+    value.match(/^From\s+(.+)$/i);
 
   if (fromMatch) {
-
     return `${fromMatch[1].trim()}-დან`;
-
   }
-
 
   const startingFromMatch =
     value.match(
       /^Starting\s+from\s+(.+)$/i
     );
 
-
   if (startingFromMatch) {
-
     return `${startingFromMatch[1].trim()}-დან`;
-
   }
-
 
   return value;
-
 }
 
 
 /* =========================================================
-   IMAGE URL
+   IMAGES
 ========================================================= */
 
-function imageUrl(tour) {
-
+function mainImageUrl(tour) {
   if (!tour.image) {
-
     return '';
-
   }
 
-
-  /*
-   * updatedAt changes when:
-   * - text changes
-   * - price changes
-   * - image changes
-   *
-   * The query parameter forces the
-   * browser to use the newest image.
-   */
   const version =
     encodeURIComponent(
-      tour.updatedAt ||
-      Date.now()
+      tour.updatedAt
+      ||
+      tour.id
+      ||
+      '1'
     );
 
-
   return `${tour.image}?v=${version}`;
+}
 
+
+function galleryImageUrl(image) {
+  if (!image?.url) {
+    return '';
+  }
+
+  return (
+    `${image.url}?v=${encodeURIComponent(
+      image.id || '1'
+    )}`
+  );
+}
+
+
+function tourImages(tour) {
+  const images = [];
+
+  /*
+   * MAIN IMAGE FIRST
+   */
+  if (tour.image) {
+    images.push({
+      id: 'main',
+      url: mainImageUrl(tour),
+      rawUrl: tour.image
+    });
+  }
+
+  /*
+   * ADDITIONAL GALLERY IMAGES
+   */
+  for (
+    const image of
+    (
+      tour.galleryImages
+      ||
+      []
+    )
+  ) {
+    if (!image?.url) {
+      continue;
+    }
+
+    images.push({
+      id: image.id,
+      url: galleryImageUrl(image),
+      rawUrl: image.url
+    });
+  }
+
+  return images;
 }
 
 
 /* =========================================================
-   RENDER TOURS
+   TOUR CARDS
 ========================================================= */
 
 function renderTours() {
-
   if (
-    !Array.isArray(tours) ||
+    !Array.isArray(tours)
+    ||
     tours.length === 0
   ) {
-
-    tourGrid.innerHTML =
-      `
-        <div class="empty-state">
-          ${escapeHtml(t('noTours'))}
-        </div>
-      `;
+    tourGrid.innerHTML = `
+      <div class="empty-state">
+        ${escapeHtml(t('noTours'))}
+      </div>
+    `;
 
     return;
-
   }
-
 
   const sorted =
     [...tours].sort(
       (a, b) =>
-        Number(a.sortOrder || 0) -
+        Number(a.sortOrder || 0)
+        -
         Number(b.sortOrder || 0)
     );
-
 
   tourGrid.innerHTML =
     sorted
       .map((tour) => {
-
         const title =
           tourField(
             tour,
             'titleEn',
             'titleKa'
           );
-
 
         const description =
           tourField(
@@ -262,7 +260,6 @@ function renderTours() {
             'descriptionKa'
           );
 
-
         const duration =
           tourField(
             tour,
@@ -270,25 +267,20 @@ function renderTours() {
             'durationKa'
           );
 
-
         const price =
           formatPrice(
             tour.price
           );
 
-
-        const subject =
-          encodeURIComponent(
-            `${
-              language === 'ka'
-                ? 'ტურის მოთხოვნა'
-                : 'Tour inquiry'
-            } — ${title}`
-          );
-
+        const hasLongDescription =
+          description.length >
+          DESCRIPTION_PREVIEW_LIMIT;
 
         return `
-          <article class="tour-card">
+          <article
+            class="tour-card"
+            data-tour-id="${escapeHtml(tour.id)}"
+          >
 
             <div class="tour-media">
 
@@ -297,7 +289,7 @@ function renderTours() {
 
                   ? `
                     <img
-                      src="${escapeHtml(imageUrl(tour))}"
+                      src="${escapeHtml(mainImageUrl(tour))}"
                       alt="${escapeHtml(title)}"
                       loading="lazy"
                     >
@@ -319,7 +311,6 @@ function renderTours() {
                     </div>
                   `
               }
-
 
               ${
                 price
@@ -344,7 +335,6 @@ function renderTours() {
                   ${escapeHtml(title)}
                 </h3>
 
-
                 ${
                   duration
 
@@ -360,88 +350,574 @@ function renderTours() {
               </div>
 
 
-              <p>
-                ${escapeHtml(description)}
-              </p>
+              <div class="tour-description-wrap">
+
+                <p
+                  class="
+                    tour-description
+                    ${
+                      hasLongDescription
+                        ? 'is-clamped'
+                        : ''
+                    }
+                  "
+                >
+                  ${escapeHtml(
+                    description
+                    ||
+                    t('noDescription')
+                  )}
+                </p>
 
 
-              <a
-                class="button button-primary button-full"
-                href="mailto:info.est.official@gmail.com?subject=${subject}"
+                ${
+                  hasLongDescription
+
+                    ? `
+                      <button
+                        class="description-toggle"
+                        type="button"
+                        data-action="toggle-description"
+                      >
+                        ${escapeHtml(
+                          t('showMore')
+                        )}
+                      </button>
+                    `
+
+                    : ''
+                }
+
+              </div>
+
+
+              <button
+                class="button button-primary button-full about-tour-button"
+                type="button"
+                data-action="about-tour"
               >
-                ${escapeHtml(t('askTour'))}
-              </a>
+                ${escapeHtml(
+                  t('aboutTour')
+                )}
+              </button>
 
             </div>
 
           </article>
         `;
-
       })
       .join('');
 
+  bindTourCardActions();
 }
 
 
 /* =========================================================
-   CHECK WHETHER DATA CHANGED
+   CARD ACTIONS
+========================================================= */
+
+function bindTourCardActions() {
+  tourGrid
+    .querySelectorAll('.tour-card')
+    .forEach((card) => {
+      const tourId =
+        card.dataset.tourId;
+
+      /*
+       * SHOW MORE / SHOW LESS
+       */
+      const toggle =
+        card.querySelector(
+          '[data-action="toggle-description"]'
+        );
+
+      if (toggle) {
+        toggle.addEventListener(
+          'click',
+          () => {
+            const description =
+              card.querySelector(
+                '.tour-description'
+              );
+
+            const expanded =
+              description
+                .classList
+                .toggle(
+                  'is-expanded'
+                );
+
+            description
+              .classList
+              .toggle(
+                'is-clamped',
+                !expanded
+              );
+
+            toggle.textContent =
+              expanded
+                ? t('showLess')
+                : t('showMore');
+          }
+        );
+      }
+
+      /*
+       * ABOUT THIS TOUR
+       */
+      const aboutButton =
+        card.querySelector(
+          '[data-action="about-tour"]'
+        );
+
+      if (aboutButton) {
+        aboutButton.addEventListener(
+          'click',
+          () => {
+            openTourModal(
+              tourId
+            );
+          }
+        );
+      }
+    });
+}
+
+
+/* =========================================================
+   CREATE TOUR MODAL
+========================================================= */
+
+function ensureTourModal() {
+  let modal =
+    document.getElementById(
+      'tourDetailModal'
+    );
+
+  if (modal) {
+    return modal;
+  }
+
+  modal =
+    document.createElement('div');
+
+  modal.id =
+    'tourDetailModal';
+
+  modal.className =
+    'tour-modal hidden';
+
+  modal.setAttribute(
+    'aria-hidden',
+    'true'
+  );
+
+  modal.innerHTML = `
+    <div
+      class="tour-modal-backdrop"
+      data-close-modal
+    ></div>
+
+    <section
+      class="tour-modal-dialog"
+      role="dialog"
+      aria-modal="true"
+    >
+
+      <button
+        class="tour-modal-close"
+        type="button"
+        data-close-modal
+        aria-label="Close"
+      >
+        ×
+      </button>
+
+      <div
+        id="tourModalContent"
+      ></div>
+
+    </section>
+  `;
+
+  document.body.appendChild(
+    modal
+  );
+
+  modal
+    .querySelectorAll(
+      '[data-close-modal]'
+    )
+    .forEach((element) => {
+      element.addEventListener(
+        'click',
+        closeTourModal
+      );
+    });
+
+  return modal;
+}
+
+
+/* =========================================================
+   OPEN TOUR MODAL
+========================================================= */
+
+function openTourModal(tourId) {
+  const tour =
+    tours.find(
+      (item) =>
+        item.id === tourId
+    );
+
+  if (!tour) {
+    return;
+  }
+
+  openTourId =
+    tourId;
+
+  const modal =
+    ensureTourModal();
+
+  const content =
+    modal.querySelector(
+      '#tourModalContent'
+    );
+
+  const title =
+    tourField(
+      tour,
+      'titleEn',
+      'titleKa'
+    );
+
+  const description =
+    tourField(
+      tour,
+      'descriptionEn',
+      'descriptionKa'
+    )
+    ||
+    t('noDescription');
+
+  const duration =
+    tourField(
+      tour,
+      'durationEn',
+      'durationKa'
+    );
+
+  const price =
+    formatPrice(
+      tour.price
+    );
+
+  const images =
+    tourImages(
+      tour
+    );
+
+  const initialImage =
+    images[0]?.url || '';
+
+  const emailSubject =
+    encodeURIComponent(
+      `${
+        language === 'ka'
+          ? 'ტურის მოთხოვნა'
+          : 'Tour inquiry'
+      } — ${title}`
+    );
+
+  content.innerHTML = `
+    <div class="tour-modal-layout">
+
+      <!-- LEFT SIDE -->
+      <div class="tour-modal-info">
+
+        <p class="tour-modal-eyebrow">
+          ${escapeHtml(
+            t('tourDetails')
+          )}
+        </p>
+
+
+        <h2>
+          ${escapeHtml(title)}
+        </h2>
+
+
+        <div class="tour-modal-meta">
+
+          ${
+            price
+
+              ? `
+                <span>
+                  ${escapeHtml(price)}
+                </span>
+              `
+
+              : ''
+          }
+
+          ${
+            duration
+
+              ? `
+                <span>
+                  ${escapeHtml(duration)}
+                </span>
+              `
+
+              : ''
+          }
+
+        </div>
+
+
+        <div class="tour-modal-description">
+          ${escapeHtml(description)}
+        </div>
+
+
+        <a
+          class="button button-primary button-full"
+          href="mailto:info.est.official@gmail.com?subject=${emailSubject}"
+        >
+          ${escapeHtml(
+            t('askTour')
+          )}
+        </a>
+
+      </div>
+
+
+      <!-- RIGHT SIDE -->
+      <div class="tour-modal-gallery">
+
+        ${
+          initialImage
+
+            ? `
+              <div class="tour-modal-main-image-wrap">
+
+                <img
+                  id="tourModalMainImage"
+                  class="tour-modal-main-image"
+                  src="${escapeHtml(initialImage)}"
+                  alt="${escapeHtml(title)}"
+                >
+
+              </div>
+            `
+
+            : `
+              <div class="tour-modal-main-image-wrap">
+
+                <div class="photo-placeholder">
+
+                  <span class="placeholder-icon">
+                    ✈
+                  </span>
+
+                  <strong>
+                    ${escapeHtml(
+                      t('photoPlaceholder')
+                    )}
+                  </strong>
+
+                </div>
+
+              </div>
+            `
+        }
+
+
+        ${
+          images.length > 1
+
+            ? `
+              <div class="tour-modal-gallery-title">
+                ${escapeHtml(
+                  t('gallery')
+                )}
+              </div>
+
+
+              <div class="tour-modal-thumbnails">
+
+                ${
+                  images
+                    .map(
+                      (
+                        image,
+                        index
+                      ) => `
+                        <button
+                          class="
+                            tour-modal-thumb
+                            ${
+                              index === 0
+                                ? 'active'
+                                : ''
+                            }
+                          "
+                          type="button"
+                          data-gallery-src="${escapeHtml(image.url)}"
+                        >
+
+                          <img
+                            src="${escapeHtml(image.url)}"
+                            alt="${escapeHtml(title)}"
+                          >
+
+                        </button>
+                      `
+                    )
+                    .join('')
+                }
+
+              </div>
+            `
+
+            : ''
+        }
+
+      </div>
+
+    </div>
+  `;
+
+
+  /*
+   * GALLERY THUMBNAIL CLICK
+   */
+  content
+    .querySelectorAll(
+      '.tour-modal-thumb'
+    )
+    .forEach((button) => {
+      button.addEventListener(
+        'click',
+        () => {
+          const mainImage =
+            content.querySelector(
+              '#tourModalMainImage'
+            );
+
+          if (!mainImage) {
+            return;
+          }
+
+          mainImage.src =
+            button.dataset.gallerySrc;
+
+          content
+            .querySelectorAll(
+              '.tour-modal-thumb'
+            )
+            .forEach((item) => {
+              item
+                .classList
+                .remove('active');
+            });
+
+          button
+            .classList
+            .add('active');
+        }
+      );
+    });
+
+
+  modal
+    .classList
+    .remove('hidden');
+
+  modal.setAttribute(
+    'aria-hidden',
+    'false'
+  );
+
+  document.body
+    .classList
+    .add('modal-open');
+}
+
+
+/* =========================================================
+   CLOSE MODAL
+========================================================= */
+
+function closeTourModal() {
+  const modal =
+    document.getElementById(
+      'tourDetailModal'
+    );
+
+  if (!modal) {
+    return;
+  }
+
+  modal
+    .classList
+    .add('hidden');
+
+  modal.setAttribute(
+    'aria-hidden',
+    'true'
+  );
+
+  document.body
+    .classList
+    .remove('modal-open');
+
+  openTourId =
+    null;
+}
+
+
+/* =========================================================
+   CHECK IF TOURS CHANGED
 ========================================================= */
 
 function toursChanged(newTours) {
-
   try {
-
     return (
-      JSON.stringify(newTours) !==
+      JSON.stringify(newTours)
+      !==
       JSON.stringify(tours)
     );
-
   }
-
   catch (_) {
-
     return true;
-
   }
-
 }
 
 
 /* =========================================================
-   LOAD TOURS FROM BACKEND
+   LOAD TOURS
 ========================================================= */
 
 async function loadTours(
   silent = false
 ) {
-
   if (!silent) {
-
-    tourGrid.innerHTML =
-      `
-        <div class="empty-state">
-          ${escapeHtml(
-            t('loadingTours')
-          )}
-        </div>
-      `;
-
+    tourGrid.innerHTML = `
+      <div class="empty-state">
+        ${escapeHtml(
+          t('loadingTours')
+        )}
+      </div>
+    `;
   }
 
-
   try {
-
-    /*
-     * Timestamp prevents browser,
-     * Railway or proxy caching.
-     */
-    const url =
-      `/api/tours?refresh=${Date.now()}`;
-
-
     const response =
       await fetch(
-        url,
+        `/api/tours?refresh=${Date.now()}`,
         {
           method: 'GET',
 
@@ -457,61 +933,59 @@ async function loadTours(
         }
       );
 
-
     if (!response.ok) {
-
       throw new Error(
         'Could not load tours.'
       );
-
     }
-
 
     const freshTours =
       await response.json();
 
-
-    /*
-     * Only redraw the cards if
-     * something actually changed.
-     */
     if (
-      toursChanged(freshTours)
+      toursChanged(
+        freshTours
+      )
     ) {
-
       tours =
         freshTours;
 
-
       renderTours();
 
+      /*
+       * If currently opened tour
+       * was deleted, close modal.
+       */
+      if (openTourId) {
+        const stillExists =
+          tours.some(
+            (tour) =>
+              tour.id ===
+              openTourId
+          );
+
+        if (!stillExists) {
+          closeTourModal();
+        }
+      }
     }
-
   }
-
   catch (error) {
-
     console.error(
       'Tour refresh failed:',
       error
     );
 
-
     if (!silent) {
-
-      tourGrid.innerHTML =
-        `
-          <div class="empty-state">
-            ${escapeHtml(
-              t('noTours')
-            )}
-          </div>
-        `;
-
+      tourGrid.innerHTML = `
+        <div class="empty-state">
+          ${escapeHtml(
+            t('noTours')
+          )}
+        </div>
+      `;
     }
-
   }
-
 }
 
 
@@ -519,153 +993,130 @@ async function loadTours(
    LANGUAGE SWITCH
 ========================================================= */
 
-langButton
-  .addEventListener(
+if (langButton) {
+  langButton.addEventListener(
     'click',
     () => {
-
       language =
         language === 'en'
           ? 'ka'
           : 'en';
 
-
       applyStaticTranslations();
 
-
-      /*
-       * Tour data does not need
-       * fetching again just because
-       * language changed.
-       */
       renderTours();
 
+      /*
+       * Refresh opened modal
+       * in the newly selected language.
+       */
+      if (openTourId) {
+        openTourModal(
+          openTourId
+        );
+      }
     }
   );
+}
 
 
 /* =========================================================
    MOBILE MENU
 ========================================================= */
 
-menuButton
-  .addEventListener(
+if (
+  menuButton
+  &&
+  mobileMenu
+) {
+  menuButton.addEventListener(
     'click',
     () => {
-
       const open =
         mobileMenu
           .classList
           .toggle('open');
 
-
-      menuButton
-        .setAttribute(
-          'aria-expanded',
-          String(open)
-        );
-
+      menuButton.setAttribute(
+        'aria-expanded',
+        String(open)
+      );
     }
   );
 
 
-mobileMenu
-  .querySelectorAll('a')
-  .forEach(
-    (link) => {
-
+  mobileMenu
+    .querySelectorAll('a')
+    .forEach((link) => {
       link.addEventListener(
         'click',
         () => {
-
           mobileMenu
             .classList
             .remove('open');
 
-
-          menuButton
-            .setAttribute(
-              'aria-expanded',
-              'false'
-            );
-
+          menuButton.setAttribute(
+            'aria-expanded',
+            'false'
+          );
         }
       );
-
-    }
-  );
+    });
+}
 
 
 /* =========================================================
-   LIVE UPDATE
+   ESC CLOSE
 ========================================================= */
 
-/*
- * Check backend every 3 seconds.
- *
- * The page itself does NOT reload.
- * Only tour cards update.
- */
+document.addEventListener(
+  'keydown',
+  (event) => {
+    if (
+      event.key === 'Escape'
+    ) {
+      closeTourModal();
+    }
+  }
+);
+
+
+/* =========================================================
+   LIVE REFRESH
+========================================================= */
+
 setInterval(
   () => {
-
     loadTours(true);
-
   },
-
   3000
 );
 
 
-/*
- * Immediately check when visitor
- * returns to the browser tab.
- */
-document
-  .addEventListener(
-    'visibilitychange',
-    () => {
-
-      if (!document.hidden) {
-
-        loadTours(true);
-
-      }
-
-    }
-  );
+window.addEventListener(
+  'focus',
+  () => {
+    loadTours(true);
+  }
+);
 
 
-/*
- * Also check when browser window
- * receives focus.
- */
-window
-  .addEventListener(
-    'focus',
-    () => {
-
+document.addEventListener(
+  'visibilitychange',
+  () => {
+    if (!document.hidden) {
       loadTours(true);
-
     }
-  );
+  }
+);
 
 
-/*
- * The browser back-forward cache
- * can restore an old page.
- *
- * Refresh tour data after restore.
- */
-window
-  .addEventListener(
-    'pageshow',
-    () => {
-
-      loadTours(true);
-
-    }
-  );
+window.addEventListener(
+  'pageshow',
+  () => {
+    loadTours(true);
+  }
+);
 
 
 /* =========================================================
@@ -674,5 +1125,4 @@ window
 
 applyStaticTranslations();
 
-
-loadTours();
+loadTours(false);
