@@ -42,6 +42,10 @@ let openTourId =
   null;
 
 
+/* =========================================================
+   HELPERS
+========================================================= */
+
 function escapeHtml(
   value = ''
 ) {
@@ -50,16 +54,11 @@ function escapeHtml(
     .replace(
       /[&<>"']/g,
       (char) => ({
-        '&':
-          '&amp;',
-        '<':
-          '&lt;',
-        '>':
-          '&gt;',
-        '"':
-          '&quot;',
-        "'":
-          '&#39;'
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
       })[char]
     );
 }
@@ -78,6 +77,10 @@ function t(
   );
 }
 
+
+/* =========================================================
+   LANGUAGE
+========================================================= */
 
 function applyStaticTranslations() {
 
@@ -151,6 +154,10 @@ function tourField(
 }
 
 
+/* =========================================================
+   PRICE
+========================================================= */
+
 function formatPrice(
   rawPrice
 ) {
@@ -161,8 +168,14 @@ function formatPrice(
     ).trim();
 
 
+  if (!raw) {
+
+    return '';
+
+  }
+
+
   if (
-    !raw ||
     language !== 'ka'
   ) {
 
@@ -171,7 +184,7 @@ function formatPrice(
   }
 
 
-  const value =
+  let value =
     raw.replace(
       /\bGEL\b/gi,
       '₾'
@@ -212,6 +225,10 @@ function formatPrice(
 }
 
 
+/* =========================================================
+   IMAGE URLS
+========================================================= */
+
 function versionedImageUrl(
   url,
   version
@@ -231,7 +248,9 @@ function versionedImageUrl(
 
 
   return (
-    `${url}${separator}v=${encodeURIComponent(version || '1')}`
+    `${url}${separator}v=${encodeURIComponent(
+      version || '1'
+    )}`
   );
 }
 
@@ -263,6 +282,10 @@ function galleryImageUrl(
 }
 
 
+/*
+ * Main image is the first gallery image.
+ * Catalog images follow it.
+ */
 function tourImages(
   tour
 ) {
@@ -279,9 +302,11 @@ function tourImages(
         `main-${tour.mainImageId || tour.id}`,
 
       url:
-        mainImageUrl(tour),
+        mainImageUrl(
+          tour
+        ),
 
-      label:
+      type:
         'main'
 
     });
@@ -298,9 +323,7 @@ function tourImages(
     )
   ) {
 
-    if (
-      !image?.url
-    ) {
+    if (!image?.url) {
 
       continue;
 
@@ -317,7 +340,7 @@ function tourImages(
           image
         ),
 
-      label:
+      type:
         'gallery'
 
     });
@@ -328,6 +351,10 @@ function tourImages(
   return images;
 }
 
+
+/* =========================================================
+   RENDER TOUR CARDS
+========================================================= */
 
 function renderTours() {
 
@@ -418,7 +445,9 @@ function renderTours() {
 
                     ? `
                       <img
-                        src="${escapeHtml(mainImageUrl(tour))}"
+                        src="${escapeHtml(
+                          mainImageUrl(tour)
+                        )}"
                         alt="${escapeHtml(title)}"
                         loading="lazy"
                       >
@@ -544,6 +573,10 @@ function renderTours() {
 }
 
 
+/* =========================================================
+   TOUR CARD ACTIONS
+========================================================= */
+
 function bindTourCardActions() {
 
   tourGrid
@@ -612,10 +645,13 @@ function bindTourCardActions() {
 
           aboutButton.addEventListener(
             'click',
-            () =>
+            () => {
+
               openTourModal(
                 tourId
-              )
+              );
+
+            }
           );
 
         }
@@ -624,6 +660,10 @@ function bindTourCardActions() {
     );
 }
 
+
+/* =========================================================
+   CREATE MODAL
+========================================================= */
 
 function ensureTourModal() {
 
@@ -667,6 +707,7 @@ function ensureTourModal() {
         data-close-modal
       ></div>
 
+
       <section
         class="tour-modal-dialog"
         role="dialog"
@@ -681,6 +722,7 @@ function ensureTourModal() {
         >
           ×
         </button>
+
 
         <div
           id="tourModalContent"
@@ -715,6 +757,10 @@ function ensureTourModal() {
   return modal;
 }
 
+
+/* =========================================================
+   OPEN TOUR MODAL
+========================================================= */
 
 function openTourModal(
   tourId
@@ -807,6 +853,8 @@ function openTourModal(
       <div class="tour-modal-layout">
 
 
+        <!-- LEFT SIDE -->
+
         <div class="tour-modal-info">
 
           <p class="tour-modal-eyebrow">
@@ -825,22 +873,26 @@ function openTourModal(
 
             ${
               price
+
                 ? `
                   <span>
                     ${escapeHtml(price)}
                   </span>
                 `
+
                 : ''
             }
 
 
             ${
               duration
+
                 ? `
                   <span>
                     ${escapeHtml(duration)}
                   </span>
                 `
+
                 : ''
             }
 
@@ -865,20 +917,53 @@ function openTourModal(
 
 
 
+        <!-- RIGHT SIDE -->
+
         <div class="tour-modal-gallery">
+
 
           ${
             initialImage
 
               ? `
-                <div class="tour-modal-main-image-wrap">
+                <div
+                  class="tour-modal-main-image-wrap"
+                  id="tourModalMainImageWrap"
+                >
+
+                  <button
+                    class="gallery-arrow gallery-arrow-left"
+                    id="galleryPrevious"
+                    type="button"
+                    aria-label="Previous photo"
+                    hidden
+                  >
+                    ‹
+                  </button>
+
 
                   <img
                     id="tourModalMainImage"
                     class="tour-modal-main-image"
                     src="${escapeHtml(initialImage)}"
                     alt="${escapeHtml(title)}"
+                    draggable="false"
                   >
+
+
+                  <button
+                    class="gallery-arrow gallery-arrow-right"
+                    id="galleryNext"
+                    type="button"
+                    aria-label="Next photo"
+                    ${
+                      images.length > 1
+                        ? ''
+                        : 'hidden'
+                    }
+                  >
+                    ›
+                  </button>
 
                 </div>
               `
@@ -916,35 +1001,45 @@ function openTourModal(
                 </div>
 
 
-                <div class="tour-modal-thumbnails">
+                <div
+                  class="tour-modal-thumb-viewport"
+                >
 
-                  ${
-                    images
-                      .map(
-                        (
-                          image,
-                          index
-                        ) => `
-                          <button
-                            class="tour-modal-thumb ${
-                              index === 0
-                                ? 'active'
-                                : ''
-                            }"
-                            type="button"
-                            data-gallery-src="${escapeHtml(image.url)}"
-                          >
+                  <div
+                    class="tour-modal-thumbnails"
+                    id="tourModalThumbnails"
+                  >
 
-                            <img
-                              src="${escapeHtml(image.url)}"
-                              alt="${escapeHtml(title)}"
+                    ${
+                      images
+                        .map(
+                          (
+                            image,
+                            index
+                          ) => `
+                            <button
+                              class="tour-modal-thumb ${
+                                index === 0
+                                  ? 'active'
+                                  : ''
+                              }"
+                              type="button"
+                              data-gallery-index="${index}"
                             >
 
-                          </button>
-                        `
-                      )
-                      .join('')
-                  }
+                              <img
+                                src="${escapeHtml(image.url)}"
+                                alt="${escapeHtml(title)}"
+                                draggable="false"
+                              >
+
+                            </button>
+                          `
+                        )
+                        .join('')
+                    }
+
+                  </div>
 
                 </div>
               `
@@ -958,60 +1053,400 @@ function openTourModal(
     `;
 
 
-  content
-    .querySelectorAll(
-      '.tour-modal-thumb'
-    )
-    .forEach(
-      (button) => {
+  /* =======================================================
+     GALLERY CAROUSEL
+  ======================================================= */
 
-        button.addEventListener(
+  if (
+    images.length > 0
+  ) {
+
+    let currentImageIndex =
+      0;
+
+
+    const mainImage =
+      content.querySelector(
+        '#tourModalMainImage'
+      );
+
+
+    const mainImageWrap =
+      content.querySelector(
+        '#tourModalMainImageWrap'
+      );
+
+
+    const previousButton =
+      content.querySelector(
+        '#galleryPrevious'
+      );
+
+
+    const nextButton =
+      content.querySelector(
+        '#galleryNext'
+      );
+
+
+    const thumbnailStrip =
+      content.querySelector(
+        '#tourModalThumbnails'
+      );
+
+
+    const thumbnails =
+      [
+        ...content.querySelectorAll(
+          '.tour-modal-thumb'
+        )
+      ];
+
+
+    /*
+     * Change currently selected image.
+     */
+    function selectGalleryImage(
+      index
+    ) {
+
+      if (
+        index < 0 ||
+        index >= images.length
+      ) {
+
+        return;
+
+      }
+
+
+      currentImageIndex =
+        index;
+
+
+      if (mainImage) {
+
+        mainImage.src =
+          images[
+            currentImageIndex
+          ].url;
+
+      }
+
+
+      /*
+       * Highlight current thumbnail.
+       */
+      thumbnails.forEach(
+        (
+          thumbnail,
+          thumbnailIndex
+        ) => {
+
+          thumbnail
+            .classList
+            .toggle(
+              'active',
+              thumbnailIndex ===
+              currentImageIndex
+            );
+
+        }
+      );
+
+
+      /*
+       * Hide left arrow on first image.
+       */
+      if (previousButton) {
+
+        previousButton.hidden =
+          currentImageIndex === 0;
+
+      }
+
+
+      /*
+       * Hide right arrow on last image.
+       */
+      if (nextButton) {
+
+        nextButton.hidden =
+          currentImageIndex ===
+          images.length - 1;
+
+      }
+
+
+      /*
+       * Keep selected thumbnail visible.
+       */
+      const activeThumbnail =
+        thumbnails[
+          currentImageIndex
+        ];
+
+
+      if (
+        activeThumbnail &&
+        thumbnailStrip
+      ) {
+
+        const thumbnailLeft =
+          activeThumbnail.offsetLeft;
+
+
+        const thumbnailWidth =
+          activeThumbnail.offsetWidth;
+
+
+        const stripWidth =
+          thumbnailStrip.clientWidth;
+
+
+        const desiredScroll =
+          thumbnailLeft
+          -
+          (
+            stripWidth / 2
+          )
+          +
+          (
+            thumbnailWidth / 2
+          );
+
+
+        thumbnailStrip.scrollTo({
+
+          left:
+            Math.max(
+              0,
+              desiredScroll
+            ),
+
+          behavior:
+            'smooth'
+
+        });
+
+      }
+
+    }
+
+
+    /*
+     * Click thumbnail.
+     */
+    thumbnails.forEach(
+      (
+        thumbnail,
+        index
+      ) => {
+
+        thumbnail.addEventListener(
           'click',
           () => {
 
-            const mainImage =
-              content.querySelector(
-                '#tourModalMainImage'
-              );
-
-
-            if (!mainImage) {
-
-              return;
-
-            }
-
-
-            mainImage.src =
-              button.dataset.gallerySrc;
-
-
-            content
-              .querySelectorAll(
-                '.tour-modal-thumb'
-              )
-              .forEach(
-                (item) => {
-
-                  item.classList.remove(
-                    'active'
-                  );
-
-                }
-              );
-
-
-            button
-              .classList
-              .add(
-                'active'
-              );
+            selectGalleryImage(
+              index
+            );
 
           }
         );
 
       }
     );
+
+
+    /*
+     * Previous arrow.
+     */
+    if (previousButton) {
+
+      previousButton.addEventListener(
+        'click',
+        (event) => {
+
+          event.stopPropagation();
+
+
+          selectGalleryImage(
+            currentImageIndex - 1
+          );
+
+        }
+      );
+
+    }
+
+
+    /*
+     * Next arrow.
+     */
+    if (nextButton) {
+
+      nextButton.addEventListener(
+        'click',
+        (event) => {
+
+          event.stopPropagation();
+
+
+          selectGalleryImage(
+            currentImageIndex + 1
+          );
+
+        }
+      );
+
+    }
+
+
+    /* =====================================================
+       MOBILE SWIPE
+    ===================================================== */
+
+    if (mainImageWrap) {
+
+      let touchStartX =
+        0;
+
+
+      let touchStartY =
+        0;
+
+
+      mainImageWrap.addEventListener(
+        'touchstart',
+        (event) => {
+
+          const touch =
+            event.touches[0];
+
+
+          if (!touch) {
+
+            return;
+
+          }
+
+
+          touchStartX =
+            touch.clientX;
+
+
+          touchStartY =
+            touch.clientY;
+
+        },
+        {
+          passive: true
+        }
+      );
+
+
+      mainImageWrap.addEventListener(
+        'touchend',
+        (event) => {
+
+          const touch =
+            event.changedTouches[0];
+
+
+          if (!touch) {
+
+            return;
+
+          }
+
+
+          const differenceX =
+            touch.clientX
+            -
+            touchStartX;
+
+
+          const differenceY =
+            touch.clientY
+            -
+            touchStartY;
+
+
+          /*
+           * Movement must be large enough.
+           */
+          if (
+            Math.abs(
+              differenceX
+            ) < 45
+          ) {
+
+            return;
+
+          }
+
+
+          /*
+           * If movement is mostly vertical,
+           * treat it as page scrolling.
+           */
+          if (
+            Math.abs(
+              differenceY
+            )
+            >
+            Math.abs(
+              differenceX
+            )
+          ) {
+
+            return;
+
+          }
+
+
+          /*
+           * Swipe LEFT.
+           */
+          if (
+            differenceX < 0
+          ) {
+
+            selectGalleryImage(
+              currentImageIndex + 1
+            );
+
+          }
+
+
+          /*
+           * Swipe RIGHT.
+           */
+          else {
+
+            selectGalleryImage(
+              currentImageIndex - 1
+            );
+
+          }
+
+        },
+        {
+          passive: true
+        }
+      );
+
+    }
+
+
+    /*
+     * Initial carousel state.
+     */
+    selectGalleryImage(
+      0
+    );
+
+  }
 
 
   modal
@@ -1034,6 +1469,10 @@ function openTourModal(
     );
 }
 
+
+/* =========================================================
+   CLOSE MODAL
+========================================================= */
 
 function closeTourModal() {
 
@@ -1075,6 +1514,10 @@ function closeTourModal() {
 }
 
 
+/* =========================================================
+   TOUR DATA COMPARISON
+========================================================= */
+
 function toursChanged(
   newTours
 ) {
@@ -1100,6 +1543,10 @@ function toursChanged(
   }
 }
 
+
+/* =========================================================
+   LOAD TOURS
+========================================================= */
 
 async function loadTours(
   silent = false
@@ -1172,6 +1619,10 @@ async function loadTours(
       renderTours();
 
 
+      /*
+       * If currently opened tour was deleted,
+       * close the modal.
+       */
       if (openTourId) {
 
         const stillExists =
@@ -1219,6 +1670,10 @@ async function loadTours(
 }
 
 
+/* =========================================================
+   LANGUAGE SWITCH
+========================================================= */
+
 if (langButton) {
 
   langButton.addEventListener(
@@ -1233,9 +1688,13 @@ if (langButton) {
 
       applyStaticTranslations();
 
+
       renderTours();
 
 
+      /*
+       * Refresh open modal language too.
+       */
       if (openTourId) {
 
         openTourModal(
@@ -1249,6 +1708,10 @@ if (langButton) {
 
 }
 
+
+/* =========================================================
+   MOBILE MENU
+========================================================= */
 
 if (
   menuButton &&
@@ -1307,6 +1770,10 @@ if (
 }
 
 
+/* =========================================================
+   ESCAPE CLOSE
+========================================================= */
+
 document.addEventListener(
   'keydown',
   (event) => {
@@ -1323,30 +1790,43 @@ document.addEventListener(
 );
 
 
+/* =========================================================
+   LIVE UPDATES
+========================================================= */
+
 setInterval(
-  () =>
+  () => {
+
     loadTours(
       true
-    ),
+    );
+
+  },
   3000
 );
 
 
 window.addEventListener(
   'focus',
-  () =>
+  () => {
+
     loadTours(
       true
-    )
+    );
+
+  }
 );
 
 
 window.addEventListener(
   'pageshow',
-  () =>
+  () => {
+
     loadTours(
       true
-    )
+    );
+
+  }
 );
 
 
@@ -1366,6 +1846,13 @@ document.addEventListener(
 );
 
 
+/* =========================================================
+   START
+========================================================= */
+
 applyStaticTranslations();
 
-loadTours(false);
+
+loadTours(
+  false
+);
