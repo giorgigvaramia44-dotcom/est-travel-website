@@ -1,33 +1,69 @@
 <!doctype html>
+
 <html lang="en">
+
 <head>
+
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0a96c8">
 
-  <title>EST Travel — Owner Dashboard</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
 
-  <link rel="icon" href="/assets/est-emblem.png">
+  <meta
+    name="theme-color"
+    content="#0a96c8"
+  >
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <title>
+    EST Travel — Owner Dashboard
+  </title>
+
+  <link
+    rel="icon"
+    href="/assets/est-emblem.png"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
 
   <link
     href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   >
 
-  <link rel="stylesheet" href="/admin/admin.css">
+  <link
+    rel="stylesheet"
+    href="/admin/admin.css?v=20260916-1"
+  >
+
 </head>
+
 
 <body>
 
   <main class="admin-shell">
 
+
     <!-- LOGIN -->
-    <section class="login-layout" id="loginView">
+
+    <section
+      class="login-layout"
+      id="loginView"
+    >
+
 
       <div class="login-brand-panel">
+
 
         <div class="brand-lockup">
 
@@ -37,8 +73,15 @@
           >
 
           <div>
-            <strong>EST TRAVEL</strong>
-            <span>Your journey starts here</span>
+
+            <strong>
+              EST TRAVEL
+            </strong>
+
+            <span>
+              Your journey starts here
+            </span>
+
           </div>
 
         </div>
@@ -58,8 +101,8 @@
           </h1>
 
           <p data-i18n="loginHeroText">
-            Update prices, descriptions, visibility and tour photos.
-            Changes appear on the public website.
+            Update prices, descriptions,
+            visibility, main photos and tour catalogs.
           </p>
 
         </div>
@@ -69,7 +112,6 @@
 
           <span>
             <b>✓</b>
-
             <span data-i18n="feature1">
               English & Georgian content
             </span>
@@ -77,7 +119,6 @@
 
           <span>
             <b>✓</b>
-
             <span data-i18n="feature2">
               Owner-only editing
             </span>
@@ -85,9 +126,8 @@
 
           <span>
             <b>✓</b>
-
             <span data-i18n="feature3">
-              Photo upload & publishing controls
+              Main image & photo catalog controls
             </span>
           </span>
 
@@ -108,11 +148,15 @@
             >
 
             <div>
-              <strong>EST TRAVEL</strong>
+
+              <strong>
+                EST TRAVEL
+              </strong>
 
               <span data-i18n="ownerDashboard">
                 Owner Dashboard
               </span>
+
             </div>
 
           </div>
@@ -121,7 +165,7 @@
           <div class="language-row">
 
             <button
-              class="admin-button secondary language-button"
+              class="admin-button secondary"
               id="adminLangButton"
               type="button"
             >
@@ -208,14 +252,6 @@
 
           </form>
 
-
-          <p
-            class="security-note"
-            data-i18n="securityNote"
-          >
-            🔒 Only authorized EST Travel staff can access this dashboard.
-          </p>
-
         </section>
 
       </div>
@@ -223,11 +259,14 @@
     </section>
 
 
+
     <!-- DASHBOARD -->
+
     <section
       class="dashboard hidden"
       id="dashboardView"
     >
+
 
       <header class="dashboard-header">
 
@@ -299,6 +338,7 @@
       </header>
 
 
+
       <section class="dashboard-hero">
 
         <div>
@@ -315,41 +355,8 @@
           </h1>
 
           <p data-i18n="tourManagementText">
-            Manage public tour content from this private dashboard.
-            Visitors cannot edit these fields.
-          </p>
-
-        </div>
-
-
-        <div class="status-pill">
-
-          <span class="status-dot"></span>
-
-          <span data-i18n="ownerAccess">
-            Owner access
-          </span>
-
-        </div>
-
-      </section>
-
-
-      <section class="notice">
-
-        <div class="notice-icon">
-          i
-        </div>
-
-        <div>
-
-          <strong data-i18n="changesUpdate">
-            Changes update the public website
-          </strong>
-
-          <p data-i18n="changesUpdateText">
-            Edit a tour and press Save changes.
-            Photos and prices update on the public website.
+            Manage public tour content, main images
+            and separate photo catalogs.
           </p>
 
         </div>
@@ -357,7 +364,9 @@
       </section>
 
 
-      <!-- ADD TOUR -->
+
+      <!-- ADD NEW TOUR -->
+
       <section class="add-tour-panel">
 
         <div class="panel-heading">
@@ -365,7 +374,6 @@
           <div class="panel-icon">
             ＋
           </div>
-
 
           <div>
 
@@ -381,8 +389,7 @@
             </h2>
 
             <p data-i18n="addNewTourText">
-              Enter the tour information, descriptions and photo,
-              then create the complete package in one step.
+              Add one main image and optional catalog images.
             </p>
 
           </div>
@@ -394,6 +401,7 @@
           class="add-tour-form"
           id="addTourForm"
         >
+
 
           <label>
 
@@ -466,10 +474,13 @@
           </label>
 
 
-          <label class="new-photo-field">
 
-            <span data-i18n="tourPhoto">
-              Tour photo *
+          <!-- MAIN IMAGE -->
+
+          <label>
+
+            <span data-i18n="mainPhoto">
+              Main image *
             </span>
 
             <input
@@ -479,10 +490,37 @@
               required
             >
 
+            <small>
+              Used as the main image on the tour card.
+            </small>
+
           </label>
 
 
-          <!-- NEW ENGLISH DESCRIPTION -->
+
+          <!-- MULTIPLE CATALOG IMAGES -->
+
+          <label class="full-create-field">
+
+            <span data-i18n="catalogPhotos">
+              Catalog images
+            </span>
+
+            <input
+              id="newGalleryPhotos"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+            >
+
+            <small data-i18n="catalogHelp">
+              Optional · select up to 12 extra images
+            </small>
+
+          </label>
+
+
+
           <label class="full-create-field">
 
             <span data-i18n="englishDescription">
@@ -491,14 +529,14 @@
 
             <textarea
               id="newDescriptionEn"
-              rows="4"
+              rows="5"
               placeholder="Write the English tour description..."
             ></textarea>
 
           </label>
 
 
-          <!-- NEW GEORGIAN DESCRIPTION -->
+
           <label class="full-create-field">
 
             <span data-i18n="georgianDescription">
@@ -507,14 +545,17 @@
 
             <textarea
               id="newDescriptionKa"
-              rows="4"
+              rows="5"
               placeholder="ჩაწერეთ ტურის ქართული აღწერა..."
             ></textarea>
 
           </label>
 
 
-          <div class="add-button-wrap">
+
+          <div
+            class="add-button-wrap full-create-field"
+          >
 
             <button
               class="admin-button primary full"
@@ -532,7 +573,9 @@
       </section>
 
 
+
       <!-- MANAGE TOURS -->
+
       <section class="manage-section">
 
         <div class="section-title-row">
@@ -557,7 +600,7 @@
             class="upload-limit"
             data-i18n="imageLimit"
           >
-            Images: JPG / PNG / WEBP · Max 6 MB
+            JPG / PNG / WEBP · Max 6 MB each · Max 12 catalog images
           </span>
 
         </div>
@@ -581,7 +624,8 @@
   ></div>
 
 
-  <script src="/admin/admin.js"></script>
+  <script src="/admin/admin.js?v=20260916-1"></script>
 
 </body>
+
 </html>
