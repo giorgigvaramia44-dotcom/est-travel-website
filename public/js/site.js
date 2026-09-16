@@ -1,45 +1,74 @@
 const tourGrid =
-  document.getElementById('tourGrid');
+  document.getElementById(
+    'tourGrid'
+  );
+
 
 const langButton =
-  document.getElementById('langButton');
+  document.getElementById(
+    'langButton'
+  );
+
 
 const menuButton =
-  document.getElementById('menuButton');
+  document.getElementById(
+    'menuButton'
+  );
+
 
 const mobileMenu =
-  document.getElementById('mobileMenu');
+  document.getElementById(
+    'mobileMenu'
+  );
 
 
-const DESCRIPTION_PREVIEW_LIMIT = 170;
+const DESCRIPTION_PREVIEW_LIMIT =
+  170;
+
 
 let language =
-  localStorage.getItem('est-language') || 'en';
+  localStorage.getItem(
+    'est-language'
+  )
+  ||
+  'en';
 
-let tours = [];
 
-let openTourId = null;
+let tours =
+  [];
 
 
-/* =========================================================
-   HELPERS
-========================================================= */
+let openTourId =
+  null;
 
-function escapeHtml(value = '') {
-  return String(value).replace(
-    /[&<>"']/g,
-    (char) => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;'
-    })[char]
-  );
+
+function escapeHtml(
+  value = ''
+) {
+
+  return String(value)
+    .replace(
+      /[&<>"']/g,
+      (char) => ({
+        '&':
+          '&amp;',
+        '<':
+          '&lt;',
+        '>':
+          '&gt;',
+        '"':
+          '&quot;',
+        "'":
+          '&#39;'
+      })[char]
+    );
 }
 
 
-function t(key) {
+function t(
+  key
+) {
+
   return (
     window.EST_I18N?.[language]?.[key]
     ||
@@ -51,21 +80,38 @@ function t(key) {
 
 
 function applyStaticTranslations() {
-  document.documentElement.lang = language;
 
   document
-    .querySelectorAll('[data-i18n]')
-    .forEach((element) => {
-      element.textContent =
-        t(element.dataset.i18n);
-    });
+    .documentElement
+    .lang =
+      language;
+
+
+  document
+    .querySelectorAll(
+      '[data-i18n]'
+    )
+    .forEach(
+      (element) => {
+
+        element.textContent =
+          t(
+            element.dataset.i18n
+          );
+
+      }
+    );
+
 
   if (langButton) {
+
     langButton.textContent =
       language === 'en'
         ? 'ქართული'
         : 'EN';
+
   }
+
 
   localStorage.setItem(
     'est-language',
@@ -79,7 +125,11 @@ function tourField(
   enKey,
   kaKey
 ) {
-  if (language === 'ka') {
+
+  if (
+    language === 'ka'
+  ) {
+
     return (
       tour[kaKey]
       ||
@@ -87,7 +137,9 @@ function tourField(
       ||
       ''
     );
+
   }
+
 
   return (
     tour[enKey]
@@ -99,248 +151,303 @@ function tourField(
 }
 
 
-/* =========================================================
-   PRICE
-========================================================= */
+function formatPrice(
+  rawPrice
+) {
 
-function formatPrice(rawPrice) {
   const raw =
-    String(rawPrice || '').trim();
+    String(
+      rawPrice || ''
+    ).trim();
 
-  if (!raw) {
-    return '';
-  }
 
-  if (language !== 'ka') {
+  if (
+    !raw ||
+    language !== 'ka'
+  ) {
+
     return raw;
+
   }
 
-  let value =
+
+  const value =
     raw.replace(
       /\bGEL\b/gi,
       '₾'
     );
 
+
   const fromMatch =
-    value.match(/^From\s+(.+)$/i);
+    value.match(
+      /^From\s+(.+)$/i
+    );
+
 
   if (fromMatch) {
-    return `${fromMatch[1].trim()}-დან`;
+
+    return (
+      `${fromMatch[1].trim()}-დან`
+    );
+
   }
+
 
   const startingFromMatch =
     value.match(
       /^Starting\s+from\s+(.+)$/i
     );
 
+
   if (startingFromMatch) {
-    return `${startingFromMatch[1].trim()}-დან`;
+
+    return (
+      `${startingFromMatch[1].trim()}-დან`
+    );
+
   }
+
 
   return value;
 }
 
 
-/* =========================================================
-   IMAGES
-========================================================= */
+function versionedImageUrl(
+  url,
+  version
+) {
 
-function mainImageUrl(tour) {
-  if (!tour.image) {
+  if (!url) {
+
     return '';
+
   }
 
-  const version =
-    encodeURIComponent(
-      tour.updatedAt
-      ||
-      tour.id
-      ||
-      '1'
-    );
 
-  return `${tour.image}?v=${version}`;
-}
+  const separator =
+    url.includes('?')
+      ? '&'
+      : '?';
 
-
-function galleryImageUrl(image) {
-  if (!image?.url) {
-    return '';
-  }
 
   return (
-    `${image.url}?v=${encodeURIComponent(
-      image.id || '1'
-    )}`
+    `${url}${separator}v=${encodeURIComponent(version || '1')}`
   );
 }
 
 
-function tourImages(tour) {
-  const images = [];
+function mainImageUrl(
+  tour
+) {
 
-  /*
-   * MAIN IMAGE FIRST
-   */
+  return versionedImageUrl(
+    tour.image,
+    tour.mainImageId
+    ||
+    tour.updatedAt
+    ||
+    tour.id
+  );
+}
+
+
+function galleryImageUrl(
+  image
+) {
+
+  return versionedImageUrl(
+    image?.url,
+    image?.id ||
+    '1'
+  );
+}
+
+
+function tourImages(
+  tour
+) {
+
+  const images =
+    [];
+
+
   if (tour.image) {
+
     images.push({
-      id: 'main',
-      url: mainImageUrl(tour),
-      rawUrl: tour.image
+
+      id:
+        `main-${tour.mainImageId || tour.id}`,
+
+      url:
+        mainImageUrl(tour),
+
+      label:
+        'main'
+
     });
+
   }
 
-  /*
-   * ADDITIONAL GALLERY IMAGES
-   */
+
   for (
-    const image of
-    (
+    const image
+    of (
       tour.galleryImages
       ||
       []
     )
   ) {
-    if (!image?.url) {
+
+    if (
+      !image?.url
+    ) {
+
       continue;
+
     }
 
+
     images.push({
-      id: image.id,
-      url: galleryImageUrl(image),
-      rawUrl: image.url
+
+      id:
+        `gallery-${image.id}`,
+
+      url:
+        galleryImageUrl(
+          image
+        ),
+
+      label:
+        'gallery'
+
     });
+
   }
+
 
   return images;
 }
 
 
-/* =========================================================
-   TOUR CARDS
-========================================================= */
-
 function renderTours() {
+
   if (
     !Array.isArray(tours)
     ||
     tours.length === 0
   ) {
-    tourGrid.innerHTML = `
-      <div class="empty-state">
-        ${escapeHtml(t('noTours'))}
-      </div>
-    `;
+
+    tourGrid.innerHTML =
+      `
+        <div class="empty-state">
+          ${escapeHtml(
+            t('noTours')
+          )}
+        </div>
+      `;
+
 
     return;
   }
 
+
   const sorted =
-    [...tours].sort(
-      (a, b) =>
-        Number(a.sortOrder || 0)
-        -
-        Number(b.sortOrder || 0)
-    );
+    [...tours]
+      .sort(
+        (a, b) =>
+          Number(
+            a.sortOrder || 0
+          )
+          -
+          Number(
+            b.sortOrder || 0
+          )
+      );
+
 
   tourGrid.innerHTML =
     sorted
-      .map((tour) => {
-        const title =
-          tourField(
-            tour,
-            'titleEn',
-            'titleKa'
-          );
+      .map(
+        (tour) => {
 
-        const description =
-          tourField(
-            tour,
-            'descriptionEn',
-            'descriptionKa'
-          );
-
-        const duration =
-          tourField(
-            tour,
-            'durationEn',
-            'durationKa'
-          );
-
-        const price =
-          formatPrice(
-            tour.price
-          );
-
-        const hasLongDescription =
-          description.length >
-          DESCRIPTION_PREVIEW_LIMIT;
-
-        return `
-          <article
-            class="tour-card"
-            data-tour-id="${escapeHtml(tour.id)}"
-          >
-
-            <div class="tour-media">
-
-              ${
-                tour.image
-
-                  ? `
-                    <img
-                      src="${escapeHtml(mainImageUrl(tour))}"
-                      alt="${escapeHtml(title)}"
-                      loading="lazy"
-                    >
-                  `
-
-                  : `
-                    <div class="photo-placeholder">
-
-                      <span class="placeholder-icon">
-                        ✈
-                      </span>
-
-                      <strong>
-                        ${escapeHtml(
-                          t('photoPlaceholder')
-                        )}
-                      </strong>
-
-                    </div>
-                  `
-              }
-
-              ${
-                price
-
-                  ? `
-                    <span class="price-badge">
-                      ${escapeHtml(price)}
-                    </span>
-                  `
-
-                  : ''
-              }
-
-            </div>
+          const title =
+            tourField(
+              tour,
+              'titleEn',
+              'titleKa'
+            );
 
 
-            <div class="tour-content">
+          const description =
+            tourField(
+              tour,
+              'descriptionEn',
+              'descriptionKa'
+            );
 
-              <div class="tour-title-row">
 
-                <h3>
-                  ${escapeHtml(title)}
-                </h3>
+          const duration =
+            tourField(
+              tour,
+              'durationEn',
+              'durationKa'
+            );
+
+
+          const price =
+            formatPrice(
+              tour.price
+            );
+
+
+          const hasLongDescription =
+            description.length >
+            DESCRIPTION_PREVIEW_LIMIT;
+
+
+          return `
+            <article
+              class="tour-card"
+              data-tour-id="${escapeHtml(tour.id)}"
+            >
+
+              <div class="tour-media">
 
                 ${
-                  duration
+                  tour.image
 
                     ? `
-                      <span class="duration">
-                        ${escapeHtml(duration)}
+                      <img
+                        src="${escapeHtml(mainImageUrl(tour))}"
+                        alt="${escapeHtml(title)}"
+                        loading="lazy"
+                      >
+                    `
+
+                    : `
+                      <div class="photo-placeholder">
+
+                        <span class="placeholder-icon">
+                          ✈
+                        </span>
+
+                        <strong>
+                          ${escapeHtml(
+                            t('photoPlaceholder')
+                          )}
+                        </strong>
+
+                      </div>
+                    `
+                }
+
+
+                ${
+                  price
+
+                    ? `
+                      <span class="price-badge">
+                        ${escapeHtml(price)}
                       </span>
                     `
 
@@ -350,240 +457,296 @@ function renderTours() {
               </div>
 
 
-              <div class="tour-description-wrap">
+              <div class="tour-content">
 
-                <p
-                  class="
-                    tour-description
-                    ${
+
+                <div class="tour-title-row">
+
+                  <h3>
+                    ${escapeHtml(title)}
+                  </h3>
+
+
+                  ${
+                    duration
+
+                      ? `
+                        <span class="duration">
+                          ${escapeHtml(duration)}
+                        </span>
+                      `
+
+                      : ''
+                  }
+
+                </div>
+
+
+                <div class="tour-description-wrap">
+
+                  <p
+                    class="tour-description ${
                       hasLongDescription
                         ? 'is-clamped'
                         : ''
-                    }
-                  "
+                    }"
+                  >
+                    ${escapeHtml(
+                      description
+                      ||
+                      t('noDescription')
+                    )}
+                  </p>
+
+
+                  ${
+                    hasLongDescription
+
+                      ? `
+                        <button
+                          class="description-toggle"
+                          type="button"
+                          data-action="toggle-description"
+                        >
+                          ${escapeHtml(
+                            t('showMore')
+                          )}
+                        </button>
+                      `
+
+                      : ''
+                  }
+
+                </div>
+
+
+                <button
+                  class="button button-primary button-full about-tour-button"
+                  type="button"
+                  data-action="about-tour"
                 >
                   ${escapeHtml(
-                    description
-                    ||
-                    t('noDescription')
+                    t('aboutTour')
                   )}
-                </p>
-
-
-                ${
-                  hasLongDescription
-
-                    ? `
-                      <button
-                        class="description-toggle"
-                        type="button"
-                        data-action="toggle-description"
-                      >
-                        ${escapeHtml(
-                          t('showMore')
-                        )}
-                      </button>
-                    `
-
-                    : ''
-                }
+                </button>
 
               </div>
 
+            </article>
+          `;
 
-              <button
-                class="button button-primary button-full about-tour-button"
-                type="button"
-                data-action="about-tour"
-              >
-                ${escapeHtml(
-                  t('aboutTour')
-                )}
-              </button>
-
-            </div>
-
-          </article>
-        `;
-      })
+        }
+      )
       .join('');
+
 
   bindTourCardActions();
 }
 
 
-/* =========================================================
-   CARD ACTIONS
-========================================================= */
-
 function bindTourCardActions() {
+
   tourGrid
-    .querySelectorAll('.tour-card')
-    .forEach((card) => {
-      const tourId =
-        card.dataset.tourId;
+    .querySelectorAll(
+      '.tour-card'
+    )
+    .forEach(
+      (card) => {
 
-      /*
-       * SHOW MORE / SHOW LESS
-       */
-      const toggle =
-        card.querySelector(
-          '[data-action="toggle-description"]'
-        );
+        const tourId =
+          card.dataset.tourId;
 
-      if (toggle) {
-        toggle.addEventListener(
-          'click',
-          () => {
-            const description =
-              card.querySelector(
-                '.tour-description'
-              );
 
-            const expanded =
+        const toggle =
+          card.querySelector(
+            '[data-action="toggle-description"]'
+          );
+
+
+        if (toggle) {
+
+          toggle.addEventListener(
+            'click',
+            () => {
+
+              const description =
+                card.querySelector(
+                  '.tour-description'
+                );
+
+
+              const expanded =
+                description
+                  .classList
+                  .toggle(
+                    'is-expanded'
+                  );
+
+
               description
                 .classList
                 .toggle(
-                  'is-expanded'
+                  'is-clamped',
+                  !expanded
                 );
 
-            description
-              .classList
-              .toggle(
-                'is-clamped',
-                !expanded
-              );
 
-            toggle.textContent =
-              expanded
-                ? t('showLess')
-                : t('showMore');
-          }
-        );
+              toggle.textContent =
+                expanded
+                  ? t('showLess')
+                  : t('showMore');
+
+            }
+          );
+
+        }
+
+
+        const aboutButton =
+          card.querySelector(
+            '[data-action="about-tour"]'
+          );
+
+
+        if (aboutButton) {
+
+          aboutButton.addEventListener(
+            'click',
+            () =>
+              openTourModal(
+                tourId
+              )
+          );
+
+        }
+
       }
-
-      /*
-       * ABOUT THIS TOUR
-       */
-      const aboutButton =
-        card.querySelector(
-          '[data-action="about-tour"]'
-        );
-
-      if (aboutButton) {
-        aboutButton.addEventListener(
-          'click',
-          () => {
-            openTourModal(
-              tourId
-            );
-          }
-        );
-      }
-    });
+    );
 }
 
 
-/* =========================================================
-   CREATE TOUR MODAL
-========================================================= */
-
 function ensureTourModal() {
+
   let modal =
     document.getElementById(
       'tourDetailModal'
     );
 
+
   if (modal) {
+
     return modal;
+
   }
 
+
   modal =
-    document.createElement('div');
+    document.createElement(
+      'div'
+    );
+
 
   modal.id =
     'tourDetailModal';
 
+
   modal.className =
     'tour-modal hidden';
+
 
   modal.setAttribute(
     'aria-hidden',
     'true'
   );
 
-  modal.innerHTML = `
-    <div
-      class="tour-modal-backdrop"
-      data-close-modal
-    ></div>
 
-    <section
-      class="tour-modal-dialog"
-      role="dialog"
-      aria-modal="true"
-    >
-
-      <button
-        class="tour-modal-close"
-        type="button"
-        data-close-modal
-        aria-label="Close"
-      >
-        ×
-      </button>
-
+  modal.innerHTML =
+    `
       <div
-        id="tourModalContent"
+        class="tour-modal-backdrop"
+        data-close-modal
       ></div>
 
-    </section>
-  `;
+      <section
+        class="tour-modal-dialog"
+        role="dialog"
+        aria-modal="true"
+      >
 
-  document.body.appendChild(
-    modal
-  );
+        <button
+          class="tour-modal-close"
+          type="button"
+          data-close-modal
+          aria-label="Close"
+        >
+          ×
+        </button>
+
+        <div
+          id="tourModalContent"
+        ></div>
+
+      </section>
+    `;
+
+
+  document.body
+    .appendChild(
+      modal
+    );
+
 
   modal
     .querySelectorAll(
       '[data-close-modal]'
     )
-    .forEach((element) => {
-      element.addEventListener(
-        'click',
-        closeTourModal
-      );
-    });
+    .forEach(
+      (element) => {
+
+        element.addEventListener(
+          'click',
+          closeTourModal
+        );
+
+      }
+    );
+
 
   return modal;
 }
 
 
-/* =========================================================
-   OPEN TOUR MODAL
-========================================================= */
+function openTourModal(
+  tourId
+) {
 
-function openTourModal(tourId) {
   const tour =
     tours.find(
       (item) =>
         item.id === tourId
     );
 
+
   if (!tour) {
+
     return;
+
   }
+
 
   openTourId =
     tourId;
 
+
   const modal =
     ensureTourModal();
+
 
   const content =
     modal.querySelector(
       '#tourModalContent'
     );
+
 
   const title =
     tourField(
@@ -591,6 +754,7 @@ function openTourModal(tourId) {
       'titleEn',
       'titleKa'
     );
+
 
   const description =
     tourField(
@@ -601,6 +765,7 @@ function openTourModal(tourId) {
     ||
     t('noDescription');
 
+
   const duration =
     tourField(
       tour,
@@ -608,18 +773,24 @@ function openTourModal(tourId) {
       'durationKa'
     );
 
+
   const price =
     formatPrice(
       tour.price
     );
+
 
   const images =
     tourImages(
       tour
     );
 
+
   const initialImage =
-    images[0]?.url || '';
+    images[0]?.url
+    ||
+    '';
+
 
   const emailSubject =
     encodeURIComponent(
@@ -630,333 +801,379 @@ function openTourModal(tourId) {
       } — ${title}`
     );
 
-  content.innerHTML = `
-    <div class="tour-modal-layout">
 
-      <!-- LEFT SIDE -->
-      <div class="tour-modal-info">
-
-        <p class="tour-modal-eyebrow">
-          ${escapeHtml(
-            t('tourDetails')
-          )}
-        </p>
+  content.innerHTML =
+    `
+      <div class="tour-modal-layout">
 
 
-        <h2>
-          ${escapeHtml(title)}
-        </h2>
+        <div class="tour-modal-info">
+
+          <p class="tour-modal-eyebrow">
+            ${escapeHtml(
+              t('tourDetails')
+            )}
+          </p>
 
 
-        <div class="tour-modal-meta">
-
-          ${
-            price
-
-              ? `
-                <span>
-                  ${escapeHtml(price)}
-                </span>
-              `
-
-              : ''
-          }
-
-          ${
-            duration
-
-              ? `
-                <span>
-                  ${escapeHtml(duration)}
-                </span>
-              `
-
-              : ''
-          }
-
-        </div>
+          <h2>
+            ${escapeHtml(title)}
+          </h2>
 
 
-        <div class="tour-modal-description">
-          ${escapeHtml(description)}
-        </div>
+          <div class="tour-modal-meta">
 
-
-        <a
-          class="button button-primary button-full"
-          href="mailto:info.est.official@gmail.com?subject=${emailSubject}"
-        >
-          ${escapeHtml(
-            t('askTour')
-          )}
-        </a>
-
-      </div>
-
-
-      <!-- RIGHT SIDE -->
-      <div class="tour-modal-gallery">
-
-        ${
-          initialImage
-
-            ? `
-              <div class="tour-modal-main-image-wrap">
-
-                <img
-                  id="tourModalMainImage"
-                  class="tour-modal-main-image"
-                  src="${escapeHtml(initialImage)}"
-                  alt="${escapeHtml(title)}"
-                >
-
-              </div>
-            `
-
-            : `
-              <div class="tour-modal-main-image-wrap">
-
-                <div class="photo-placeholder">
-
-                  <span class="placeholder-icon">
-                    ✈
+            ${
+              price
+                ? `
+                  <span>
+                    ${escapeHtml(price)}
                   </span>
+                `
+                : ''
+            }
 
-                  <strong>
-                    ${escapeHtml(
-                      t('photoPlaceholder')
-                    )}
-                  </strong>
+
+            ${
+              duration
+                ? `
+                  <span>
+                    ${escapeHtml(duration)}
+                  </span>
+                `
+                : ''
+            }
+
+          </div>
+
+
+          <div class="tour-modal-description">
+            ${escapeHtml(description)}
+          </div>
+
+
+          <a
+            class="button button-primary button-full"
+            href="mailto:info.est.official@gmail.com?subject=${emailSubject}"
+          >
+            ${escapeHtml(
+              t('askTour')
+            )}
+          </a>
+
+        </div>
+
+
+
+        <div class="tour-modal-gallery">
+
+          ${
+            initialImage
+
+              ? `
+                <div class="tour-modal-main-image-wrap">
+
+                  <img
+                    id="tourModalMainImage"
+                    class="tour-modal-main-image"
+                    src="${escapeHtml(initialImage)}"
+                    alt="${escapeHtml(title)}"
+                  >
 
                 </div>
+              `
 
-              </div>
-            `
-        }
+              : `
+                <div class="tour-modal-main-image-wrap">
+
+                  <div class="photo-placeholder">
+
+                    <span class="placeholder-icon">
+                      ✈
+                    </span>
+
+                    <strong>
+                      ${escapeHtml(
+                        t('photoPlaceholder')
+                      )}
+                    </strong>
+
+                  </div>
+
+                </div>
+              `
+          }
 
 
-        ${
-          images.length > 1
+          ${
+            images.length > 1
 
-            ? `
-              <div class="tour-modal-gallery-title">
-                ${escapeHtml(
-                  t('gallery')
-                )}
-              </div>
+              ? `
+                <div class="tour-modal-gallery-title">
+                  ${escapeHtml(
+                    t('catalog')
+                  )}
+                </div>
 
 
-              <div class="tour-modal-thumbnails">
+                <div class="tour-modal-thumbnails">
 
-                ${
-                  images
-                    .map(
-                      (
-                        image,
-                        index
-                      ) => `
-                        <button
-                          class="
-                            tour-modal-thumb
-                            ${
+                  ${
+                    images
+                      .map(
+                        (
+                          image,
+                          index
+                        ) => `
+                          <button
+                            class="tour-modal-thumb ${
                               index === 0
                                 ? 'active'
                                 : ''
-                            }
-                          "
-                          type="button"
-                          data-gallery-src="${escapeHtml(image.url)}"
-                        >
-
-                          <img
-                            src="${escapeHtml(image.url)}"
-                            alt="${escapeHtml(title)}"
+                            }"
+                            type="button"
+                            data-gallery-src="${escapeHtml(image.url)}"
                           >
 
-                        </button>
-                      `
-                    )
-                    .join('')
-                }
+                            <img
+                              src="${escapeHtml(image.url)}"
+                              alt="${escapeHtml(title)}"
+                            >
 
-              </div>
-            `
+                          </button>
+                        `
+                      )
+                      .join('')
+                  }
 
-            : ''
-        }
+                </div>
+              `
+
+              : ''
+          }
+
+        </div>
 
       </div>
-
-    </div>
-  `;
+    `;
 
 
-  /*
-   * GALLERY THUMBNAIL CLICK
-   */
   content
     .querySelectorAll(
       '.tour-modal-thumb'
     )
-    .forEach((button) => {
-      button.addEventListener(
-        'click',
-        () => {
-          const mainImage =
-            content.querySelector(
-              '#tourModalMainImage'
-            );
+    .forEach(
+      (button) => {
 
-          if (!mainImage) {
-            return;
+        button.addEventListener(
+          'click',
+          () => {
+
+            const mainImage =
+              content.querySelector(
+                '#tourModalMainImage'
+              );
+
+
+            if (!mainImage) {
+
+              return;
+
+            }
+
+
+            mainImage.src =
+              button.dataset.gallerySrc;
+
+
+            content
+              .querySelectorAll(
+                '.tour-modal-thumb'
+              )
+              .forEach(
+                (item) => {
+
+                  item.classList.remove(
+                    'active'
+                  );
+
+                }
+              );
+
+
+            button
+              .classList
+              .add(
+                'active'
+              );
+
           }
+        );
 
-          mainImage.src =
-            button.dataset.gallerySrc;
-
-          content
-            .querySelectorAll(
-              '.tour-modal-thumb'
-            )
-            .forEach((item) => {
-              item
-                .classList
-                .remove('active');
-            });
-
-          button
-            .classList
-            .add('active');
-        }
-      );
-    });
+      }
+    );
 
 
   modal
     .classList
-    .remove('hidden');
+    .remove(
+      'hidden'
+    );
+
 
   modal.setAttribute(
     'aria-hidden',
     'false'
   );
 
+
   document.body
     .classList
-    .add('modal-open');
+    .add(
+      'modal-open'
+    );
 }
 
 
-/* =========================================================
-   CLOSE MODAL
-========================================================= */
-
 function closeTourModal() {
+
   const modal =
     document.getElementById(
       'tourDetailModal'
     );
 
+
   if (!modal) {
+
     return;
+
   }
+
 
   modal
     .classList
-    .add('hidden');
+    .add(
+      'hidden'
+    );
+
 
   modal.setAttribute(
     'aria-hidden',
     'true'
   );
 
+
   document.body
     .classList
-    .remove('modal-open');
+    .remove(
+      'modal-open'
+    );
+
 
   openTourId =
     null;
 }
 
 
-/* =========================================================
-   CHECK IF TOURS CHANGED
-========================================================= */
+function toursChanged(
+  newTours
+) {
 
-function toursChanged(newTours) {
   try {
+
     return (
-      JSON.stringify(newTours)
+      JSON.stringify(
+        newTours
+      )
       !==
-      JSON.stringify(tours)
+      JSON.stringify(
+        tours
+      )
     );
+
   }
+
   catch (_) {
+
     return true;
+
   }
 }
 
 
-/* =========================================================
-   LOAD TOURS
-========================================================= */
-
 async function loadTours(
   silent = false
 ) {
+
   if (!silent) {
-    tourGrid.innerHTML = `
-      <div class="empty-state">
-        ${escapeHtml(
-          t('loadingTours')
-        )}
-      </div>
-    `;
+
+    tourGrid.innerHTML =
+      `
+        <div class="empty-state">
+          ${escapeHtml(
+            t('loadingTours')
+          )}
+        </div>
+      `;
+
   }
 
+
   try {
+
     const response =
       await fetch(
         `/api/tours?refresh=${Date.now()}`,
         {
-          method: 'GET',
 
-          cache: 'no-store',
+          method:
+            'GET',
+
+          cache:
+            'no-store',
 
           headers: {
+
             'Cache-Control':
               'no-cache, no-store, must-revalidate',
 
             'Pragma':
               'no-cache'
+
           }
+
         }
       );
 
+
     if (!response.ok) {
+
       throw new Error(
         'Could not load tours.'
       );
+
     }
+
 
     const freshTours =
       await response.json();
+
 
     if (
       toursChanged(
         freshTours
       )
     ) {
+
       tours =
         freshTours;
 
+
       renderTours();
 
-      /*
-       * If currently opened tour
-       * was deleted, close modal.
-       */
+
       if (openTourId) {
+
         const stillExists =
           tours.some(
             (tour) =>
@@ -964,164 +1181,190 @@ async function loadTours(
               openTourId
           );
 
+
         if (!stillExists) {
+
           closeTourModal();
+
         }
+
       }
+
     }
+
   }
+
   catch (error) {
+
     console.error(
       'Tour refresh failed:',
       error
     );
 
+
     if (!silent) {
-      tourGrid.innerHTML = `
-        <div class="empty-state">
-          ${escapeHtml(
-            t('noTours')
-          )}
-        </div>
-      `;
+
+      tourGrid.innerHTML =
+        `
+          <div class="empty-state">
+            ${escapeHtml(
+              t('noTours')
+            )}
+          </div>
+        `;
+
     }
+
   }
 }
 
 
-/* =========================================================
-   LANGUAGE SWITCH
-========================================================= */
-
 if (langButton) {
+
   langButton.addEventListener(
     'click',
     () => {
+
       language =
         language === 'en'
           ? 'ka'
           : 'en';
 
+
       applyStaticTranslations();
 
       renderTours();
 
-      /*
-       * Refresh opened modal
-       * in the newly selected language.
-       */
+
       if (openTourId) {
+
         openTourModal(
           openTourId
         );
+
       }
+
     }
   );
+
 }
 
 
-/* =========================================================
-   MOBILE MENU
-========================================================= */
-
 if (
-  menuButton
-  &&
+  menuButton &&
   mobileMenu
 ) {
+
   menuButton.addEventListener(
     'click',
     () => {
+
       const open =
         mobileMenu
           .classList
-          .toggle('open');
+          .toggle(
+            'open'
+          );
+
 
       menuButton.setAttribute(
         'aria-expanded',
         String(open)
       );
+
     }
   );
 
 
   mobileMenu
     .querySelectorAll('a')
-    .forEach((link) => {
-      link.addEventListener(
-        'click',
-        () => {
-          mobileMenu
-            .classList
-            .remove('open');
+    .forEach(
+      (link) => {
 
-          menuButton.setAttribute(
-            'aria-expanded',
-            'false'
-          );
-        }
-      );
-    });
+        link.addEventListener(
+          'click',
+          () => {
+
+            mobileMenu
+              .classList
+              .remove(
+                'open'
+              );
+
+
+            menuButton
+              .setAttribute(
+                'aria-expanded',
+                'false'
+              );
+
+          }
+        );
+
+      }
+    );
+
 }
 
-
-/* =========================================================
-   ESC CLOSE
-========================================================= */
 
 document.addEventListener(
   'keydown',
   (event) => {
+
     if (
       event.key === 'Escape'
     ) {
+
       closeTourModal();
+
     }
+
   }
 );
 
 
-/* =========================================================
-   LIVE REFRESH
-========================================================= */
-
 setInterval(
-  () => {
-    loadTours(true);
-  },
+  () =>
+    loadTours(
+      true
+    ),
   3000
 );
 
 
 window.addEventListener(
   'focus',
-  () => {
-    loadTours(true);
-  }
+  () =>
+    loadTours(
+      true
+    )
+);
+
+
+window.addEventListener(
+  'pageshow',
+  () =>
+    loadTours(
+      true
+    )
 );
 
 
 document.addEventListener(
   'visibilitychange',
   () => {
+
     if (!document.hidden) {
-      loadTours(true);
+
+      loadTours(
+        true
+      );
+
     }
+
   }
 );
 
-
-window.addEventListener(
-  'pageshow',
-  () => {
-    loadTours(true);
-  }
-);
-
-
-/* =========================================================
-   START
-========================================================= */
 
 applyStaticTranslations();
 
