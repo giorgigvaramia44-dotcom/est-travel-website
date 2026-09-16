@@ -52,12 +52,14 @@ body.modal-open {
 
 img {
   max-width: 100%;
+
   display: block;
 }
 
 
 a {
   color: inherit;
+
   text-decoration: none;
 }
 
@@ -68,12 +70,14 @@ button {
 
 
 .container {
-  width: min(
-    1180px,
-    calc(100% - 32px)
-  );
+  width:
+    min(
+      1180px,
+      calc(100% - 32px)
+    );
 
-  margin: 0 auto;
+  margin:
+    0 auto;
 }
 
 
@@ -133,7 +137,8 @@ button {
       .94
     );
 
-  backdrop-filter: blur(12px);
+  backdrop-filter:
+    blur(12px);
 
   border-bottom:
     1px solid
@@ -371,7 +376,8 @@ button {
 
 
 .button:hover {
-  transform: translateY(-1px);
+  transform:
+    translateY(-1px);
 }
 
 
@@ -493,8 +499,14 @@ button {
   display: grid;
 
   grid-template-columns:
-    minmax(0, 1.1fr)
-    minmax(320px, .9fr);
+    minmax(
+      0,
+      1.1fr
+    )
+    minmax(
+      320px,
+      .9fr
+    );
 
   gap: 44px;
 
@@ -606,10 +618,11 @@ button {
 
 
 .hero-logo-panel {
-  width: min(
-    360px,
-    92%
-  );
+  width:
+    min(
+      360px,
+      92%
+    );
 
   min-height: 340px;
 
@@ -715,7 +728,9 @@ button {
 ========================================================= */
 
 .section {
-  padding: 72px 0;
+  padding:
+    72px
+    0;
 }
 
 
@@ -938,7 +953,8 @@ button {
 .placeholder-icon {
   font-size: 42px;
 
-  transform: rotate(-9deg);
+  transform:
+    rotate(-9deg);
 }
 
 
@@ -989,7 +1005,7 @@ button {
 
 
 /* =========================================================
-   TOUR TITLE + DURATION
+   TITLE + DURATION
 ========================================================= */
 
 .tour-title-row {
@@ -1018,12 +1034,6 @@ button {
 }
 
 
-/*
- * FIXED DURATION BADGE
- *
- * Prevents Georgian text such as
- * "4 დღე" from becoming a tall oval.
- */
 .duration {
   flex: 0 0 auto;
 
@@ -1272,7 +1282,7 @@ small {
 
 
 /* =========================================================
-   ABOUT TOUR MODAL
+   TOUR MODAL
 ========================================================= */
 
 .tour-modal.hidden {
@@ -1317,10 +1327,11 @@ small {
 
   z-index: 1;
 
-  width: min(
-    1100px,
-    100%
-  );
+  width:
+    min(
+      1100px,
+      100%
+    );
 
   max-height:
     calc(
@@ -1351,7 +1362,7 @@ small {
 
   right: 14px;
 
-  z-index: 5;
+  z-index: 30;
 
   width: 42px;
 
@@ -1408,6 +1419,10 @@ small {
   min-height: 590px;
 }
 
+
+/* =========================================================
+   MODAL LEFT SIDE
+========================================================= */
 
 .tour-modal-info {
   display: flex;
@@ -1520,14 +1535,26 @@ small {
 }
 
 
+/* =========================================================
+   MODAL GALLERY
+========================================================= */
+
 .tour-modal-gallery {
+  min-width: 0;
+
   padding: 34px;
 
   background: #f7fafc;
 }
 
 
+/* =========================================================
+   LARGE IMAGE
+========================================================= */
+
 .tour-modal-main-image-wrap {
+  position: relative;
+
   width: 100%;
 
   aspect-ratio: 4 / 3;
@@ -1537,6 +1564,13 @@ small {
   border-radius: 20px;
 
   background: var(--blue-soft);
+
+  /*
+   * Vertical page scrolling still works,
+   * horizontal finger movement is used
+   * for our image swipe.
+   */
+  touch-action: pan-y;
 }
 
 
@@ -1546,11 +1580,109 @@ small {
   height: 100%;
 
   object-fit: cover;
+
+  user-select: none;
+
+  -webkit-user-select: none;
+
+  -webkit-user-drag: none;
 }
 
 
+/* =========================================================
+   LARGE IMAGE PREVIOUS / NEXT ARROWS
+========================================================= */
+
+.gallery-arrow {
+  position: absolute;
+
+  top: 50%;
+
+  z-index: 20;
+
+  width: 46px;
+
+  height: 46px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  transform:
+    translateY(-50%);
+
+  border: 0;
+
+  border-radius: 50%;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      .92
+    );
+
+  color: #242b30;
+
+  box-shadow:
+    0 8px 24px
+    rgba(
+      0,
+      0,
+      0,
+      .22
+    );
+
+  font-size: 36px;
+
+  font-weight: 400;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    transform .15s ease,
+    background .15s ease,
+    opacity .15s ease;
+}
+
+
+.gallery-arrow:hover {
+  background: #fff;
+
+  transform:
+    translateY(-50%)
+    scale(1.06);
+}
+
+
+.gallery-arrow-left {
+  left: 14px;
+}
+
+
+.gallery-arrow-right {
+  right: 14px;
+}
+
+
+.gallery-arrow[hidden] {
+  display: none !important;
+}
+
+
+/* =========================================================
+   CATALOG TITLE
+========================================================= */
+
 .tour-modal-gallery-title {
   margin-top: 18px;
+
+  margin-bottom: 10px;
 
   font-size: 12px;
 
@@ -1564,25 +1696,88 @@ small {
 }
 
 
-.tour-modal-thumbnails {
-  display: grid;
+/* =========================================================
+   THUMBNAIL VIEWPORT
+========================================================= */
 
-  grid-template-columns:
-    repeat(
-      4,
-      minmax(
-        0,
-        1fr
-      )
-    );
+.tour-modal-thumb-viewport {
+  width: 100%;
 
-  gap: 9px;
+  min-width: 0;
 
-  margin-top: 10px;
+  overflow: hidden;
 }
 
 
+/* =========================================================
+   ONE ROW OF THUMBNAILS
+========================================================= */
+
+.tour-modal-thumbnails {
+  width: 100%;
+
+  display: grid;
+
+  /*
+   * Critical:
+   * every image is placed horizontally.
+   * It can NEVER wrap to another row.
+   */
+  grid-auto-flow: column;
+
+
+  /*
+   * Exactly five thumbnails fit
+   * inside the available desktop width.
+   *
+   * 4 gaps × 9px = 36px.
+   */
+  grid-auto-columns:
+    calc(
+      (
+        100% - 36px
+      )
+      / 5
+    );
+
+
+  gap: 9px;
+
+
+  overflow-x: auto;
+
+  overflow-y: hidden;
+
+
+  scroll-behavior: smooth;
+
+  scroll-snap-type: x proximity;
+
+
+  scrollbar-width: none;
+
+
+  padding:
+    2px
+    0
+    4px;
+}
+
+
+.tour-modal-thumbnails::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* =========================================================
+   THUMBNAIL
+========================================================= */
+
 .tour-modal-thumb {
+  width: 100%;
+
+  min-width: 0;
+
   padding: 0;
 
   aspect-ratio: 4 / 3;
@@ -1598,6 +1793,19 @@ small {
   background: #fff;
 
   cursor: pointer;
+
+  scroll-snap-align: center;
+
+  transition:
+    border-color .15s ease,
+    transform .15s ease,
+    box-shadow .15s ease;
+}
+
+
+.tour-modal-thumb:hover {
+  transform:
+    translateY(-1px);
 }
 
 
@@ -1621,6 +1829,12 @@ small {
   height: 100%;
 
   object-fit: cover;
+
+  user-select: none;
+
+  -webkit-user-select: none;
+
+  -webkit-user-drag: none;
 }
 
 
@@ -1916,15 +2130,78 @@ small {
   }
 
 
+  /*
+   * Modal uses almost the entire screen.
+   */
+  .tour-modal {
+    padding: 7px;
+  }
+
+
+  .tour-modal-dialog {
+    border-radius: 19px;
+  }
+
+
+  .tour-modal-info {
+    padding:
+      30px
+      18px
+      22px;
+  }
+
+
+  .tour-modal-gallery {
+    padding:
+      18px;
+  }
+
+
+  /*
+   * Four thumbnails on phones.
+   * Still only ONE ROW.
+   */
   .tour-modal-thumbnails {
-    grid-template-columns:
-      repeat(
-        3,
-        minmax(
-          0,
-          1fr
+    grid-auto-columns:
+      calc(
+        (
+          100% - 27px
         )
+        / 4
       );
+  }
+
+
+  /*
+   * Smaller arrows on phone.
+   */
+  .gallery-arrow {
+    width: 38px;
+
+    height: 38px;
+
+    font-size: 30px;
+  }
+
+
+  .gallery-arrow-left {
+    left: 8px;
+  }
+
+
+  .gallery-arrow-right {
+    right: 8px;
+  }
+
+
+  .tour-modal-close {
+    top: 9px;
+
+    right: 9px;
+
+    width: 38px;
+
+    height: 38px;
   }
 
 }
