@@ -1,12 +1,59 @@
-const loginView = document.getElementById('loginView');
-const dashboardView = document.getElementById('dashboardView');
-const loginForm = document.getElementById('loginForm');
-const adminTours = document.getElementById('adminTours');
-const toast = document.getElementById('toast');
-const loginError = document.getElementById('loginError');
-const adminLangButton = document.getElementById('adminLangButton');
-const dashboardLangButton = document.getElementById('dashboardLangButton');
-const addTourButton = document.getElementById('addTourButton');
+const loginView =
+  document.getElementById(
+    'loginView'
+  );
+
+
+const dashboardView =
+  document.getElementById(
+    'dashboardView'
+  );
+
+
+const loginForm =
+  document.getElementById(
+    'loginForm'
+  );
+
+
+const adminTours =
+  document.getElementById(
+    'adminTours'
+  );
+
+
+const toast =
+  document.getElementById(
+    'toast'
+  );
+
+
+const loginError =
+  document.getElementById(
+    'loginError'
+  );
+
+
+const adminLangButton =
+  document.getElementById(
+    'adminLangButton'
+  );
+
+
+const dashboardLangButton =
+  document.getElementById(
+    'dashboardLangButton'
+  );
+
+
+const addTourButton =
+  document.getElementById(
+    'addTourButton'
+  );
+
+
+const MAX_GALLERY_IMAGES =
+  12;
 
 
 const I18N = {
@@ -20,7 +67,7 @@ const I18N = {
       'Manage tours in one place.',
 
     loginHeroText:
-      'Update prices, descriptions, visibility and tour photos. Changes appear on the public website.',
+      'Update prices, descriptions, visibility, main photos and tour catalogs.',
 
     feature1:
       'English & Georgian content',
@@ -29,7 +76,7 @@ const I18N = {
       'Owner-only editing',
 
     feature3:
-      'Photo upload & publishing controls',
+      'Main image & photo catalog controls',
 
     ownerDashboard:
       'Owner Dashboard',
@@ -58,9 +105,6 @@ const I18N = {
     loginButton:
       'Log in',
 
-    securityNote:
-      '🔒 Only authorized EST Travel staff can access this dashboard.',
-
     publicWebsite:
       '↗ Public website',
 
@@ -77,16 +121,7 @@ const I18N = {
       'Tour management',
 
     tourManagementText:
-      'Manage public tour content from this private dashboard. Visitors cannot edit these fields.',
-
-    ownerAccess:
-      'Owner access',
-
-    changesUpdate:
-      'Changes update the public website',
-
-    changesUpdateText:
-      'Edit a tour and press Save changes. Photos and prices update on the public website.',
+      'Manage public tour content, main images and separate photo catalogs.',
 
     newPackage:
       'NEW PACKAGE',
@@ -95,7 +130,7 @@ const I18N = {
       'Add new tour',
 
     addNewTourText:
-      'Enter the tour information, descriptions and photo, then create the complete package in one step.',
+      'Create the tour with one main image and optional catalog images.',
 
     englishTitle:
       'English title *',
@@ -112,14 +147,29 @@ const I18N = {
     durationKa:
       'Duration KA',
 
-    tourPhoto:
-      'Tour photo *',
+    mainPhoto:
+      'Main image *',
+
+    catalogPhotos:
+      'Catalog images',
+
+    catalogHelp:
+      'Optional · select up to 12 extra images',
+
+    englishDescription:
+      'English description',
+
+    georgianDescription:
+      'Georgian description',
 
     addTourButton:
       '+ Add tour',
 
     creatingTour:
       'Creating tour...',
+
+    uploadingCatalog:
+      'Uploading catalog...',
 
     savingExisting:
       'Saving previous changes...',
@@ -131,22 +181,34 @@ const I18N = {
       'Manage tours',
 
     imageLimit:
-      'Images: JPG / PNG / WEBP · Max 6 MB',
+      'JPG / PNG / WEBP · Max 6 MB each · Max 12 catalog images',
 
     noTours:
       'No tours yet. Add the first one above.',
 
     noPhoto:
-      'No photo uploaded',
+      'No main image uploaded',
 
     noPhotoText:
-      'The public website shows a placeholder until a photo is uploaded.',
+      'Upload a main image to show it on the public tour card.',
+
+    mainImage:
+      'MAIN IMAGE',
 
     uploadReplace:
-      'Upload / replace photo',
+      'Upload / replace main image',
 
     removePhoto:
-      'Remove photo',
+      'Remove main image',
+
+    photoCatalog:
+      'PHOTO CATALOG',
+
+    noCatalog:
+      'No catalog images yet.',
+
+    uploadCatalog:
+      'Upload selected images',
 
     englishTitleLabel:
       'English title',
@@ -156,12 +218,6 @@ const I18N = {
 
     order:
       'Order',
-
-    englishDescription:
-      'English description',
-
-    georgianDescription:
-      'Georgian description',
 
     published:
       'Published on public website',
@@ -182,16 +238,25 @@ const I18N = {
       'Your login session expired. Please log in again.',
 
     choosePhoto:
-      'Please choose a tour photo.',
+      'Please choose a main image.',
+
+    chooseCatalogFirst:
+      'Choose one or more catalog images first.',
 
     invalidPhoto:
       'Photo must be JPG, PNG or WEBP.',
 
     photoTooLarge:
-      'Photo must be 6 MB or smaller.',
+      'Each photo must be 6 MB or smaller.',
+
+    tooManyCatalog:
+      'A tour can have at most 12 catalog images.',
 
     tourAdded:
       'Tour created successfully.',
+
+    tourAddedCatalogWarning:
+      'Tour was created, but one or more catalog images could not be uploaded.',
 
     changesSaved:
       'Changes saved.',
@@ -200,16 +265,25 @@ const I18N = {
       'Choose an image first.',
 
     photoUploaded:
-      'Photo updated. The public website will refresh automatically.',
+      'Main image updated.',
 
     photoRemoved:
-      'Photo removed.',
+      'Main image removed.',
+
+    catalogUploaded:
+      'Catalog images uploaded.',
+
+    catalogRemoved:
+      'Catalog image removed.',
 
     tourDeleted:
       'Tour deleted.',
 
     confirmRemovePhoto:
-      'Remove this tour photo?',
+      'Remove this main image?',
+
+    confirmRemoveCatalog:
+      'Remove this catalog image?',
 
     confirmDelete:
       'Delete this tour permanently?',
@@ -229,7 +303,7 @@ const I18N = {
       'მართე ტურები ერთ სივრცეში.',
 
     loginHeroText:
-      'შეცვალე ფასები, აღწერები, გამოქვეყნების სტატუსი და ტურის ფოტოები. ცვლილებები აისახება საჯარო ვებსაიტზე.',
+      'შეცვალე ფასები, აღწერები, მთავარი ფოტო და ფოტო კატალოგი.',
 
     feature1:
       'ინგლისური და ქართული კონტენტი',
@@ -238,7 +312,7 @@ const I18N = {
       'რედაქტირება მხოლოდ მფლობელისთვის',
 
     feature3:
-      'ფოტოების ატვირთვა და გამოქვეყნების კონტროლი',
+      'მთავარი ფოტო და ფოტო კატალოგის მართვა',
 
     ownerDashboard:
       'მფლობელის პანელი',
@@ -250,7 +324,7 @@ const I18N = {
       'მფლობელის ავტორიზაცია',
 
     loginText:
-      'შედი სისტემაში EST Travel-ის ვებსაიტის კონტენტის სამართავად.',
+      'შედი სისტემაში EST Travel-ის ვებსაიტის სამართავად.',
 
     username:
       'მომხმარებელი',
@@ -266,9 +340,6 @@ const I18N = {
 
     loginButton:
       'შესვლა',
-
-    securityNote:
-      '🔒 ამ პანელზე წვდომა მხოლოდ ავტორიზებულ EST Travel-ის თანამშრომელს აქვს.',
 
     publicWebsite:
       '↗ საჯარო ვებსაიტი',
@@ -286,16 +357,7 @@ const I18N = {
       'ტურების მართვა',
 
     tourManagementText:
-      'მართე საჯარო ტურების კონტენტი ამ დახურული პანელიდან. ვიზიტორებს რედაქტირება არ შეუძლიათ.',
-
-    ownerAccess:
-      'მფლობელის წვდომა',
-
-    changesUpdate:
-      'ცვლილებები საჯარო ვებსაიტზე აისახება',
-
-    changesUpdateText:
-      'შეცვალე ტური და დააჭირე „ცვლილებების შენახვას“. ფოტოები და ფასები საჯარო ვებსაიტზე განახლდება.',
+      'მართე ტურის ტექსტი, მთავარი ფოტო და ცალკე ფოტო კატალოგი.',
 
     newPackage:
       'ახალი პაკეტი',
@@ -304,7 +366,7 @@ const I18N = {
       'ახალი ტურის დამატება',
 
     addNewTourText:
-      'შეავსე ტურის ინფორმაცია, აღწერები და ფოტო და შექმენი სრული პაკეტი ერთ ნაბიჯში.',
+      'შექმენი ტური მთავარი ფოტოთი და სურვილის შემთხვევაში კატალოგის ფოტოებით.',
 
     englishTitle:
       'ინგლისური სათაური *',
@@ -321,8 +383,20 @@ const I18N = {
     durationKa:
       'ხანგრძლივობა KA',
 
-    tourPhoto:
-      'ტურის ფოტო *',
+    mainPhoto:
+      'მთავარი ფოტო *',
+
+    catalogPhotos:
+      'ფოტო კატალოგი',
+
+    catalogHelp:
+      'არასავალდებულო · მაქსიმუმ 12 დამატებითი ფოტო',
+
+    englishDescription:
+      'ინგლისური აღწერა',
+
+    georgianDescription:
+      'ქართული აღწერა',
 
     addTourButton:
       '+ ტურის დამატება',
@@ -330,8 +404,11 @@ const I18N = {
     creatingTour:
       'ტური იქმნება...',
 
+    uploadingCatalog:
+      'კატალოგი იტვირთება...',
+
     savingExisting:
-      'წინა ცვლილებები ინახება...',
+      'ცვლილებები ინახება...',
 
     yourContent:
       'შენი კონტენტი',
@@ -340,22 +417,34 @@ const I18N = {
       'ტურების მართვა',
 
     imageLimit:
-      'ფოტოები: JPG / PNG / WEBP · მაქს. 6 MB',
+      'JPG / PNG / WEBP · მაქს. 6 MB თითოეული · მაქს. 12 კატალოგის ფოტო',
 
     noTours:
-      'ტურები ჯერ არ არის. დაამატე პირველი ტური ზემოთ.',
+      'ტურები ჯერ არ არის.',
 
     noPhoto:
-      'ფოტო არ არის ატვირთული',
+      'მთავარი ფოტო არ არის',
 
     noPhotoText:
-      'საჯარო ვებსაიტზე placeholder გამოჩნდება მანამ, სანამ ფოტო არ აიტვირთება.',
+      'ატვირთე მთავარი ფოტო.',
+
+    mainImage:
+      'მთავარი ფოტო',
 
     uploadReplace:
-      'ფოტოს ატვირთვა / შეცვლა',
+      'მთავარი ფოტოს შეცვლა',
 
     removePhoto:
-      'ფოტოს წაშლა',
+      'მთავარი ფოტოს წაშლა',
+
+    photoCatalog:
+      'ფოტო კატალოგი',
+
+    noCatalog:
+      'კატალოგის ფოტოები ჯერ არ არის.',
+
+    uploadCatalog:
+      'არჩეული ფოტოების ატვირთვა',
 
     englishTitleLabel:
       'ინგლისური სათაური',
@@ -365,12 +454,6 @@ const I18N = {
 
     order:
       'რიგითობა',
-
-    englishDescription:
-      'ინგლისური აღწერა',
-
-    georgianDescription:
-      'ქართული აღწერა',
 
     published:
       'გამოქვეყნებულია საჯარო ვებსაიტზე',
@@ -388,19 +471,28 @@ const I18N = {
       'მომხმარებელი ან პაროლი არასწორია.',
 
     sessionExpired:
-      'ავტორიზაციის სესია დასრულდა. გთხოვ, თავიდან შეხვიდე.',
+      'სესია დასრულდა. თავიდან შედი.',
 
     choosePhoto:
-      'გთხოვ, აირჩიე ტურის ფოტო.',
+      'აირჩიე მთავარი ფოტო.',
+
+    chooseCatalogFirst:
+      'ჯერ აირჩიე კატალოგის ფოტოები.',
 
     invalidPhoto:
       'ფოტო უნდა იყოს JPG, PNG ან WEBP.',
 
     photoTooLarge:
-      'ფოტო უნდა იყოს მაქსიმუმ 6 MB.',
+      'თითოეული ფოტო უნდა იყოს მაქსიმუმ 6 MB.',
+
+    tooManyCatalog:
+      'ერთ ტურს მაქსიმუმ 12 კატალოგის ფოტო შეიძლება ჰქონდეს.',
 
     tourAdded:
       'ტური წარმატებით შეიქმნა.',
+
+    tourAddedCatalogWarning:
+      'ტური შეიქმნა, მაგრამ ზოგი ფოტო ვერ აიტვირთა.',
 
     changesSaved:
       'ცვლილებები შენახულია.',
@@ -409,16 +501,25 @@ const I18N = {
       'ჯერ აირჩიე ფოტო.',
 
     photoUploaded:
-      'ფოტო განახლებულია. საჯარო ვებსაიტიც ავტომატურად განახლდება.',
+      'მთავარი ფოტო განახლებულია.',
 
     photoRemoved:
-      'ფოტო წაშლილია.',
+      'მთავარი ფოტო წაშლილია.',
+
+    catalogUploaded:
+      'კატალოგის ფოტოები აიტვირთა.',
+
+    catalogRemoved:
+      'კატალოგის ფოტო წაშლილია.',
 
     tourDeleted:
       'ტური წაშლილია.',
 
     confirmRemovePhoto:
-      'წავშალოთ ტურის ფოტო?',
+      'წავშალოთ მთავარი ფოტო?',
+
+    confirmRemoveCatalog:
+      'წავშალოთ ეს კატალოგის ფოტო?',
 
     confirmDelete:
       'ნამდვილად წავშალოთ ეს ტური?',
@@ -434,41 +535,54 @@ const I18N = {
 let language =
   localStorage.getItem(
     'est-admin-language'
-  ) || 'en';
+  )
+  ||
+  'en';
 
 
-function t(key) {
+function t(
+  key
+) {
 
   return (
-    I18N[language]?.[key] ||
-    I18N.en[key] ||
+    I18N[language]?.[key]
+    ||
+    I18N.en[key]
+    ||
     key
   );
-
 }
 
 
-function escapeHtml(value = '') {
+function escapeHtml(
+  value = ''
+) {
 
-  return String(value).replace(
-    /[&<>"']/g,
-
-    (char) => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;'
-    })[char]
-  );
-
+  return String(value)
+    .replace(
+      /[&<>"']/g,
+      (char) => ({
+        '&':
+          '&amp;',
+        '<':
+          '&lt;',
+        '>':
+          '&gt;',
+        '"':
+          '&quot;',
+        "'":
+          '&#39;'
+      })[char]
+    );
 }
 
 
 function applyTranslations() {
 
-  document.documentElement.lang =
-    language;
+  document
+    .documentElement
+    .lang =
+      language;
 
 
   document
@@ -509,97 +623,42 @@ function applyTranslations() {
       : 'EN';
 
 
-  adminLangButton.textContent =
-    switchText;
+  if (adminLangButton) {
+
+    adminLangButton.textContent =
+      switchText;
+
+  }
 
 
-  dashboardLangButton.textContent =
-    switchText;
+  if (dashboardLangButton) {
+
+    dashboardLangButton.textContent =
+      switchText;
+
+  }
 
 
   localStorage.setItem(
     'est-admin-language',
     language
   );
-
 }
 
 
-async function switchLanguage() {
-
-  try {
-
-    if (
-      !dashboardView
-        .classList
-        .contains('hidden')
-    ) {
-
-      await saveAllDirtyTours();
-
-    }
-
-
-    language =
-      language === 'en'
-        ? 'ka'
-        : 'en';
-
-
-    applyTranslations();
-
-
-    if (
-      !dashboardView
-        .classList
-        .contains('hidden')
-    ) {
-
-      await loadTours();
-
-    }
-
-  }
-
-  catch (error) {
-
-    if (
-      error.message !==
-      'Unauthorized'
-    ) {
-
-      showToast(
-        error.message
-      );
-
-    }
-
-  }
-
-}
-
-
-adminLangButton.addEventListener(
-  'click',
-  switchLanguage
-);
-
-
-dashboardLangButton.addEventListener(
-  'click',
-  switchLanguage
-);
-
-
-function showToast(message) {
+function showToast(
+  message
+) {
 
   toast.textContent =
     message;
 
 
-  toast.classList.add(
-    'show'
-  );
+  toast
+    .classList
+    .add(
+      'show'
+    );
 
 
   clearTimeout(
@@ -612,11 +671,11 @@ function showToast(message) {
       () =>
         toast
           .classList
-          .remove('show'),
-
-      2300
+          .remove(
+            'show'
+          ),
+      2600
     );
-
 }
 
 
@@ -624,43 +683,48 @@ function showLoginForExpiredSession() {
 
   dashboardView
     .classList
-    .add('hidden');
+    .add(
+      'hidden'
+    );
 
 
   loginView
     .classList
-    .remove('hidden');
+    .remove(
+      'hidden'
+    );
 
 
   loginError.textContent =
-    t('sessionExpired');
-
-
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
-  });
-
+    t(
+      'sessionExpired'
+    );
 }
 
 
-function validatePhoto(file) {
+function validatePhoto(
+  file
+) {
 
   if (!file) {
 
     return {
-      valid: false,
-      message: t('choosePhoto')
+      valid:
+        false,
+
+      message:
+        t('choosePhoto')
     };
 
   }
 
 
-  const allowedTypes = [
-    'image/jpeg',
-    'image/png',
-    'image/webp'
-  ];
+  const allowedTypes =
+    [
+      'image/jpeg',
+      'image/png',
+      'image/webp'
+    ];
 
 
   if (
@@ -670,8 +734,11 @@ function validatePhoto(file) {
   ) {
 
     return {
-      valid: false,
-      message: t('invalidPhoto')
+      valid:
+        false,
+
+      message:
+        t('invalidPhoto')
     };
 
   }
@@ -683,17 +750,71 @@ function validatePhoto(file) {
   ) {
 
     return {
-      valid: false,
-      message: t('photoTooLarge')
+      valid:
+        false,
+
+      message:
+        t('photoTooLarge')
     };
 
   }
 
 
   return {
-    valid: true
+    valid:
+      true
   };
+}
 
+
+function validateCatalogFiles(
+  files,
+  existingCount = 0
+) {
+
+  const list =
+    [...files];
+
+
+  if (
+    existingCount +
+    list.length >
+    MAX_GALLERY_IMAGES
+  ) {
+
+    return {
+      valid:
+        false,
+
+      message:
+        t('tooManyCatalog')
+    };
+
+  }
+
+
+  for (
+    const file
+    of list
+  ) {
+
+    const result =
+      validatePhoto(file);
+
+
+    if (!result.valid) {
+
+      return result;
+
+    }
+
+  }
+
+
+  return {
+    valid:
+      true
+  };
 }
 
 
@@ -706,14 +827,21 @@ async function api(
     await fetch(
       url,
       {
-        credentials: 'include',
-        cache: 'no-store',
+
+        credentials:
+          'include',
+
+        cache:
+          'no-store',
+
         ...options
+
       }
     );
 
 
-  let payload = {};
+  let payload =
+    {};
 
 
   try {
@@ -732,6 +860,7 @@ async function api(
 
     showLoginForExpiredSession();
 
+
     throw new Error(
       'Unauthorized'
     );
@@ -739,12 +868,11 @@ async function api(
   }
 
 
-  if (
-    !response.ok
-  ) {
+  if (!response.ok) {
 
     throw new Error(
-      payload.error ||
+      payload.error
+      ||
       t('requestFailed')
     );
 
@@ -752,7 +880,36 @@ async function api(
 
 
   return payload;
+}
 
+
+async function uploadCatalogFile(
+  tourId,
+  file
+) {
+
+  const formData =
+    new FormData();
+
+
+  formData.append(
+    'image',
+    file
+  );
+
+
+  return api(
+    `/api/admin/tours/${encodeURIComponent(tourId)}/gallery`,
+    {
+
+      method:
+        'POST',
+
+      body:
+        formData
+
+    }
+  );
 }
 
 
@@ -762,8 +919,13 @@ async function refreshSession() {
     await fetch(
       '/api/admin/status',
       {
-        credentials: 'include',
-        cache: 'no-store'
+
+        credentials:
+          'include',
+
+        cache:
+          'no-store'
+
       }
     );
 
@@ -801,152 +963,162 @@ async function refreshSession() {
     await loadTours();
 
   }
-
 }
 
 
-loginForm.addEventListener(
-  'submit',
+async function switchLanguage() {
 
-  async (event) => {
+  try {
 
-    event.preventDefault();
-
-
-    loginError.textContent =
-      '';
-
-
-    try {
-
-      const response =
-        await fetch(
-          '/api/admin/login',
-          {
-            method: 'POST',
-
-            credentials:
-              'include',
-
-            cache:
-              'no-store',
-
-            headers: {
-              'Content-Type':
-                'application/json'
-            },
-
-            body:
-              JSON.stringify({
-
-                username:
-                  document
-                    .getElementById(
-                      'username'
-                    )
-                    .value
-                    .trim(),
-
-                password:
-                  document
-                    .getElementById(
-                      'password'
-                    )
-                    .value
-
-              })
-          }
-        );
-
-
-      let payload =
-        {};
-
-
-      try {
-
-        payload =
-          await response.json();
-
-      }
-
-      catch (_) {}
-
-
-      if (
-        !response.ok
-      ) {
-
-        loginError.textContent =
-          response.status === 401
-
-            ? t('invalidLogin')
-
-            : (
-                payload.error ||
-                t('requestFailed')
-              );
-
-
-        return;
-
-      }
-
-
-      document
-        .getElementById(
-          'password'
+    if (
+      !dashboardView
+        .classList
+        .contains(
+          'hidden'
         )
-        .value = '';
+    ) {
 
-
-      await refreshSession();
+      await saveAllDirtyTours();
 
     }
 
-    catch (error) {
 
-      loginError.textContent =
-        error.message;
+    language =
+      language === 'en'
+        ? 'ka'
+        : 'en';
+
+
+    applyTranslations();
+
+
+    if (
+      !dashboardView
+        .classList
+        .contains(
+          'hidden'
+        )
+    ) {
+
+      await loadTours();
 
     }
 
   }
-);
+
+  catch (error) {
+
+    if (
+      error.message !==
+      'Unauthorized'
+    ) {
+
+      showToast(
+        error.message
+      );
+
+    }
+
+  }
+}
 
 
-document
-  .getElementById(
-    'logoutButton'
-  )
-  .addEventListener(
+adminLangButton
+  ?.addEventListener(
     'click',
+    switchLanguage
+  );
 
-    async () => {
+
+dashboardLangButton
+  ?.addEventListener(
+    'click',
+    switchLanguage
+  );
+
+
+loginForm
+  ?.addEventListener(
+    'submit',
+    async (event) => {
+
+      event.preventDefault();
+
+
+      loginError.textContent =
+        '';
+
 
       try {
 
-        await fetch(
-          '/api/admin/logout',
-          {
-            method: 'POST',
-            credentials: 'include',
-            cache: 'no-store'
-          }
-        );
+        const response =
+          await fetch(
+            '/api/admin/login',
+            {
+
+              method:
+                'POST',
+
+              credentials:
+                'include',
+
+              cache:
+                'no-store',
+
+              headers: {
+                'Content-Type':
+                  'application/json'
+              },
+
+              body:
+                JSON.stringify({
+
+                  username:
+                    document
+                      .getElementById(
+                        'username'
+                      )
+                      .value
+                      .trim(),
+
+                  password:
+                    document
+                      .getElementById(
+                        'password'
+                      )
+                      .value
+
+                })
+
+            }
+          );
+
+
+        const payload =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          loginError.textContent =
+            payload.error
+            ||
+            t('invalidLogin');
+
+
+          return;
+
+        }
+
+
+        await refreshSession();
 
       }
 
-      finally {
+      catch (error) {
 
-        loginView
-          .classList
-          .remove('hidden');
-
-
-        dashboardView
-          .classList
-          .add('hidden');
+        loginError.textContent =
+          error.message;
 
       }
 
@@ -956,11 +1128,36 @@ document
 
 document
   .getElementById(
+    'logoutButton'
+  )
+  ?.addEventListener(
+    'click',
+    async () => {
+
+      await fetch(
+        '/api/admin/logout',
+        {
+          method:
+            'POST',
+
+          credentials:
+            'include'
+        }
+      );
+
+
+      await refreshSession();
+
+    }
+  );
+
+
+document
+  .getElementById(
     'refreshButton'
   )
-  .addEventListener(
+  ?.addEventListener(
     'click',
-
     async () => {
 
       try {
@@ -973,16 +1170,9 @@ document
 
       catch (error) {
 
-        if (
-          error.message !==
-          'Unauthorized'
-        ) {
-
-          showToast(
-            error.message
-          );
-
-        }
+        showToast(
+          error.message
+        );
 
       }
 
@@ -990,19 +1180,12 @@ document
   );
 
 
-/*
- * CREATE NEW TOUR
- *
- * Before the new tour is created,
- * save any edited existing tours.
- */
 document
   .getElementById(
     'addTourForm'
   )
-  .addEventListener(
+  ?.addEventListener(
     'submit',
-
     async (event) => {
 
       event.preventDefault();
@@ -1012,7 +1195,7 @@ document
         event.currentTarget;
 
 
-      const photo =
+      const mainPhoto =
         document
           .getElementById(
             'newTourPhoto'
@@ -1020,18 +1203,48 @@ document
           .files[0];
 
 
-      const validation =
+      const catalogFiles =
+        [
+          ...document
+            .getElementById(
+              'newGalleryPhotos'
+            )
+            .files
+        ];
+
+
+      const mainValidation =
         validatePhoto(
-          photo
+          mainPhoto
         );
 
 
       if (
-        !validation.valid
+        !mainValidation.valid
       ) {
 
         showToast(
-          validation.message
+          mainValidation.message
+        );
+
+        return;
+
+      }
+
+
+      const catalogValidation =
+        validateCatalogFiles(
+          catalogFiles,
+          0
+        );
+
+
+      if (
+        !catalogValidation.valid
+      ) {
+
+        showToast(
+          catalogValidation.message
         );
 
         return;
@@ -1045,13 +1258,6 @@ document
           true;
 
 
-        addTourButton.textContent =
-          t('savingExisting');
-
-
-        /*
-         * SAVE EXISTING EDITS FIRST
-         */
         await saveAllDirtyTours();
 
 
@@ -1061,7 +1267,6 @@ document
 
         formData.append(
           'titleEn',
-
           document
             .getElementById(
               'newTitleEn'
@@ -1073,7 +1278,6 @@ document
 
         formData.append(
           'titleKa',
-
           document
             .getElementById(
               'newTitleKa'
@@ -1085,7 +1289,6 @@ document
 
         formData.append(
           'price',
-
           document
             .getElementById(
               'newPrice'
@@ -1097,7 +1300,6 @@ document
 
         formData.append(
           'durationEn',
-
           document
             .getElementById(
               'newDurationEn'
@@ -1109,7 +1311,6 @@ document
 
         formData.append(
           'durationKa',
-
           document
             .getElementById(
               'newDurationKa'
@@ -1119,12 +1320,8 @@ document
         );
 
 
-        /*
-         * NEW DESCRIPTION VALUES
-         */
         formData.append(
           'descriptionEn',
-
           document
             .getElementById(
               'newDescriptionEn'
@@ -1136,7 +1333,6 @@ document
 
         formData.append(
           'descriptionKa',
-
           document
             .getElementById(
               'newDescriptionKa'
@@ -1154,7 +1350,7 @@ document
 
         formData.append(
           'image',
-          photo
+          mainPhoto
         );
 
 
@@ -1162,20 +1358,75 @@ document
           t('creatingTour');
 
 
-        await api(
-          '/api/admin/tours',
-          {
-            method: 'POST',
-            body: formData
+        const created =
+          await api(
+            '/api/admin/tours',
+            {
+
+              method:
+                'POST',
+
+              body:
+                formData
+
+            }
+          );
+
+
+        let catalogFailed =
+          false;
+
+
+        if (
+          catalogFiles.length > 0
+        ) {
+
+          addTourButton.textContent =
+            t('uploadingCatalog');
+
+
+          for (
+            const file
+            of catalogFiles
+          ) {
+
+            try {
+
+              await uploadCatalogFile(
+                created.id,
+                file
+              );
+
+            }
+
+            catch (error) {
+
+              catalogFailed =
+                true;
+
+
+              console.error(
+                error
+              );
+
+            }
+
           }
-        );
+
+        }
 
 
         form.reset();
 
 
         showToast(
-          t('tourAdded')
+          catalogFailed
+            ? t(
+                'tourAddedCatalogWarning'
+              )
+            : t(
+                'tourAdded'
+              )
         );
 
 
@@ -1213,6 +1464,66 @@ document
   );
 
 
+function renderCatalogHtml(
+  tour
+) {
+
+  const catalog =
+    Array.isArray(
+      tour.galleryImages
+    )
+      ? tour.galleryImages
+      : [];
+
+
+  if (
+    catalog.length === 0
+  ) {
+
+    return `
+      <p class="catalog-empty">
+        ${escapeHtml(
+          t('noCatalog')
+        )}
+      </p>
+    `;
+
+  }
+
+
+  return `
+    <div class="catalog-grid">
+
+      ${
+        catalog
+          .map(
+            (image) => `
+              <div class="catalog-item">
+
+                <img
+                  src="${escapeHtml(image.url)}?v=${encodeURIComponent(image.id)}"
+                  alt="Catalog image"
+                >
+
+                <button
+                  class="catalog-delete"
+                  type="button"
+                  data-catalog-id="${escapeHtml(image.id)}"
+                >
+                  ×
+                </button>
+
+              </div>
+            `
+          )
+          .join('')
+      }
+
+    </div>
+  `;
+}
+
+
 async function loadTours() {
 
   try {
@@ -1224,16 +1535,14 @@ async function loadTours() {
 
 
     if (
-      !Array.isArray(
-        tours
-      )
+      !Array.isArray(tours)
       ||
       tours.length === 0
     ) {
 
       adminTours.innerHTML =
         `
-          <div class="notice">
+          <div class="tour-editor">
             ${escapeHtml(
               t('noTours')
             )}
@@ -1264,17 +1573,31 @@ async function loadTours() {
           (tour) => {
 
             const title =
-              tour.titleEn ||
-              tour.titleKa ||
+              tour.titleEn
+              ||
+              tour.titleKa
+              ||
               'Tour';
 
 
             const imageVersion =
               encodeURIComponent(
-                tour.updatedAt ||
-                tour.id ||
+                tour.mainImageId
+                ||
+                tour.updatedAt
+                ||
+                tour.id
+                ||
                 '1'
               );
+
+
+            const catalog =
+              Array.isArray(
+                tour.galleryImages
+              )
+                ? tour.galleryImages
+                : [];
 
 
             return `
@@ -1285,7 +1608,15 @@ async function loadTours() {
 
                 <div class="editor-grid">
 
+
                   <div>
+
+                    <p class="image-section-title">
+                      ${escapeHtml(
+                        t('mainImage')
+                      )}
+                    </p>
+
 
                     <div class="photo-box">
 
@@ -1366,25 +1697,23 @@ async function loadTours() {
                   </div>
 
 
+
                   <div>
 
                     <div class="fields-grid">
+
 
                       <label>
 
                         <span>
                           ${escapeHtml(
-                            t(
-                              'englishTitleLabel'
-                            )
+                            t('englishTitleLabel')
                           )}
                         </span>
 
                         <input
                           class="title-en"
-                          value="${escapeHtml(
-                            tour.titleEn
-                          )}"
+                          value="${escapeHtml(tour.titleEn)}"
                         >
 
                       </label>
@@ -1394,17 +1723,13 @@ async function loadTours() {
 
                         <span>
                           ${escapeHtml(
-                            t(
-                              'georgianTitleLabel'
-                            )
+                            t('georgianTitleLabel')
                           )}
                         </span>
 
                         <input
                           class="title-ka"
-                          value="${escapeHtml(
-                            tour.titleKa
-                          )}"
+                          value="${escapeHtml(tour.titleKa)}"
                         >
 
                       </label>
@@ -1420,10 +1745,7 @@ async function loadTours() {
 
                         <input
                           class="price"
-                          value="${escapeHtml(
-                            tour.price
-                          )}"
-                          placeholder="From 699 GEL"
+                          value="${escapeHtml(tour.price)}"
                         >
 
                       </label>
@@ -1440,9 +1762,7 @@ async function loadTours() {
                         <input
                           class="sort-order"
                           type="number"
-                          value="${escapeHtml(
-                            tour.sortOrder
-                          )}"
+                          value="${escapeHtml(tour.sortOrder)}"
                         >
 
                       </label>
@@ -1458,9 +1778,7 @@ async function loadTours() {
 
                         <input
                           class="duration-en"
-                          value="${escapeHtml(
-                            tour.durationEn
-                          )}"
+                          value="${escapeHtml(tour.durationEn)}"
                         >
 
                       </label>
@@ -1476,9 +1794,7 @@ async function loadTours() {
 
                         <input
                           class="duration-ka"
-                          value="${escapeHtml(
-                            tour.durationKa
-                          )}"
+                          value="${escapeHtml(tour.durationKa)}"
                         >
 
                       </label>
@@ -1488,18 +1804,14 @@ async function loadTours() {
 
                         <span>
                           ${escapeHtml(
-                            t(
-                              'englishDescription'
-                            )
+                            t('englishDescription')
                           )}
                         </span>
 
                         <textarea
                           class="description-en"
-                          rows="4"
-                        >${escapeHtml(
-                          tour.descriptionEn
-                        )}</textarea>
+                          rows="5"
+                        >${escapeHtml(tour.descriptionEn)}</textarea>
 
                       </label>
 
@@ -1508,22 +1820,19 @@ async function loadTours() {
 
                         <span>
                           ${escapeHtml(
-                            t(
-                              'georgianDescription'
-                            )
+                            t('georgianDescription')
                           )}
                         </span>
 
                         <textarea
                           class="description-ka"
-                          rows="4"
-                        >${escapeHtml(
-                          tour.descriptionKa
-                        )}</textarea>
+                          rows="5"
+                        >${escapeHtml(tour.descriptionKa)}</textarea>
 
                       </label>
 
                     </div>
+
 
 
                     <label class="publish-row">
@@ -1543,6 +1852,54 @@ async function loadTours() {
                       )}
 
                     </label>
+
+
+
+                    <!-- PHOTO CATALOG -->
+
+                    <section class="catalog-panel">
+
+                      <div class="catalog-heading">
+
+                        <strong>
+                          ${escapeHtml(
+                            t('photoCatalog')
+                          )}
+                        </strong>
+
+                        <span class="catalog-count">
+                          ${catalog.length}/${MAX_GALLERY_IMAGES}
+                        </span>
+
+                      </div>
+
+
+                      ${renderCatalogHtml(tour)}
+
+
+                      <div class="catalog-tools">
+
+                        <input
+                          class="catalog-input"
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          multiple
+                        >
+
+
+                        <button
+                          class="admin-button secondary catalog-upload-button"
+                          type="button"
+                        >
+                          ${escapeHtml(
+                            t('uploadCatalog')
+                          )}
+                        </button>
+
+                      </div>
+
+                    </section>
+
 
 
                     <div class="editor-actions">
@@ -1598,11 +1955,12 @@ async function loadTours() {
     }
 
   }
-
 }
 
 
-function collectCardBody(card) {
+function collectCardBody(
+  card
+) {
 
   return {
 
@@ -1668,7 +2026,9 @@ function collectCardBody(card) {
           .querySelector(
             '.sort-order'
           )
-          .value || 0
+          .value
+        ||
+        0
       ),
 
     active:
@@ -1679,34 +2039,23 @@ function collectCardBody(card) {
         .checked
 
   };
-
 }
 
 
-async function saveCard(
-  card,
-  {
-    showSuccess = false
-  } = {}
+async function saveTextFields(
+  card
 ) {
 
   const id =
     card.dataset.id;
 
 
-  const body =
-    collectCardBody(
-      card
-    );
-
-
-  /*
-   * SAVE TEXT DATA
-   */
   await api(
     `/api/admin/tours/${encodeURIComponent(id)}`,
     {
-      method: 'PUT',
+
+      method:
+        'PUT',
 
       headers: {
         'Content-Type':
@@ -1715,84 +2064,17 @@ async function saveCard(
 
       body:
         JSON.stringify(
-          body
+          collectCardBody(
+            card
+          )
         )
+
     }
   );
 
 
-  /*
-   * IF A NEW PHOTO WAS SELECTED,
-   * SAVE IT TOO.
-   */
-  const imageInput =
-    card.querySelector(
-      '.image-input'
-    );
-
-
-  const selectedPhoto =
-    imageInput
-      ?.files
-      ?.[0];
-
-
-  if (
-    selectedPhoto
-  ) {
-
-    const validation =
-      validatePhoto(
-        selectedPhoto
-      );
-
-
-    if (
-      !validation.valid
-    ) {
-
-      throw new Error(
-        validation.message
-      );
-
-    }
-
-
-    const formData =
-      new FormData();
-
-
-    formData.append(
-      'image',
-      selectedPhoto
-    );
-
-
-    await api(
-      `/api/admin/tours/${encodeURIComponent(id)}/image`,
-      {
-        method: 'POST',
-        body: formData
-      }
-    );
-
-  }
-
-
   card.dataset.dirty =
     '0';
-
-
-  if (
-    showSuccess
-  ) {
-
-    showToast(
-      t('changesSaved')
-    );
-
-  }
-
 }
 
 
@@ -1802,7 +2084,7 @@ async function saveAllDirtyTours() {
     [
       ...document
         .querySelectorAll(
-          '.tour-editor'
+          '.tour-editor[data-id]'
         )
     ]
       .filter(
@@ -1812,33 +2094,16 @@ async function saveAllDirtyTours() {
       );
 
 
-  /*
-   * SEQUENTIAL SAVE
-   *
-   * Avoid two cards changing
-   * the same tours at once.
-   */
   for (
-    const card of
-    dirtyCards
+    const card
+    of dirtyCards
   ) {
 
-    await saveCard(
+    await saveTextFields(
       card
     );
 
   }
-
-}
-
-
-function markCardDirty(
-  card
-) {
-
-  card.dataset.dirty =
-    '1';
-
 }
 
 
@@ -1846,7 +2111,7 @@ function bindEditorActions() {
 
   document
     .querySelectorAll(
-      '.tour-editor'
+      '.tour-editor[data-id]'
     )
     .forEach(
       (card) => {
@@ -1859,101 +2124,65 @@ function bindEditorActions() {
           '0';
 
 
-        /*
-         * NORMAL INPUT CHANGES
-         */
         card
           .querySelectorAll(
-            'input:not(.image-input), textarea'
+            'input:not(.image-input):not(.catalog-input), textarea'
           )
           .forEach(
             (field) => {
 
               field.addEventListener(
                 'input',
+                () => {
 
-                () =>
-                  markCardDirty(
-                    card
-                  )
-              );
+                  card.dataset.dirty =
+                    '1';
 
-
-              field.addEventListener(
-                'change',
-
-                () =>
-                  markCardDirty(
-                    card
-                  )
-              );
-
-            }
-          );
-
-
-        /*
-         * PHOTO SELECTION
-         */
-        const imageInput =
-          card.querySelector(
-            '.image-input'
-          );
-
-
-        imageInput.addEventListener(
-          'change',
-
-          () =>
-            markCardDirty(
-              card
-            )
-        );
-
-
-        /*
-         * SAVE BUTTON
-         */
-        const saveButton =
-          card.querySelector(
-            '.save-button'
-          );
-
-
-        saveButton.addEventListener(
-          'click',
-
-          async () => {
-
-            try {
-
-              saveButton.disabled =
-                true;
-
-
-              saveButton.textContent =
-                t('saving');
-
-
-              await saveCard(
-                card,
-                {
-                  showSuccess:
-                    true
                 }
               );
 
+              field.addEventListener(
+                'change',
+                () => {
 
-              await loadTours();
+                  card.dataset.dirty =
+                    '1';
+
+                }
+              );
 
             }
+          );
 
-            catch (error) {
 
-              if (
-                error.message !==
-                'Unauthorized'
-              ) {
+        /*
+         * SAVE
+         */
+        card
+          .querySelector(
+            '.save-button'
+          )
+          .addEventListener(
+            'click',
+            async () => {
+
+              try {
+
+                await saveTextFields(
+                  card
+                );
+
+
+                showToast(
+                  t('changesSaved')
+                );
+
+
+                await loadTours();
+
+              }
+
+              catch (error) {
 
                 showToast(
                   error.message
@@ -1962,24 +2191,11 @@ function bindEditorActions() {
               }
 
             }
-
-            finally {
-
-              saveButton.disabled =
-                false;
-
-
-              saveButton.textContent =
-                t('saveChanges');
-
-            }
-
-          }
-        );
+          );
 
 
         /*
-         * UPLOAD / REPLACE PHOTO
+         * MAIN IMAGE
          */
         card
           .querySelector(
@@ -1987,7 +2203,6 @@ function bindEditorActions() {
           )
           .addEventListener(
             'click',
-
             async () => {
 
               const file =
@@ -2001,9 +2216,7 @@ function bindEditorActions() {
               if (!file) {
 
                 showToast(
-                  t(
-                    'chooseImageFirst'
-                  )
+                  t('chooseImageFirst')
                 );
 
                 return;
@@ -2030,38 +2243,46 @@ function bindEditorActions() {
               }
 
 
-              const formData =
-                new FormData();
-
-
-              formData.append(
-                'image',
-                file
-              );
-
-
               try {
+
+                if (
+                  card.dataset.dirty ===
+                  '1'
+                ) {
+
+                  await saveTextFields(
+                    card
+                  );
+
+                }
+
+
+                const formData =
+                  new FormData();
+
+
+                formData.append(
+                  'image',
+                  file
+                );
+
 
                 await api(
                   `/api/admin/tours/${encodeURIComponent(id)}/image`,
                   {
+
                     method:
                       'POST',
 
                     body:
                       formData
+
                   }
                 );
 
 
-                card.dataset.dirty =
-                  '0';
-
-
                 showToast(
-                  t(
-                    'photoUploaded'
-                  )
+                  t('photoUploaded')
                 );
 
 
@@ -2071,16 +2292,195 @@ function bindEditorActions() {
 
               catch (error) {
 
+                showToast(
+                  error.message
+                );
+
+              }
+
+            }
+          );
+
+
+        const removePhotoButton =
+          card.querySelector(
+            '.remove-photo-button'
+          );
+
+
+        if (removePhotoButton) {
+
+          removePhotoButton.addEventListener(
+            'click',
+            async () => {
+
+              if (
+                !confirm(
+                  t(
+                    'confirmRemovePhoto'
+                  )
+                )
+              ) {
+
+                return;
+
+              }
+
+
+              try {
+
+                await api(
+                  `/api/admin/tours/${encodeURIComponent(id)}/image`,
+                  {
+                    method:
+                      'DELETE'
+                  }
+                );
+
+
+                showToast(
+                  t('photoRemoved')
+                );
+
+
+                await loadTours();
+
+              }
+
+              catch (error) {
+
+                showToast(
+                  error.message
+                );
+
+              }
+
+            }
+          );
+
+        }
+
+
+        /*
+         * CATALOG UPLOAD
+         */
+        const catalogUploadButton =
+          card.querySelector(
+            '.catalog-upload-button'
+          );
+
+
+        catalogUploadButton
+          .addEventListener(
+            'click',
+            async () => {
+
+              const catalogInput =
+                card.querySelector(
+                  '.catalog-input'
+                );
+
+
+              const files =
+                [
+                  ...catalogInput.files
+                ];
+
+
+              const existingCount =
+                card
+                  .querySelectorAll(
+                    '.catalog-item'
+                  )
+                  .length;
+
+
+              if (
+                files.length === 0
+              ) {
+
+                showToast(
+                  t(
+                    'chooseCatalogFirst'
+                  )
+                );
+
+                return;
+
+              }
+
+
+              const validation =
+                validateCatalogFiles(
+                  files,
+                  existingCount
+                );
+
+
+              if (
+                !validation.valid
+              ) {
+
+                showToast(
+                  validation.message
+                );
+
+                return;
+
+              }
+
+
+              try {
+
+                catalogUploadButton.disabled =
+                  true;
+
+
+                catalogUploadButton.textContent =
+                  t(
+                    'uploadingCatalog'
+                  );
+
+
                 if (
-                  error.message !==
-                  'Unauthorized'
+                  card.dataset.dirty ===
+                  '1'
                 ) {
 
-                  showToast(
-                    error.message
+                  await saveTextFields(
+                    card
                   );
 
                 }
+
+
+                for (
+                  const file
+                  of files
+                ) {
+
+                  await uploadCatalogFile(
+                    id,
+                    file
+                  );
+
+                }
+
+
+                showToast(
+                  t('catalogUploaded')
+                );
+
+
+                await loadTours();
+
+              }
+
+              catch (error) {
+
+                showToast(
+                  error.message
+                );
 
               }
 
@@ -2089,65 +2489,57 @@ function bindEditorActions() {
 
 
         /*
-         * REMOVE PHOTO
+         * DELETE CATALOG IMAGE
          */
-        const removePhotoButton =
-          card.querySelector(
-            '.remove-photo-button'
-          );
+        card
+          .querySelectorAll(
+            '.catalog-delete'
+          )
+          .forEach(
+            (button) => {
 
-
-        if (
-          removePhotoButton
-        ) {
-
-          removePhotoButton
-            .addEventListener(
-              'click',
-
-              async () => {
-
-                if (
-                  !confirm(
-                    t(
-                      'confirmRemovePhoto'
-                    )
-                  )
-                ) {
-
-                  return;
-
-                }
-
-
-                try {
-
-                  await api(
-                    `/api/admin/tours/${encodeURIComponent(id)}/image`,
-                    {
-                      method:
-                        'DELETE'
-                    }
-                  );
-
-
-                  showToast(
-                    t(
-                      'photoRemoved'
-                    )
-                  );
-
-
-                  await loadTours();
-
-                }
-
-                catch (error) {
+              button.addEventListener(
+                'click',
+                async () => {
 
                   if (
-                    error.message !==
-                    'Unauthorized'
+                    !confirm(
+                      t(
+                        'confirmRemoveCatalog'
+                      )
+                    )
                   ) {
+
+                    return;
+
+                  }
+
+
+                  const imageId =
+                    button.dataset.catalogId;
+
+
+                  try {
+
+                    await api(
+                      `/api/admin/tours/${encodeURIComponent(id)}/gallery/${encodeURIComponent(imageId)}`,
+                      {
+                        method:
+                          'DELETE'
+                      }
+                    );
+
+
+                    showToast(
+                      t('catalogRemoved')
+                    );
+
+
+                    await loadTours();
+
+                  }
+
+                  catch (error) {
 
                     showToast(
                       error.message
@@ -2156,11 +2548,10 @@ function bindEditorActions() {
                   }
 
                 }
+              );
 
-              }
-            );
-
-        }
+            }
+          );
 
 
         /*
@@ -2172,7 +2563,6 @@ function bindEditorActions() {
           )
           .addEventListener(
             'click',
-
             async () => {
 
               if (
@@ -2200,9 +2590,7 @@ function bindEditorActions() {
 
 
                 showToast(
-                  t(
-                    'tourDeleted'
-                  )
+                  t('tourDeleted')
                 );
 
 
@@ -2212,16 +2600,9 @@ function bindEditorActions() {
 
               catch (error) {
 
-                if (
-                  error.message !==
-                  'Unauthorized'
-                ) {
-
-                  showToast(
-                    error.message
-                  );
-
-                }
+                showToast(
+                  error.message
+                );
 
               }
 
@@ -2230,7 +2611,6 @@ function bindEditorActions() {
 
       }
     );
-
 }
 
 
