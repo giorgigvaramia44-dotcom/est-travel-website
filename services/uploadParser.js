@@ -1,23 +1,6 @@
-const crypto =
-  require('crypto');
-
-const fs =
-  require('fs');
-
-const path =
-  require('path');
-
-
-const {
-  uploadsDir
-} =
-  require('../config');
-
-
 const {
   readBody
-} =
-  require('../lib/http');
+} = require('../lib/http');
 
 
 const MAX_IMAGE_BYTES =
@@ -28,37 +11,23 @@ const MAX_MULTIPART_BYTES =
   7 * 1024 * 1024;
 
 
-const allowed = {
+const IMAGE_RULES = {
 
   'image/jpeg': {
-
-    ext:
-      '.jpg',
-
     check:
       (buffer) =>
         buffer.length > 3 &&
         buffer[0] === 0xff &&
         buffer[1] === 0xd8 &&
         buffer[2] === 0xff
-
   },
 
-
   'image/png': {
-
-    ext:
-      '.png',
-
     check:
       (buffer) =>
-        buffer.length > 8
-        &&
+        buffer.length > 8 &&
         buffer
-          .slice(
-            0,
-            8
-          )
+          .slice(0, 8)
           .equals(
             Buffer.from([
               0x89,
@@ -71,35 +40,19 @@ const allowed = {
               0x0a
             ])
           )
-
   },
 
-
   'image/webp': {
-
-    ext:
-      '.webp',
-
     check:
       (buffer) =>
-        buffer.length > 12
+        buffer.length > 12 &&
+        buffer
+          .slice(0, 4)
+          .toString() === 'RIFF'
         &&
         buffer
-          .slice(
-            0,
-            4
-          )
-          .toString() ===
-          'RIFF'
-        &&
-        buffer
-          .slice(
-            8,
-            12
-          )
-          .toString() ===
-          'WEBP'
-
+          .slice(8, 12)
+          .toString() === 'WEBP'
   }
 
 };
@@ -111,9 +64,7 @@ function boundaryFromContentType(
 
   const match =
     /boundary=(?:"([^"]+)"|([^;]+))/i
-      .exec(
-        contentType
-      );
+      .exec(contentType);
 
 
   const value =
@@ -130,10 +81,7 @@ function boundaryFromContentType(
   }
 
 
-  return (
-    `--${value}`
-  );
-
+  return `--${value}`;
 }
 
 
@@ -156,13 +104,8 @@ function parseMultipartForm(
 
   const parts =
     raw
-      .split(
-        boundary
-      )
-      .slice(
-        1,
-        -1
-      );
+      .split(boundary)
+      .slice(1, -1);
 
 
   const fields =
@@ -173,14 +116,10 @@ function parseMultipartForm(
     null;
 
 
-  for (
-    let part of parts
-  ) {
+  for (let part of parts) {
 
     if (
-      part.startsWith(
-        '\r\n'
-      )
+      part.startsWith('\r\n')
     ) {
 
       part =
@@ -190,16 +129,11 @@ function parseMultipartForm(
 
 
     if (
-      part.endsWith(
-        '\r\n'
-      )
+      part.endsWith('\r\n')
     ) {
 
       part =
-        part.slice(
-          0,
-          -2
-        );
+        part.slice(0, -2);
 
     }
 
@@ -233,39 +167,28 @@ function parseMultipartForm(
 
 
     if (
-      contentText.endsWith(
-        '\r\n'
-      )
+      contentText.endsWith('\r\n')
     ) {
 
       contentText =
-        contentText.slice(
-          0,
-          -2
-        );
+        contentText.slice(0, -2);
 
     }
 
 
     const nameMatch =
       /name="([^"]+)"/i
-        .exec(
-          headersText
-        );
+        .exec(headersText);
 
 
     const filenameMatch =
       /filename="([^"]*)"/i
-        .exec(
-          headersText
-        );
+        .exec(headersText);
 
 
     const typeMatch =
       /Content-Type:\s*([^\r\n]+)/i
-        .exec(
-          headersText
-        );
+        .exec(headersText);
 
 
     const name =
@@ -279,13 +202,10 @@ function parseMultipartForm(
     }
 
 
-    if (
-      filenameMatch
-    ) {
+    if (filenameMatch) {
 
       if (
-        name === 'image'
-        &&
+        name === 'image' &&
         filenameMatch[1]
       ) {
 
@@ -295,10 +215,8 @@ function parseMultipartForm(
             filenameMatch[1],
 
           mimeType:
-            (
-              typeMatch?.[1]
-              ||
-              ''
+            String(
+              typeMatch?.[1] || ''
             )
               .trim()
               .toLowerCase(),
@@ -336,11 +254,10 @@ function parseMultipartForm(
     fields,
     image
   };
-
 }
 
 
-function validateAndSaveImage(
+function validateImage(
   file
 ) {
 
@@ -354,7 +271,7 @@ function validateAndSaveImage(
 
 
   const rule =
-    allowed[
+    IMAGE_RULES[
       file.mimeType
     ];
 
@@ -393,50 +310,21 @@ function validateAndSaveImage(
   }
 
 
-  fs.mkdirSync(
-    uploadsDir,
-    {
-      recursive: true
-    }
-  );
-
-
-  /*
-   * Always create a new unique filename.
-   *
-   * This prevents browser/CDN caching
-   * from showing an old replaced photo.
-   */
-  const fileName =
-    `${Date.now()}-` +
-    `${crypto.randomBytes(12).toString('hex')}` +
-    `${rule.ext}`;
-
-
-  const fullPath =
-    path.join(
-      uploadsDir,
-      fileName
-    );
-
-
-  fs.writeFileSync(
-    fullPath,
-    file.data
-  );
-
-
   return {
 
-    fileName,
+    filename:
+      String(
+        file.filename ||
+        'image'
+      ),
 
-    publicPath:
-      `/uploads/${fileName}`,
+    mimeType:
+      file.mimeType,
 
-    fullPath
+    data:
+      file.data
 
   };
-
 }
 
 
@@ -478,11 +366,10 @@ async function readMultipartRequest(
     body,
     contentType
   );
-
 }
 
 
-async function saveUploadedImage(
+async function readImageUpload(
   req
 ) {
 
@@ -492,10 +379,9 @@ async function saveUploadedImage(
     );
 
 
-  return validateAndSaveImage(
+  return validateImage(
     parsed.image
   );
-
 }
 
 
@@ -509,27 +395,23 @@ async function readTourWithImage(
     );
 
 
-  const uploaded =
-    validateAndSaveImage(
-      parsed.image
-    );
-
-
   return {
 
     fields:
       parsed.fields,
 
-    uploaded
+    image:
+      validateImage(
+        parsed.image
+      )
 
   };
-
 }
 
 
 module.exports = {
 
-  saveUploadedImage,
+  readImageUpload,
 
   readTourWithImage
 
