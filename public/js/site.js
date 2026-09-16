@@ -84,10 +84,8 @@ function t(
 
 function applyStaticTranslations() {
 
-  document
-    .documentElement
-    .lang =
-      language;
+  document.documentElement.lang =
+    language;
 
 
   document
@@ -283,8 +281,8 @@ function galleryImageUrl(
 
 
 /*
- * Main image is the first gallery image.
- * Catalog images follow it.
+ * First image = main image.
+ * Then all catalog images.
  */
 function tourImages(
   tour
@@ -375,6 +373,7 @@ function renderTours() {
 
 
     return;
+
   }
 
 
@@ -574,7 +573,7 @@ function renderTours() {
 
 
 /* =========================================================
-   TOUR CARD ACTIONS
+   CARD ACTIONS
 ========================================================= */
 
 function bindTourCardActions() {
@@ -931,17 +930,6 @@ function openTourModal(
                   id="tourModalMainImageWrap"
                 >
 
-                  <button
-                    class="gallery-arrow gallery-arrow-left"
-                    id="galleryPrevious"
-                    type="button"
-                    aria-label="Previous photo"
-                    hidden
-                  >
-                    ‹
-                  </button>
-
-
                   <img
                     id="tourModalMainImage"
                     class="tour-modal-main-image"
@@ -949,21 +937,6 @@ function openTourModal(
                     alt="${escapeHtml(title)}"
                     draggable="false"
                   >
-
-
-                  <button
-                    class="gallery-arrow gallery-arrow-right"
-                    id="galleryNext"
-                    type="button"
-                    aria-label="Next photo"
-                    ${
-                      images.length > 1
-                        ? ''
-                        : 'hidden'
-                    }
-                  >
-                    ›
-                  </button>
 
                 </div>
               `
@@ -1001,45 +974,73 @@ function openTourModal(
                 </div>
 
 
-                <div
-                  class="tour-modal-thumb-viewport"
-                >
+                <div class="catalog-carousel">
+
+
+                  <button
+                    class="catalog-arrow catalog-arrow-left"
+                    id="catalogPrevious"
+                    type="button"
+                    aria-label="Previous catalog photos"
+                    hidden
+                  >
+                    ‹
+                  </button>
+
 
                   <div
-                    class="tour-modal-thumbnails"
-                    id="tourModalThumbnails"
+                    class="tour-modal-thumb-viewport"
+                    id="catalogViewport"
                   >
 
-                    ${
-                      images
-                        .map(
-                          (
-                            image,
-                            index
-                          ) => `
-                            <button
-                              class="tour-modal-thumb ${
-                                index === 0
-                                  ? 'active'
-                                  : ''
-                              }"
-                              type="button"
-                              data-gallery-index="${index}"
-                            >
+                    <div
+                      class="tour-modal-thumbnails"
+                      id="tourModalThumbnails"
+                    >
 
-                              <img
-                                src="${escapeHtml(image.url)}"
-                                alt="${escapeHtml(title)}"
-                                draggable="false"
+                      ${
+                        images
+                          .map(
+                            (
+                              image,
+                              index
+                            ) => `
+                              <button
+                                class="tour-modal-thumb ${
+                                  index === 0
+                                    ? 'active'
+                                    : ''
+                                }"
+                                type="button"
+                                data-gallery-index="${index}"
                               >
 
-                            </button>
-                          `
-                        )
-                        .join('')
-                    }
+                                <img
+                                  src="${escapeHtml(image.url)}"
+                                  alt="${escapeHtml(title)}"
+                                  draggable="false"
+                                >
+
+                              </button>
+                            `
+                          )
+                          .join('')
+                      }
+
+                    </div>
 
                   </div>
+
+
+                  <button
+                    class="catalog-arrow catalog-arrow-right"
+                    id="catalogNext"
+                    type="button"
+                    aria-label="Next catalog photos"
+                  >
+                    ›
+                  </button>
+
 
                 </div>
               `
@@ -1054,7 +1055,7 @@ function openTourModal(
 
 
   /* =======================================================
-     GALLERY CAROUSEL
+     GALLERY LOGIC
   ======================================================= */
 
   if (
@@ -1077,21 +1078,27 @@ function openTourModal(
       );
 
 
-    const previousButton =
+    const viewport =
       content.querySelector(
-        '#galleryPrevious'
-      );
-
-
-    const nextButton =
-      content.querySelector(
-        '#galleryNext'
+        '#catalogViewport'
       );
 
 
     const thumbnailStrip =
       content.querySelector(
         '#tourModalThumbnails'
+      );
+
+
+    const previousButton =
+      content.querySelector(
+        '#catalogPrevious'
+      );
+
+
+    const nextButton =
+      content.querySelector(
+        '#catalogNext'
       );
 
 
@@ -1103,11 +1110,13 @@ function openTourModal(
       ];
 
 
-    /*
-     * Change currently selected image.
-     */
+    /* -------------------------------------------------------
+       SELECT LARGE IMAGE
+    ------------------------------------------------------- */
+
     function selectGalleryImage(
-      index
+      index,
+      keepThumbnailVisible = true
     ) {
 
       if (
@@ -1134,9 +1143,6 @@ function openTourModal(
       }
 
 
-      /*
-       * Highlight current thumbnail.
-       */
       thumbnails.forEach(
         (
           thumbnail,
@@ -1156,76 +1162,28 @@ function openTourModal(
 
 
       /*
-       * Hide left arrow on first image.
+       * If mobile swipe changes the big image,
+       * keep its thumbnail visible too.
        */
-      if (previousButton) {
-
-        previousButton.hidden =
-          currentImageIndex === 0;
-
-      }
-
-
-      /*
-       * Hide right arrow on last image.
-       */
-      if (nextButton) {
-
-        nextButton.hidden =
-          currentImageIndex ===
-          images.length - 1;
-
-      }
-
-
-      /*
-       * Keep selected thumbnail visible.
-       */
-      const activeThumbnail =
+      if (
+        keepThumbnailVisible &&
         thumbnails[
           currentImageIndex
-        ];
-
-
-      if (
-        activeThumbnail &&
-        thumbnailStrip
+        ]
       ) {
 
-        const thumbnailLeft =
-          activeThumbnail.offsetLeft;
-
-
-        const thumbnailWidth =
-          activeThumbnail.offsetWidth;
-
-
-        const stripWidth =
-          thumbnailStrip.clientWidth;
-
-
-        const desiredScroll =
-          thumbnailLeft
-          -
-          (
-            stripWidth / 2
-          )
-          +
-          (
-            thumbnailWidth / 2
-          );
-
-
-        thumbnailStrip.scrollTo({
-
-          left:
-            Math.max(
-              0,
-              desiredScroll
-            ),
+        thumbnails[
+          currentImageIndex
+        ].scrollIntoView({
 
           behavior:
-            'smooth'
+            'smooth',
+
+          block:
+            'nearest',
+
+          inline:
+            'nearest'
 
         });
 
@@ -1234,9 +1192,134 @@ function openTourModal(
     }
 
 
-    /*
-     * Click thumbnail.
-     */
+    /* -------------------------------------------------------
+       UPDATE BOTTOM ARROWS
+    ------------------------------------------------------- */
+
+    function updateCatalogArrows() {
+
+      if (
+        !viewport ||
+        !previousButton ||
+        !nextButton
+      ) {
+
+        return;
+
+      }
+
+
+      const maxScroll =
+        Math.max(
+          0,
+          viewport.scrollWidth
+          -
+          viewport.clientWidth
+        );
+
+
+      /*
+       * No previous content.
+       */
+      previousButton.hidden =
+        viewport.scrollLeft <= 3;
+
+
+      /*
+       * No next content.
+       */
+      nextButton.hidden =
+        (
+          maxScroll <= 3
+          ||
+          viewport.scrollLeft >=
+          maxScroll - 3
+        );
+
+    }
+
+
+    /* -------------------------------------------------------
+       GET ONE THUMBNAIL STEP
+    ------------------------------------------------------- */
+
+    function catalogStepSize() {
+
+      if (
+        thumbnails.length === 0
+      ) {
+
+        return 0;
+
+      }
+
+
+      const firstThumbnail =
+        thumbnails[0];
+
+
+      const style =
+        window.getComputedStyle(
+          thumbnailStrip
+        );
+
+
+      const gap =
+        parseFloat(
+          style.columnGap
+          ||
+          style.gap
+          ||
+          0
+        );
+
+
+      return (
+        firstThumbnail
+          .getBoundingClientRect()
+          .width
+        +
+        gap
+      );
+    }
+
+
+    /* -------------------------------------------------------
+       SCROLL CATALOG
+    ------------------------------------------------------- */
+
+    function scrollCatalog(
+      direction
+    ) {
+
+      if (!viewport) {
+
+        return;
+
+      }
+
+
+      const step =
+        catalogStepSize();
+
+
+      viewport.scrollBy({
+
+        left:
+          direction * step,
+
+        behavior:
+          'smooth'
+
+      });
+
+    }
+
+
+    /* -------------------------------------------------------
+       THUMBNAIL CLICK
+    ------------------------------------------------------- */
+
     thumbnails.forEach(
       (
         thumbnail,
@@ -1248,7 +1331,8 @@ function openTourModal(
           () => {
 
             selectGalleryImage(
-              index
+              index,
+              false
             );
 
           }
@@ -1258,20 +1342,23 @@ function openTourModal(
     );
 
 
-    /*
-     * Previous arrow.
-     */
+    /* -------------------------------------------------------
+       LEFT CATALOG ARROW
+    ------------------------------------------------------- */
+
     if (previousButton) {
 
       previousButton.addEventListener(
         'click',
         (event) => {
 
+          event.preventDefault();
+
           event.stopPropagation();
 
 
-          selectGalleryImage(
-            currentImageIndex - 1
+          scrollCatalog(
+            -1
           );
 
         }
@@ -1280,22 +1367,46 @@ function openTourModal(
     }
 
 
-    /*
-     * Next arrow.
-     */
+    /* -------------------------------------------------------
+       RIGHT CATALOG ARROW
+    ------------------------------------------------------- */
+
     if (nextButton) {
 
       nextButton.addEventListener(
         'click',
         (event) => {
 
+          event.preventDefault();
+
           event.stopPropagation();
 
 
-          selectGalleryImage(
-            currentImageIndex + 1
+          scrollCatalog(
+            1
           );
 
+        }
+      );
+
+    }
+
+
+    /* -------------------------------------------------------
+       UPDATE ARROWS WHILE CATALOG MOVES
+    ------------------------------------------------------- */
+
+    if (viewport) {
+
+      viewport.addEventListener(
+        'scroll',
+        () => {
+
+          updateCatalogArrows();
+
+        },
+        {
+          passive: true
         }
       );
 
@@ -1303,7 +1414,7 @@ function openTourModal(
 
 
     /* =====================================================
-       MOBILE SWIPE
+       MOBILE SWIPE ON LARGE IMAGE
     ===================================================== */
 
     if (mainImageWrap) {
@@ -1373,7 +1484,7 @@ function openTourModal(
 
 
           /*
-           * Movement must be large enough.
+           * Ignore very small movement.
            */
           if (
             Math.abs(
@@ -1387,8 +1498,7 @@ function openTourModal(
 
 
           /*
-           * If movement is mostly vertical,
-           * treat it as page scrolling.
+           * Ignore vertical scrolling.
            */
           if (
             Math.abs(
@@ -1406,27 +1516,40 @@ function openTourModal(
 
 
           /*
-           * Swipe LEFT.
+           * Swipe LEFT = next photo.
            */
           if (
             differenceX < 0
           ) {
 
-            selectGalleryImage(
-              currentImageIndex + 1
-            );
+            if (
+              currentImageIndex <
+              images.length - 1
+            ) {
+
+              selectGalleryImage(
+                currentImageIndex + 1
+              );
+
+            }
 
           }
 
 
           /*
-           * Swipe RIGHT.
+           * Swipe RIGHT = previous photo.
            */
           else {
 
-            selectGalleryImage(
-              currentImageIndex - 1
-            );
+            if (
+              currentImageIndex > 0
+            ) {
+
+              selectGalleryImage(
+                currentImageIndex - 1
+              );
+
+            }
 
           }
 
@@ -1440,10 +1563,29 @@ function openTourModal(
 
 
     /*
-     * Initial carousel state.
+     * Initial state.
      */
     selectGalleryImage(
-      0
+      0,
+      false
+    );
+
+
+    requestAnimationFrame(
+      () => {
+
+        updateCatalogArrows();
+
+      }
+    );
+
+
+    /*
+     * Recalculate if browser/window changes size.
+     */
+    setTimeout(
+      updateCatalogArrows,
+      100
     );
 
   }
@@ -1515,7 +1657,7 @@ function closeTourModal() {
 
 
 /* =========================================================
-   TOUR DATA COMPARISON
+   CHECK DATA CHANGES
 ========================================================= */
 
 function toursChanged(
@@ -1619,10 +1761,6 @@ async function loadTours(
       renderTours();
 
 
-      /*
-       * If currently opened tour was deleted,
-       * close the modal.
-       */
       if (openTourId) {
 
         const stillExists =
@@ -1692,9 +1830,6 @@ if (langButton) {
       renderTours();
 
 
-      /*
-       * Refresh open modal language too.
-       */
       if (openTourId) {
 
         openTourModal(
@@ -1771,7 +1906,7 @@ if (
 
 
 /* =========================================================
-   ESCAPE CLOSE
+   ESC CLOSE
 ========================================================= */
 
 document.addEventListener(
@@ -1791,7 +1926,7 @@ document.addEventListener(
 
 
 /* =========================================================
-   LIVE UPDATES
+   LIVE UPDATE
 ========================================================= */
 
 setInterval(
