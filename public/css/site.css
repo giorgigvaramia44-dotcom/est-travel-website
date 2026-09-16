@@ -76,8 +76,7 @@ button {
       calc(100% - 32px)
     );
 
-  margin:
-    0 auto;
+  margin: 0 auto;
 }
 
 
@@ -841,7 +840,7 @@ button {
 
 
 /* =========================================================
-   TOURS
+   TOUR GRID
 ========================================================= */
 
 .tours-section {
@@ -1049,7 +1048,9 @@ button {
 
   min-height: 30px;
 
-  padding: 7px 10px;
+  padding:
+    7px
+    10px;
 
   background: var(--blue-soft);
 
@@ -1070,7 +1071,7 @@ button {
 
 
 /* =========================================================
-   TOUR DESCRIPTION
+   DESCRIPTION
 ========================================================= */
 
 .tour-description-wrap {
@@ -1362,7 +1363,7 @@ small {
 
   right: 14px;
 
-  z-index: 30;
+  z-index: 40;
 
   width: 42px;
 
@@ -1381,7 +1382,7 @@ small {
       255,
       255,
       255,
-      .95
+      .96
     );
 
   color: #242b30;
@@ -1490,7 +1491,9 @@ small {
 
   min-height: 32px;
 
-  padding: 8px 11px;
+  padding:
+    8px
+    11px;
 
   border-radius: 999px;
 
@@ -1536,7 +1539,7 @@ small {
 
 
 /* =========================================================
-   MODAL GALLERY
+   MODAL RIGHT SIDE
 ========================================================= */
 
 .tour-modal-gallery {
@@ -1545,11 +1548,13 @@ small {
   padding: 34px;
 
   background: #f7fafc;
+
+  overflow: visible;
 }
 
 
 /* =========================================================
-   LARGE IMAGE
+   LARGE PHOTO
 ========================================================= */
 
 .tour-modal-main-image-wrap {
@@ -1565,11 +1570,6 @@ small {
 
   background: var(--blue-soft);
 
-  /*
-   * Vertical page scrolling still works,
-   * horizontal finger movement is used
-   * for our image swipe.
-   */
   touch-action: pan-y;
 }
 
@@ -1586,92 +1586,6 @@ small {
   -webkit-user-select: none;
 
   -webkit-user-drag: none;
-}
-
-
-/* =========================================================
-   LARGE IMAGE PREVIOUS / NEXT ARROWS
-========================================================= */
-
-.gallery-arrow {
-  position: absolute;
-
-  top: 50%;
-
-  z-index: 20;
-
-  width: 46px;
-
-  height: 46px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  transform:
-    translateY(-50%);
-
-  border: 0;
-
-  border-radius: 50%;
-
-  background:
-    rgba(
-      255,
-      255,
-      255,
-      .92
-    );
-
-  color: #242b30;
-
-  box-shadow:
-    0 8px 24px
-    rgba(
-      0,
-      0,
-      0,
-      .22
-    );
-
-  font-size: 36px;
-
-  font-weight: 400;
-
-  line-height: 1;
-
-  cursor: pointer;
-
-  transition:
-    transform .15s ease,
-    background .15s ease,
-    opacity .15s ease;
-}
-
-
-.gallery-arrow:hover {
-  background: #fff;
-
-  transform:
-    translateY(-50%)
-    scale(1.06);
-}
-
-
-.gallery-arrow-left {
-  left: 14px;
-}
-
-
-.gallery-arrow-right {
-  right: 14px;
-}
-
-
-.gallery-arrow[hidden] {
-  display: none !important;
 }
 
 
@@ -1697,84 +1611,84 @@ small {
 
 
 /* =========================================================
-   THUMBNAIL VIEWPORT
+   BOTTOM PHOTO CATALOG
 ========================================================= */
 
+.catalog-carousel {
+  position: relative;
+
+  width: 100%;
+
+  min-width: 0;
+
+  overflow: visible;
+}
+
+
+/*
+ * This is the visible catalog window.
+ *
+ * Only five thumbnails fit at once.
+ * Extra thumbnails remain to the right.
+ */
 .tour-modal-thumb-viewport {
   width: 100%;
 
   min-width: 0;
 
-  overflow: hidden;
-}
-
-
-/* =========================================================
-   ONE ROW OF THUMBNAILS
-========================================================= */
-
-.tour-modal-thumbnails {
-  width: 100%;
-
-  display: grid;
-
-  /*
-   * Critical:
-   * every image is placed horizontally.
-   * It can NEVER wrap to another row.
-   */
-  grid-auto-flow: column;
-
-
-  /*
-   * Exactly five thumbnails fit
-   * inside the available desktop width.
-   *
-   * 4 gaps × 9px = 36px.
-   */
-  grid-auto-columns:
-    calc(
-      (
-        100% - 36px
-      )
-      / 5
-    );
-
-
-  gap: 9px;
-
-
   overflow-x: auto;
 
   overflow-y: hidden;
 
-
   scroll-behavior: smooth;
-
-  scroll-snap-type: x proximity;
-
 
   scrollbar-width: none;
 
-
-  padding:
-    2px
-    0
-    4px;
+  scroll-snap-type: x proximity;
 }
 
 
-.tour-modal-thumbnails::-webkit-scrollbar {
+.tour-modal-thumb-viewport::-webkit-scrollbar {
   display: none;
 }
 
 
-/* =========================================================
-   THUMBNAIL
-========================================================= */
+/*
+ * One horizontal row only.
+ */
+.tour-modal-thumbnails {
+  display: flex;
 
-.tour-modal-thumb {
+  align-items: stretch;
+
+  gap: 10px;
+
   width: 100%;
+
+  min-width: 100%;
+
+  padding:
+    2px
+    0
+    5px;
+}
+
+
+/*
+ * Exactly 5 photos visible.
+ *
+ * 4 gaps × 10px = 40px
+ */
+.tour-modal-thumb {
+  flex:
+    0
+    0
+    calc(
+      (
+        100% - 40px
+      )
+      / 5
+    );
 
   min-width: 0;
 
@@ -1794,7 +1708,7 @@ small {
 
   cursor: pointer;
 
-  scroll-snap-align: center;
+  scroll-snap-align: start;
 
   transition:
     border-color .15s ease,
@@ -1835,6 +1749,99 @@ small {
   -webkit-user-select: none;
 
   -webkit-user-drag: none;
+}
+
+
+/* =========================================================
+   CATALOG LEFT / RIGHT ARROWS
+========================================================= */
+
+.catalog-arrow {
+  position: absolute;
+
+  top: 50%;
+
+  z-index: 35;
+
+  width: 38px;
+
+  height: 38px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  transform:
+    translateY(-50%);
+
+  border: 0;
+
+  border-radius: 50%;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      .97
+    );
+
+  color: var(--blue-dark);
+
+  box-shadow:
+    0 6px 20px
+    rgba(
+      0,
+      0,
+      0,
+      .25
+    );
+
+  font-size: 30px;
+
+  font-weight: 700;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    transform .15s ease,
+    background .15s ease;
+}
+
+
+.catalog-arrow:hover {
+  background: #fff;
+
+  transform:
+    translateY(-50%)
+    scale(1.08);
+}
+
+
+/*
+ * Half of the left circle
+ * stays outside the first visible photo.
+ */
+.catalog-arrow-left {
+  left: -19px;
+}
+
+
+/*
+ * Half of the right circle
+ * stays outside the fifth visible photo.
+ */
+.catalog-arrow-right {
+  right: -19px;
+}
+
+
+.catalog-arrow[hidden] {
+  display: none !important;
 }
 
 
@@ -1881,7 +1888,7 @@ small {
 
 
 /* =========================================================
-   MODAL TABLET
+   MODAL TABLET / MOBILE
 ========================================================= */
 
 @media (
@@ -2130,9 +2137,8 @@ small {
   }
 
 
-  /*
-   * Modal uses almost the entire screen.
-   */
+  /* MODAL */
+
   .tour-modal {
     padding: 7px;
   }
@@ -2157,43 +2163,6 @@ small {
   }
 
 
-  /*
-   * Four thumbnails on phones.
-   * Still only ONE ROW.
-   */
-  .tour-modal-thumbnails {
-    grid-auto-columns:
-      calc(
-        (
-          100% - 27px
-        )
-        / 4
-      );
-  }
-
-
-  /*
-   * Smaller arrows on phone.
-   */
-  .gallery-arrow {
-    width: 38px;
-
-    height: 38px;
-
-    font-size: 30px;
-  }
-
-
-  .gallery-arrow-left {
-    left: 8px;
-  }
-
-
-  .gallery-arrow-right {
-    right: 8px;
-  }
-
-
   .tour-modal-close {
     top: 9px;
 
@@ -2202,6 +2171,54 @@ small {
     width: 38px;
 
     height: 38px;
+
+    font-size: 25px;
+  }
+
+
+  /*
+   * Still show maximum 5 catalog
+   * photos in one row on mobile.
+   *
+   * Smaller gap gives thumbnails
+   * slightly more room.
+   */
+  .tour-modal-thumbnails {
+    gap: 6px;
+  }
+
+
+  .tour-modal-thumb {
+    flex:
+      0
+      0
+      calc(
+        (
+          100% - 24px
+        )
+        / 5
+      );
+
+    border-radius: 9px;
+  }
+
+
+  .catalog-arrow {
+    width: 34px;
+
+    height: 34px;
+
+    font-size: 27px;
+  }
+
+
+  .catalog-arrow-left {
+    left: -12px;
+  }
+
+
+  .catalog-arrow-right {
+    right: -12px;
   }
 
 }
