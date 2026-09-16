@@ -1,27 +1,27 @@
 const crypto =
   require('crypto');
 
-const fs =
-  require('fs');
-
-const path =
-  require('path');
-
 
 const {
   adminUsername,
-  adminPassword,
-  uploadsDir
+  adminPassword
 } =
   require('../config');
 
 
 const {
+  MAX_GALLERY_IMAGES,
   listTours,
   getTour,
   createTour,
   updateTour,
-  deleteTour
+  deleteTour,
+  replaceMainImage,
+  removeMainImage,
+  addGalleryImage,
+  deleteGalleryImage,
+  countGalleryImages,
+  getImage
 } =
   require('../services/tourStore');
 
@@ -35,7 +35,7 @@ const {
 
 
 const {
-  saveUploadedImage,
+  readImageUpload,
   readTourWithImage
 } =
   require('../services/uploadParser');
@@ -71,18 +71,18 @@ function safeEqual(
 
 
   return (
-    a.length === b.length
-    &&
+    a.length === b.length &&
     crypto.timingSafeEqual(
       a,
       b
     )
   );
-
 }
 
 
-function getClientIp(req) {
+function getClientIp(
+  req
+) {
 
   return (
     req.headers[
@@ -90,28 +90,27 @@ function getClientIp(req) {
     ]
       ?.split(',')[0]
       ?.trim()
-
     ||
-
     req.socket
       .remoteAddress
-
     ||
-
     'unknown'
   );
-
 }
 
 
-function loginAllowed(ip) {
+function loginAllowed(
+  ip
+) {
 
   const now =
     Date.now();
 
 
   const current =
-    loginAttempts.get(ip);
+    loginAttempts.get(
+      ip
+    );
 
 
   if (
@@ -122,7 +121,8 @@ function loginAllowed(ip) {
     loginAttempts.set(
       ip,
       {
-        count: 0,
+        count:
+          0,
 
         resetAt:
           now +
@@ -139,19 +139,19 @@ function loginAllowed(ip) {
   return (
     current.count < 10
   );
-
 }
 
 
-function recordFailure(ip) {
+function recordFailure(
+  ip
+) {
 
   const current =
     loginAttempts.get(ip)
-
     ||
-
     {
-      count: 0,
+      count:
+        0,
 
       resetAt:
         Date.now() +
@@ -159,28 +159,27 @@ function recordFailure(ip) {
     };
 
 
-  current.count += 1;
+  current.count +=
+    1;
 
 
   loginAttempts.set(
     ip,
     current
   );
-
 }
 
 
-function sessionToken(req) {
+function sessionToken(
+  req
+) {
 
   return (
     parseCookies(req)
       .est_owner_session
-
     ||
-
     ''
   );
-
 }
 
 
@@ -211,66 +210,16 @@ function requireAdmin(
 
 
   return false;
-
 }
 
 
-function normalizeText(value) {
+function normalizeText(
+  value
+) {
 
   return String(
     value ?? ''
   ).trim();
-
-}
-
-
-function removePublicImage(
-  imagePath
-) {
-
-  if (
-    !imagePath ||
-    !imagePath.startsWith(
-      '/uploads/'
-    )
-  ) {
-
-    return;
-
-  }
-
-
-  const fileName =
-    path.basename(
-      imagePath
-    );
-
-
-  const fullPath =
-    path.join(
-      uploadsDir,
-      fileName
-    );
-
-
-  if (
-    fs.existsSync(
-      fullPath
-    )
-  ) {
-
-    try {
-
-      fs.unlinkSync(
-        fullPath
-      );
-
-    }
-
-    catch (_) {}
-
-  }
-
 }
 
 
@@ -296,20 +245,19 @@ function makeId(
         /^-+|-+$/g,
         ''
       )
-
     ||
-
     'tour';
 
 
   return (
     `${slug}-${Date.now()}`
   );
-
 }
 
 
-function secureCookiePart(req) {
+function secureCookiePart(
+  req
+) {
 
   const forwardedProto =
     String(
@@ -321,20 +269,15 @@ function secureCookiePart(req) {
 
 
   return (
-    forwardedProto ===
-    'https'
-
+    forwardedProto === 'https'
       ? '; Secure'
-
       : ''
   );
-
 }
 
 
 function buildTourFromFields(
-  fields,
-  imagePath = ''
+  fields
 ) {
 
   const titleEn =
@@ -404,7 +347,7 @@ function buildTourFromFields(
       ),
 
     image:
-      imagePath,
+      '',
 
     active:
       String(
@@ -418,11 +361,9 @@ function buildTourFromFields(
           fields.sortOrder
         )
       )
-
         ? Number(
             fields.sortOrder
           )
-
         : Date.now(),
 
     createdAt:
@@ -432,7 +373,37 @@ function buildTourFromFields(
       now
 
   };
+}
 
+
+function sendStoredImage(
+  res,
+  image
+) {
+
+  res.writeHead(
+    200,
+    {
+
+      'Content-Type':
+        image.contentType,
+
+      'Content-Length':
+        image.data.length,
+
+      'Cache-Control':
+        'public, max-age=31536000, immutable',
+
+      'X-Content-Type-Options':
+        'nosniff'
+
+    }
+  );
+
+
+  res.end(
+    image.data
+  );
 }
 
 
@@ -441,6 +412,55 @@ async function handleApi(
   res,
   pathname
 ) {
+
+  /*
+   * PUBLIC IMAGE
+   */
+  const publicImageMatch =
+    pathname.match(
+      /^\/api\/tour-images\/(\d+)$/
+    );
+
+
+  if (
+    publicImageMatch &&
+    req.method === 'GET'
+  ) {
+
+    const image =
+      await getImage(
+        Number(
+          publicImageMatch[1]
+        )
+      );
+
+
+    if (!image) {
+
+      sendJson(
+        res,
+        404,
+        {
+          error:
+            'Image not found.'
+        }
+      );
+
+
+      return true;
+
+    }
+
+
+    sendStoredImage(
+      res,
+      image
+    );
+
+
+    return true;
+  }
+
 
   /*
    * PUBLIC TOURS
@@ -452,7 +472,8 @@ async function handleApi(
 
     const tours =
       await listTours({
-        activeOnly: true
+        activeOnly:
+          true
       });
 
 
@@ -464,7 +485,6 @@ async function handleApi(
 
 
     return true;
-
   }
 
 
@@ -473,8 +493,7 @@ async function handleApi(
    */
   if (
     req.method === 'GET' &&
-    pathname ===
-      '/api/admin/status'
+    pathname === '/api/admin/status'
   ) {
 
     sendJson(
@@ -490,7 +509,6 @@ async function handleApi(
 
 
     return true;
-
   }
 
 
@@ -499,8 +517,7 @@ async function handleApi(
    */
   if (
     req.method === 'POST' &&
-    pathname ===
-      '/api/admin/login'
+    pathname === '/api/admin/login'
   ) {
 
     const ip =
@@ -522,7 +539,6 @@ async function handleApi(
 
 
       return true;
-
     }
 
 
@@ -549,7 +565,6 @@ async function handleApi(
 
 
       return true;
-
     }
 
 
@@ -586,13 +601,10 @@ async function handleApi(
 
 
       return true;
-
     }
 
 
-    loginAttempts.delete(
-      ip
-    );
+    loginAttempts.delete(ip);
 
 
     const token =
@@ -603,18 +615,19 @@ async function handleApi(
       res,
       200,
       {
-        ok: true
+        ok:
+          true
       },
       {
         'Set-Cookie':
-          `est_owner_session=${encodeURIComponent(token)}; ` +
+          `est_owner_session=${encodeURIComponent(token)}; `
+          +
           `Path=/; HttpOnly; SameSite=Strict; Max-Age=28800${secureCookiePart(req)}`
       }
     );
 
 
     return true;
-
   }
 
 
@@ -623,8 +636,7 @@ async function handleApi(
    */
   if (
     req.method === 'POST' &&
-    pathname ===
-      '/api/admin/logout'
+    pathname === '/api/admin/logout'
   ) {
 
     destroySession(
@@ -636,7 +648,8 @@ async function handleApi(
       res,
       200,
       {
-        ok: true
+        ok:
+          true
       },
       {
         'Set-Cookie':
@@ -646,13 +659,11 @@ async function handleApi(
 
 
     return true;
-
   }
 
 
   /*
-   * EVERYTHING BELOW
-   * REQUIRES ADMIN
+   * PROTECT ADMIN API
    */
   if (
     pathname.startsWith(
@@ -666,170 +677,47 @@ async function handleApi(
   ) {
 
     return true;
-
   }
 
 
   /*
-   * GET ALL TOURS
+   * ADMIN TOUR LIST
    */
   if (
     req.method === 'GET' &&
-    pathname ===
-      '/api/admin/tours'
+    pathname === '/api/admin/tours'
   ) {
-
-    const tours =
-      await listTours();
-
 
     sendJson(
       res,
       200,
-      tours
+      await listTours()
     );
 
 
     return true;
-
   }
 
 
   /*
    * CREATE TOUR
-   *
-   * Supports:
-   * FormData + image
    */
   if (
     req.method === 'POST' &&
-    pathname ===
-      '/api/admin/tours'
+    pathname === '/api/admin/tours'
   ) {
 
-    const contentType =
-      String(
-        req.headers[
-          'content-type'
-        ] || ''
-      )
-        .toLowerCase();
-
-
-    /*
-     * MULTIPART:
-     * create tour + photo together
-     */
-    if (
-      contentType.startsWith(
-        'multipart/form-data'
-      )
-    ) {
-
-      let uploaded =
-        null;
-
-
-      try {
-
-        const parsed =
-          await readTourWithImage(
-            req
-          );
-
-
-        uploaded =
-          parsed.uploaded;
-
-
-        const tour =
-          buildTourFromFields(
-            parsed.fields,
-            uploaded.publicPath
-          );
-
-
-        const created =
-          await createTour(
-            tour
-          );
-
-
-        sendJson(
-          res,
-          201,
-          created
-        );
-
-      }
-
-      catch (error) {
-
-        if (
-          uploaded?.publicPath
-        ) {
-
-          removePublicImage(
-            uploaded.publicPath
-          );
-
-        }
-
-
-        sendJson(
-          res,
-          400,
-          {
-            error:
-              error.message ||
-              'Could not create tour.'
-          }
-        );
-
-      }
-
-
-      return true;
-
-    }
-
-
-    /*
-     * JSON compatibility
-     */
-    let body;
-
-
     try {
 
-      body =
-        await readJson(req);
+      const parsed =
+        await readTourWithImage(
+          req
+        );
 
-    }
-
-    catch (_) {
-
-      sendJson(
-        res,
-        400,
-        {
-          error:
-            'Invalid tour data.'
-        }
-      );
-
-
-      return true;
-
-    }
-
-
-    try {
 
       const tour =
         buildTourFromFields(
-          body,
-          ''
+          parsed.fields
         );
 
 
@@ -839,10 +727,32 @@ async function handleApi(
         );
 
 
+      try {
+
+        await replaceMainImage(
+          created.id,
+          parsed.image
+        );
+
+      }
+
+      catch (imageError) {
+
+        await deleteTour(
+          created.id
+        );
+
+
+        throw imageError;
+      }
+
+
       sendJson(
         res,
         201,
-        created
+        await getTour(
+          created.id
+        )
       );
 
     }
@@ -863,7 +773,309 @@ async function handleApi(
 
 
     return true;
+  }
 
+
+  /*
+   * ADD GALLERY IMAGE
+   */
+  const galleryMatch =
+    pathname.match(
+      /^\/api\/admin\/tours\/([^/]+)\/gallery$/
+    );
+
+
+  if (
+    galleryMatch &&
+    req.method === 'POST'
+  ) {
+
+    const tourId =
+      decodeURIComponent(
+        galleryMatch[1]
+      );
+
+
+    const current =
+      await getTour(
+        tourId
+      );
+
+
+    if (!current) {
+
+      sendJson(
+        res,
+        404,
+        {
+          error:
+            'Tour not found.'
+        }
+      );
+
+
+      return true;
+    }
+
+
+    const currentCount =
+      await countGalleryImages(
+        tourId
+      );
+
+
+    if (
+      currentCount >=
+      MAX_GALLERY_IMAGES
+    ) {
+
+      sendJson(
+        res,
+        400,
+        {
+          error:
+            `A tour can have at most ${MAX_GALLERY_IMAGES} catalog images.`
+        }
+      );
+
+
+      return true;
+    }
+
+
+    try {
+
+      const image =
+        await readImageUpload(
+          req
+        );
+
+
+      await addGalleryImage(
+        tourId,
+        image
+      );
+
+
+      sendJson(
+        res,
+        201,
+        await getTour(
+          tourId
+        )
+      );
+
+    }
+
+    catch (error) {
+
+      sendJson(
+        res,
+        400,
+        {
+          error:
+            error.message ||
+            'Could not upload catalog image.'
+        }
+      );
+
+    }
+
+
+    return true;
+  }
+
+
+  /*
+   * DELETE GALLERY IMAGE
+   */
+  const galleryImageMatch =
+    pathname.match(
+      /^\/api\/admin\/tours\/([^/]+)\/gallery\/(\d+)$/
+    );
+
+
+  if (
+    galleryImageMatch &&
+    req.method === 'DELETE'
+  ) {
+
+    const tourId =
+      decodeURIComponent(
+        galleryImageMatch[1]
+      );
+
+
+    const imageId =
+      Number(
+        galleryImageMatch[2]
+      );
+
+
+    const deleted =
+      await deleteGalleryImage(
+        tourId,
+        imageId
+      );
+
+
+    if (!deleted) {
+
+      sendJson(
+        res,
+        404,
+        {
+          error:
+            'Catalog image not found.'
+        }
+      );
+
+
+      return true;
+    }
+
+
+    sendJson(
+      res,
+      200,
+      await getTour(
+        tourId
+      )
+    );
+
+
+    return true;
+  }
+
+
+  /*
+   * MAIN IMAGE
+   */
+  const mainImageMatch =
+    pathname.match(
+      /^\/api\/admin\/tours\/([^/]+)\/image$/
+    );
+
+
+  if (
+    mainImageMatch &&
+    req.method === 'POST'
+  ) {
+
+    const tourId =
+      decodeURIComponent(
+        mainImageMatch[1]
+      );
+
+
+    const current =
+      await getTour(
+        tourId
+      );
+
+
+    if (!current) {
+
+      sendJson(
+        res,
+        404,
+        {
+          error:
+            'Tour not found.'
+        }
+      );
+
+
+      return true;
+    }
+
+
+    try {
+
+      const image =
+        await readImageUpload(
+          req
+        );
+
+
+      await replaceMainImage(
+        tourId,
+        image
+      );
+
+
+      sendJson(
+        res,
+        200,
+        await getTour(
+          tourId
+        )
+      );
+
+    }
+
+    catch (error) {
+
+      sendJson(
+        res,
+        400,
+        {
+          error:
+            error.message ||
+            'Could not upload main image.'
+        }
+      );
+
+    }
+
+
+    return true;
+  }
+
+
+  if (
+    mainImageMatch &&
+    req.method === 'DELETE'
+  ) {
+
+    const tourId =
+      decodeURIComponent(
+        mainImageMatch[1]
+      );
+
+
+    const current =
+      await getTour(
+        tourId
+      );
+
+
+    if (!current) {
+
+      sendJson(
+        res,
+        404,
+        {
+          error:
+            'Tour not found.'
+        }
+      );
+
+
+      return true;
+    }
+
+
+    sendJson(
+      res,
+      200,
+      await removeMainImage(
+        tourId
+      )
+    );
+
+
+    return true;
   }
 
 
@@ -891,9 +1103,7 @@ async function handleApi(
       await getTour(id);
 
 
-    if (
-      !current
-    ) {
+    if (!current) {
 
       sendJson(
         res,
@@ -906,7 +1116,6 @@ async function handleApi(
 
 
       return true;
-
     }
 
 
@@ -933,7 +1142,6 @@ async function handleApi(
 
 
       return true;
-
     }
 
 
@@ -986,9 +1194,7 @@ async function handleApi(
       active:
         typeof body.active ===
           'boolean'
-
           ? body.active
-
           : current.active,
 
       sortOrder:
@@ -997,11 +1203,9 @@ async function handleApi(
             body.sortOrder
           )
         )
-
           ? Number(
               body.sortOrder
             )
-
           : current.sortOrder,
 
       updatedAt:
@@ -1027,25 +1231,19 @@ async function handleApi(
 
 
       return true;
-
     }
-
-
-    const saved =
-      await updateTour(
-        updated
-      );
 
 
     sendJson(
       res,
       200,
-      saved
+      await updateTour(
+        updated
+      )
     );
 
 
     return true;
-
   }
 
 
@@ -1064,9 +1262,7 @@ async function handleApi(
       await deleteTour(id);
 
 
-    if (
-      !removed
-    ) {
+    if (!removed) {
 
       sendJson(
         res,
@@ -1079,214 +1275,24 @@ async function handleApi(
 
 
       return true;
-
     }
-
-
-    removePublicImage(
-      removed.image
-    );
 
 
     sendJson(
       res,
       200,
       {
-        ok: true
+        ok:
+          true
       }
     );
 
 
     return true;
-
-  }
-
-
-  /*
-   * REPLACE / REMOVE IMAGE
-   */
-  const imageMatch =
-    pathname.match(
-      /^\/api\/admin\/tours\/([^/]+)\/image$/
-    );
-
-
-  if (
-    imageMatch &&
-    req.method === 'POST'
-  ) {
-
-    const id =
-      decodeURIComponent(
-        imageMatch[1]
-      );
-
-
-    const current =
-      await getTour(id);
-
-
-    if (
-      !current
-    ) {
-
-      sendJson(
-        res,
-        404,
-        {
-          error:
-            'Tour not found.'
-        }
-      );
-
-
-      return true;
-
-    }
-
-
-    let uploaded =
-      null;
-
-
-    try {
-
-      uploaded =
-        await saveUploadedImage(
-          req
-        );
-
-
-      const oldImage =
-        current.image;
-
-
-      const saved =
-        await updateTour({
-          ...current,
-          image:
-            uploaded.publicPath,
-          updatedAt:
-            new Date()
-              .toISOString()
-        });
-
-
-      /*
-       * Delete old photo only
-       * after new photo is stored.
-       */
-      removePublicImage(
-        oldImage
-      );
-
-
-      sendJson(
-        res,
-        200,
-        saved
-      );
-
-    }
-
-    catch (error) {
-
-      if (
-        uploaded?.publicPath
-      ) {
-
-        removePublicImage(
-          uploaded.publicPath
-        );
-
-      }
-
-
-      sendJson(
-        res,
-        400,
-        {
-          error:
-            error.message ||
-            'Upload failed.'
-        }
-      );
-
-    }
-
-
-    return true;
-
-  }
-
-
-  if (
-    imageMatch &&
-    req.method === 'DELETE'
-  ) {
-
-    const id =
-      decodeURIComponent(
-        imageMatch[1]
-      );
-
-
-    const current =
-      await getTour(id);
-
-
-    if (
-      !current
-    ) {
-
-      sendJson(
-        res,
-        404,
-        {
-          error:
-            'Tour not found.'
-        }
-      );
-
-
-      return true;
-
-    }
-
-
-    const oldImage =
-      current.image;
-
-
-    const saved =
-      await updateTour({
-        ...current,
-        image: '',
-        updatedAt:
-          new Date()
-            .toISOString()
-      });
-
-
-    removePublicImage(
-      oldImage
-    );
-
-
-    sendJson(
-      res,
-      200,
-      saved
-    );
-
-
-    return true;
-
   }
 
 
   return false;
-
 }
 
 
