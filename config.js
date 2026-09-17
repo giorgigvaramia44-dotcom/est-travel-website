@@ -4,82 +4,162 @@ const path = require('path');
 const root = __dirname;
 
 
-function loadEnvFile() {
-  const envPath = path.join(root, '.env');
+/* =========================================================
+   LOAD .ENV
+========================================================= */
 
-  if (!fs.existsSync(envPath)) {
+function loadEnvFile() {
+
+  const envPath =
+      path.join(
+          root,
+          '.env'
+      );
+
+
+  if (
+      !fs.existsSync(envPath)
+  ) {
+
     return;
+
   }
 
-  const lines = fs.readFileSync(envPath, 'utf8').split(/\r?\n/);
 
-  for (const line of lines) {
-    const trimmed = line.trim();
+  const lines =
+      fs
+          .readFileSync(
+              envPath,
+              'utf8'
+          )
+          .split(/\r?\n/);
 
-    if (!trimmed || trimmed.startsWith('#')) {
-      continue;
-    }
 
-    const separator = trimmed.indexOf('=');
+  for (
+      const line
+      of lines
+      ) {
 
-    if (separator === -1) {
-      continue;
-    }
+    const trimmed =
+        line.trim();
 
-    const key = trimmed.slice(0, separator).trim();
-    let value = trimmed.slice(separator + 1).trim();
 
     if (
-      (value.startsWith('"') && value.endsWith('"')) ||
-      (value.startsWith("'") && value.endsWith("'"))
+        !trimmed ||
+        trimmed.startsWith('#')
     ) {
-      value = value.slice(1, -1);
+
+      continue;
+
     }
 
-    if (process.env[key] === undefined) {
-      process.env[key] = value;
+
+    const separator =
+        trimmed.indexOf('=');
+
+
+    if (
+        separator === -1
+    ) {
+
+      continue;
+
     }
+
+
+    const key =
+        trimmed
+            .slice(
+                0,
+                separator
+            )
+            .trim();
+
+
+    let value =
+        trimmed
+            .slice(
+                separator + 1
+            )
+            .trim();
+
+
+    if (
+        (
+            value.startsWith('"') &&
+            value.endsWith('"')
+        )
+        ||
+        (
+            value.startsWith("'") &&
+            value.endsWith("'")
+        )
+    ) {
+
+      value =
+          value.slice(
+              1,
+              -1
+          );
+
+    }
+
+
+    if (
+        process.env[key] ===
+        undefined
+    ) {
+
+      process.env[key] =
+          value;
+
+    }
+
   }
+
 }
 
 
 loadEnvFile();
 
 
-/*
- * Local configuration is only used
- * when running on your computer.
- */
+/* =========================================================
+   OPTIONAL LOCAL CONFIG
+========================================================= */
+
 let localConfig = {};
 
+
 const localConfigPath =
-  path.join(
-    root,
-    'private-config.json'
-  );
+    path.join(
+        root,
+        'private-config.json'
+    );
 
 
 if (
-  fs.existsSync(localConfigPath)
+    fs.existsSync(
+        localConfigPath
+    )
 ) {
 
   try {
 
     localConfig =
-      JSON.parse(
-        fs.readFileSync(
-          localConfigPath,
-          'utf8'
-        )
-      );
+        JSON.parse(
+            fs.readFileSync(
+                localConfigPath,
+                'utf8'
+            )
+        );
 
   }
 
   catch (error) {
 
     console.error(
-      'Could not read private-config.json:',
-      error.message
+        'Could not read private-config.json:',
+        error.message
     );
 
   }
@@ -87,94 +167,198 @@ if (
 }
 
 
-/*
- * Railway:
- * STORAGE_DIR=/data
- *
- * Local computer:
- * <project>/storage
- */
-const storageDir =
-  process.env.STORAGE_DIR
-  ||
-  path.join(
-    root,
-    'storage'
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function envBoolean(
+    value,
+    fallback = false
+) {
+
+  if (
+      value === undefined ||
+      value === null ||
+      value === ''
+  ) {
+
+    return fallback;
+
+  }
+
+
+  return (
+      String(value)
+          .toLowerCase() ===
+      'true'
   );
 
+}
+
+
+/* =========================================================
+   LOCAL / LEGACY STORAGE
+========================================================= */
+
+const storageDir =
+    process.env.STORAGE_DIR
+    ||
+    path.join(
+        root,
+        'storage'
+    );
+
+
+/* =========================================================
+   EXPORT CONFIG
+========================================================= */
 
 module.exports = {
 
   root,
 
+
+  /* -------------------------
+     WEBSITE
+  ------------------------- */
+
   port:
-    Number(
-      process.env.PORT
-      ||
-      localConfig.port
-      ||
-      3000
-    ),
+      Number(
+          process.env.PORT
+          ||
+          localConfig.port
+          ||
+          3000
+      ),
+
+
+  /* -------------------------
+     ADMIN
+  ------------------------- */
 
   adminUsername:
-    String(
-      process.env.ADMIN_USERNAME
-      ||
-      localConfig.adminUsername
-      ||
-      'owner'
-    ),
+      String(
+          process.env.ADMIN_USERNAME
+          ||
+          localConfig.adminUsername
+          ||
+          'owner'
+      ),
 
   adminPassword:
-    String(
-      process.env.ADMIN_PASSWORD
-      ||
-      localConfig.adminPassword
-      ||
-      ''
-    ),
+      String(
+          process.env.ADMIN_PASSWORD
+          ||
+          localConfig.adminPassword
+          ||
+          ''
+      ),
+
+
+  /* -------------------------
+     POSTGRESQL
+  ------------------------- */
 
   databaseUrl:
-    String(
-      process.env.DATABASE_URL
-      ||
-      localConfig.databaseUrl
-      ||
-      'postgres://esttravel:esttravel@localhost:5432/esttravel'
-    ),
+      String(
+          process.env.DATABASE_URL
+          ||
+          localConfig.databaseUrl
+          ||
+          'postgres://esttravel:esttravel@localhost:5432/esttravel'
+      ),
+
+
+  /* -------------------------
+     MINIO
+  ------------------------- */
+
+  minioEndpoint:
+      String(
+          process.env.MINIO_ENDPOINT
+          ||
+          localConfig.minioEndpoint
+          ||
+          'localhost'
+      ),
+
+  minioPort:
+      Number(
+          process.env.MINIO_PORT
+          ||
+          localConfig.minioPort
+          ||
+          9000
+      ),
+
+  minioUseSSL:
+      envBoolean(
+          process.env.MINIO_USE_SSL,
+          false
+      ),
+
+  minioAccessKey:
+      String(
+          process.env.MINIO_ACCESS_KEY
+          ||
+          localConfig.minioAccessKey
+          ||
+          ''
+      ),
+
+  minioSecretKey:
+      String(
+          process.env.MINIO_SECRET_KEY
+          ||
+          localConfig.minioSecretKey
+          ||
+          ''
+      ),
+
+  minioBucket:
+      String(
+          process.env.MINIO_BUCKET
+          ||
+          localConfig.minioBucket
+          ||
+          'est-travel'
+      ),
+
+
+  /* -------------------------
+     PUBLIC DIRECTORY
+  ------------------------- */
 
   publicDir:
-    path.join(
-      root,
-      'public'
-    ),
+      path.join(
+          root,
+          'public'
+      ),
 
-  /*
-   * Original data from GitHub.
-   * Used ONLY once to initialize storage.
-   */
+
+  /* -------------------------
+     LEGACY / SEED STORAGE
+  ------------------------- */
+
   seedToursFile:
-    path.join(
-      root,
-      'data',
-      'tours.json'
-    ),
+      path.join(
+          root,
+          'data',
+          'tours.json'
+      ),
 
-  /*
-   * Persistent Railway storage.
-   */
   storageDir,
 
   toursFile:
-    path.join(
-      storageDir,
-      'tours.json'
-    ),
+      path.join(
+          storageDir,
+          'tours.json'
+      ),
 
   uploadsDir:
-    path.join(
-      storageDir,
-      'uploads'
-    )
+      path.join(
+          storageDir,
+          'uploads'
+      )
 
 };

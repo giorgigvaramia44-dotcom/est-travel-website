@@ -1,5 +1,5 @@
 const fs =
-  require('fs');
+    require('fs');
 
 
 const {
@@ -8,29 +8,42 @@ const {
   toursFile,
   uploadsDir
 } =
-  require('../config');
+    require('../config');
 
 
 const {
   query,
   waitForDatabase
 } =
-  require('./db');
+    require('./db');
+
+
+const {
+  ensureMinioBucket,
+  uploadImage,
+  getImageStream,
+  deleteImage
+} =
+    require('./minioStore');
 
 
 const MAX_GALLERY_IMAGES =
-  12;
+    12;
 
+
+/* =========================================================
+   LEGACY LOCAL STORAGE
+========================================================= */
 
 function ensureStorage() {
 
   if (storageDir) {
 
     fs.mkdirSync(
-      storageDir,
-      {
-        recursive: true
-      }
+        storageDir,
+        {
+          recursive: true
+        }
     );
 
   }
@@ -39,10 +52,10 @@ function ensureStorage() {
   if (uploadsDir) {
 
     fs.mkdirSync(
-      uploadsDir,
-      {
-        recursive: true
-      }
+        uploadsDir,
+        {
+          recursive: true
+        }
     );
 
   }
@@ -50,48 +63,52 @@ function ensureStorage() {
 }
 
 
+/* =========================================================
+   HELPERS
+========================================================= */
+
 function normalizeGallery(
-  value
+    value
 ) {
 
   if (
-    Array.isArray(value)
+      Array.isArray(value)
   ) {
 
     return value.map(
-      (item) => ({
+        (item) => ({
 
-        id:
-          Number(
-            item.id
-          ),
+          id:
+              Number(
+                  item.id
+              ),
 
-        url:
-          item.url ||
-          `/api/tour-images/${item.id}`,
+          url:
+              item.url ||
+              `/api/tour-images/${item.id}`,
 
-        sortOrder:
-          Number(
-            item.sortOrder ??
-            item.sort_order ??
-            0
-          )
+          sortOrder:
+              Number(
+                  item.sortOrder ??
+                  item.sort_order ??
+                  0
+              )
 
-      })
+        })
     );
 
   }
 
 
   if (
-    typeof value ===
-    'string'
+      typeof value ===
+      'string'
   ) {
 
     try {
 
       return normalizeGallery(
-        JSON.parse(value)
+          JSON.parse(value)
       );
 
     }
@@ -110,7 +127,7 @@ function normalizeGallery(
 
 
 function mapTour(
-  row
+    row
 ) {
 
   if (!row) {
@@ -121,83 +138,90 @@ function mapTour(
 
 
   const mainImageId =
-    row.main_image_id
-      ? Number(
-          row.main_image_id
-        )
-      : null;
+      row.main_image_id
+          ? Number(
+              row.main_image_id
+          )
+          : null;
 
 
   return {
 
     id:
-      row.id,
+    row.id,
 
     titleEn:
-      row.title_en || '',
+        row.title_en || '',
 
     titleKa:
-      row.title_ka || '',
+        row.title_ka || '',
 
     descriptionEn:
-      row.description_en || '',
+        row.description_en || '',
 
     descriptionKa:
-      row.description_ka || '',
+        row.description_ka || '',
 
     price:
-      row.price || '',
+        row.price || '',
 
     durationEn:
-      row.duration_en || '',
+        row.duration_en || '',
 
     durationKa:
-      row.duration_ka || '',
+        row.duration_ka || '',
 
+    /*
+     * Keep the same public URL.
+     *
+     * Browser does not need to know
+     * whether the image comes from
+     * PostgreSQL or MinIO.
+     */
     image:
-      mainImageId
-        ? `/api/tour-images/${mainImageId}`
-        : (
-            row.image ||
-            ''
-          ),
+        mainImageId
+            ? `/api/tour-images/${mainImageId}`
+            : (
+                row.image ||
+                ''
+            ),
 
     mainImageId,
 
     galleryImages:
-      normalizeGallery(
-        row.gallery_images
-      ),
+        normalizeGallery(
+            row.gallery_images
+        ),
 
     active:
-      row.active !== false,
+        row.active !== false,
 
     sortOrder:
-      Number(
-        row.sort_order ||
-        0
-      ),
+        Number(
+            row.sort_order ||
+            0
+        ),
 
     createdAt:
-      row.created_at
-        ? new Date(
-            row.created_at
-          ).toISOString()
-        : undefined,
+        row.created_at
+            ? new Date(
+                row.created_at
+            ).toISOString()
+            : undefined,
 
     updatedAt:
-      row.updated_at
-        ? new Date(
-            row.updated_at
-          ).toISOString()
-        : undefined
+        row.updated_at
+            ? new Date(
+                row.updated_at
+            ).toISOString()
+            : undefined
 
   };
 }
 
 
 function tourToParams(
-  tour
+    tour
 ) {
 
   return [
@@ -223,21 +247,21 @@ function tourToParams(
     tour.active !== false,
 
     Number.isFinite(
-      Number(
-        tour.sortOrder
-      )
-    )
-      ? Number(
-          tour.sortOrder
+        Number(
+            tour.sortOrder
         )
-      : Date.now(),
+    )
+        ? Number(
+            tour.sortOrder
+        )
+        : Date.now(),
 
     tour.createdAt ||
-      new Date()
+    new Date()
         .toISOString(),
 
     tour.updatedAt ||
-      new Date()
+    new Date()
         .toISOString()
 
   ];
@@ -245,23 +269,29 @@ function tourToParams(
 }
 
 
+/* =========================================================
+   LEGACY SEED TOURS
+========================================================= */
+
 function readSeedTours() {
 
   const sources =
-    [
-      toursFile,
-      seedToursFile
-    ];
+      [
+        toursFile,
+        seedToursFile
+      ];
 
 
   for (
-    const filePath
-    of sources
-  ) {
+      const filePath
+      of sources
+      ) {
 
     if (
-      !filePath ||
-      !fs.existsSync(filePath)
+        !filePath ||
+        !fs.existsSync(
+            filePath
+        )
     ) {
 
       continue;
@@ -272,22 +302,22 @@ function readSeedTours() {
     try {
 
       const data =
-        JSON.parse(
-          fs.readFileSync(
-            filePath,
-            'utf8'
-          )
-        );
+          JSON.parse(
+              fs.readFileSync(
+                  filePath,
+                  'utf8'
+              )
+          );
 
 
       if (
-        Array.isArray(data) &&
-        data.length > 0
+          Array.isArray(data) &&
+          data.length > 0
       ) {
 
         console.log(
-          'Seeding tours from',
-          filePath
+            'Seeding tours from',
+            filePath
         );
 
 
@@ -300,9 +330,9 @@ function readSeedTours() {
     catch (error) {
 
       console.error(
-        'Could not read seed tours from',
-        filePath,
-        error.message
+          'Could not read seed tours from',
+          filePath,
+          error.message
       );
 
     }
@@ -314,12 +344,23 @@ function readSeedTours() {
 }
 
 
+/* =========================================================
+   INITIALIZATION
+========================================================= */
+
 async function initTourStore() {
 
   ensureStorage();
 
 
   await waitForDatabase();
+
+
+  /*
+   * Make sure MinIO is reachable
+   * before website startup finishes.
+   */
+  await ensureMinioBucket();
 
 
   await query(`
@@ -347,6 +388,9 @@ async function initTourStore() {
   `);
 
 
+  /*
+   * Fresh database.
+   */
   await query(`
     CREATE TABLE IF NOT EXISTS tour_images (
       id BIGSERIAL PRIMARY KEY,
@@ -367,12 +411,35 @@ async function initTourStore() {
 
       content_type TEXT NOT NULL,
 
-      image_data BYTEA NOT NULL,
+      object_key TEXT NOT NULL DEFAULT '',
+
+      image_data BYTEA,
 
       sort_order BIGINT NOT NULL DEFAULT 0,
 
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
+  `);
+
+
+  /*
+   * Existing database migration.
+   */
+  await query(`
+    ALTER TABLE tour_images
+      ADD COLUMN IF NOT EXISTS
+        object_key TEXT NOT NULL DEFAULT ''
+  `);
+
+
+  /*
+   * Old database required BYTEA.
+   *
+   * New MinIO records leave image_data NULL.
+   */
+  await query(`
+    ALTER TABLE tour_images
+      ALTER COLUMN image_data DROP NOT NULL
   `);
 
 
@@ -394,17 +461,28 @@ async function initTourStore() {
   `);
 
 
+  await query(`
+    CREATE INDEX IF NOT EXISTS tour_images_object_key_idx
+      ON tour_images (object_key)
+      WHERE object_key <> ''
+  `);
+
+
   await seedToursIfEmpty();
 
 }
 
 
+/* =========================================================
+   TOUR ROWS
+========================================================= */
+
 async function insertTourRow(
-  tour
+    tour
 ) {
 
   await query(
-    `
+      `
       INSERT INTO tours (
         id,
         title_en,
@@ -420,6 +498,7 @@ async function insertTourRow(
         created_at,
         updated_at
       )
+
       VALUES (
         $1,
         $2,
@@ -436,34 +515,35 @@ async function insertTourRow(
         $13
       )
     `,
-    tourToParams(
-      tour
-    )
+      tourToParams(
+          tour
+      )
   );
 
 
   return getTour(
-    tour.id
+      tour.id
   );
+
 }
 
 
 async function seedToursIfEmpty() {
 
   const countResult =
-    await query(
-      `
+      await query(
+          `
         SELECT
           COUNT(*)::int AS count
         FROM tours
       `
-    );
+      );
 
 
   if (
-    countResult
-      .rows[0]
-      .count > 0
+      countResult
+          .rows[0]
+          .count > 0
   ) {
 
     return;
@@ -472,27 +552,27 @@ async function seedToursIfEmpty() {
 
 
   const seedTours =
-    readSeedTours();
+      readSeedTours();
 
 
   for (
-    const tour
-    of seedTours
-  ) {
+      const tour
+      of seedTours
+      ) {
 
     await insertTourRow({
 
       ...tour,
 
       createdAt:
-        tour.createdAt ||
-        new Date()
-          .toISOString(),
+          tour.createdAt ||
+          new Date()
+              .toISOString(),
 
       updatedAt:
-        tour.updatedAt ||
-        new Date()
-          .toISOString()
+          tour.updatedAt ||
+          new Date()
+              .toISOString()
 
     });
 
@@ -500,10 +580,15 @@ async function seedToursIfEmpty() {
 
 
   console.log(
-    `Loaded ${seedTours.length} tours into Postgres.`
+      `Loaded ${seedTours.length} tours into Postgres.`
   );
+
 }
 
+
+/* =========================================================
+   TOUR SELECT
+========================================================= */
 
 const TOUR_SELECT = `
   SELECT
@@ -555,13 +640,17 @@ const TOUR_SELECT = `
 `;
 
 
+/* =========================================================
+   LIST / GET
+========================================================= */
+
 async function listTours({
-  activeOnly = false
-} = {}) {
+                           activeOnly = false
+                         } = {}) {
 
   const result =
-    await query(
-      `
+      await query(
+          `
         ${TOUR_SELECT}
 
         WHERE (
@@ -578,27 +667,28 @@ async function listTours({
           t.sort_order ASC,
           t.id ASC
       `,
-      [
-        activeOnly
-      ]
-    );
+          [
+            activeOnly
+          ]
+      );
 
 
   return result
-    .rows
-    .map(
-      mapTour
-    );
+      .rows
+      .map(
+          mapTour
+      );
+
 }
 
 
 async function getTour(
-  id
+    id
 ) {
 
   const result =
-    await query(
-      `
+      await query(
+          `
         ${TOUR_SELECT}
 
         WHERE
@@ -608,35 +698,41 @@ async function getTour(
           t.id,
           mi.id
       `,
-      [
-        id
-      ]
-    );
+          [
+            id
+          ]
+      );
 
 
   return mapTour(
-    result.rows[0]
+      result.rows[0]
   );
+
 }
 
 
+/* =========================================================
+   CREATE / UPDATE TOUR
+========================================================= */
+
 async function createTour(
-  tour
+    tour
 ) {
 
   return insertTourRow(
-    tour
+      tour
   );
+
 }
 
 
 async function updateTour(
-  tour
+    tour
 ) {
 
   const result =
-    await query(
-      `
+      await query(
+          `
         UPDATE tours
 
         SET
@@ -656,46 +752,46 @@ async function updateTour(
 
         RETURNING id
       `,
-      [
+          [
 
-        tour.id,
+            tour.id,
 
-        tour.titleEn || '',
+            tour.titleEn || '',
 
-        tour.titleKa || '',
+            tour.titleKa || '',
 
-        tour.descriptionEn || '',
+            tour.descriptionEn || '',
 
-        tour.descriptionKa || '',
+            tour.descriptionKa || '',
 
-        tour.price || '',
+            tour.price || '',
 
-        tour.durationEn || '',
+            tour.durationEn || '',
 
-        tour.durationKa || '',
+            tour.durationKa || '',
 
-        tour.active !== false,
+            tour.active !== false,
 
-        Number.isFinite(
-          Number(
-            tour.sortOrder
-          )
-        )
-          ? Number(
-              tour.sortOrder
+            Number.isFinite(
+                Number(
+                    tour.sortOrder
+                )
             )
-          : Date.now(),
+                ? Number(
+                    tour.sortOrder
+                )
+                : Date.now(),
 
-        tour.updatedAt ||
-          new Date()
-            .toISOString()
+            tour.updatedAt ||
+            new Date()
+                .toISOString()
 
-      ]
-    );
+          ]
+      );
 
 
   if (
-    !result.rows[0]
+      !result.rows[0]
   ) {
 
     return null;
@@ -704,19 +800,24 @@ async function updateTour(
 
 
   return getTour(
-    tour.id
+      tour.id
   );
+
 }
 
 
+/* =========================================================
+   DELETE TOUR
+========================================================= */
+
 async function deleteTour(
-  id
+    id
 ) {
 
   const current =
-    await getTour(
-      id
-    );
+      await getTour(
+          id
+      );
 
 
   if (!current) {
@@ -726,116 +827,297 @@ async function deleteTour(
   }
 
 
+  /*
+   * Remember MinIO objects before
+   * PostgreSQL CASCADE deletes the rows.
+   */
+  const imageRows =
+      await query(
+          `
+        SELECT
+          object_key
+
+        FROM tour_images
+
+        WHERE
+          tour_id = $1
+          AND
+          object_key <> ''
+      `,
+          [
+            id
+          ]
+      );
+
+
   await query(
-    `
+      `
       DELETE FROM tours
       WHERE id = $1
     `,
-    [
-      id
-    ]
+      [
+        id
+      ]
   );
+
+
+  /*
+   * Delete actual objects from MinIO.
+   */
+  for (
+      const row
+      of imageRows.rows
+      ) {
+
+    await deleteImage(
+        row.object_key
+    );
+
+  }
 
 
   return current;
+
 }
 
 
+/* =========================================================
+   MAIN IMAGE
+========================================================= */
+
 async function replaceMainImage(
-  tourId,
-  file
+    tourId,
+    file
 ) {
 
-  await query(
-    `
-      DELETE FROM tour_images
-
-      WHERE
-        tour_id = $1
-        AND
-        image_kind = 'main'
-    `,
-    [
-      tourId
-    ]
-  );
-
-
-  const result =
-    await query(
-      `
-        INSERT INTO tour_images (
-          tour_id,
-          image_kind,
-          file_name,
-          content_type,
-          image_data,
-          sort_order
-        )
-
-        VALUES (
-          $1,
+  /*
+   * Upload new object first.
+   *
+   * If upload fails, existing main image
+   * remains untouched.
+   */
+  const newObjectKey =
+      await uploadImage(
+          tourId,
           'main',
-          $2,
-          $3,
-          $4,
-          0
-        )
+          file
+      );
 
-        RETURNING id
+
+  let oldObjectKey =
+      '';
+
+
+  try {
+
+    const oldResult =
+        await query(
+            `
+          SELECT
+            id,
+            object_key
+
+          FROM tour_images
+
+          WHERE
+            tour_id = $1
+            AND
+            image_kind = 'main'
+
+          LIMIT 1
+        `,
+            [
+              tourId
+            ]
+        );
+
+
+    const existing =
+        oldResult.rows[0];
+
+
+    let imageId;
+
+
+    if (existing) {
+
+      oldObjectKey =
+          existing.object_key ||
+          '';
+
+
+      const updated =
+          await query(
+              `
+            UPDATE tour_images
+
+            SET
+              file_name = $2,
+              content_type = $3,
+              object_key = $4,
+              image_data = NULL,
+              sort_order = 0
+
+            WHERE
+              id = $1
+
+            RETURNING id
+          `,
+              [
+                existing.id,
+                file.filename || '',
+                file.mimeType,
+                newObjectKey
+              ]
+          );
+
+
+      imageId =
+          Number(
+              updated.rows[0].id
+          );
+
+    }
+
+    else {
+
+      const inserted =
+          await query(
+              `
+            INSERT INTO tour_images (
+              tour_id,
+              image_kind,
+              file_name,
+              content_type,
+              object_key,
+              image_data,
+              sort_order
+            )
+
+            VALUES (
+              $1,
+              'main',
+              $2,
+              $3,
+              $4,
+              NULL,
+              0
+            )
+
+            RETURNING id
+          `,
+              [
+                tourId,
+                file.filename || '',
+                file.mimeType,
+                newObjectKey
+              ]
+          );
+
+
+      imageId =
+          Number(
+              inserted.rows[0].id
+          );
+
+    }
+
+
+    await query(
+        `
+        UPDATE tours
+
+        SET
+          image = '',
+          updated_at = NOW()
+
+        WHERE id = $1
       `,
-      [
-        tourId,
-        file.filename || '',
-        file.mimeType,
-        file.data
-      ]
+        [
+          tourId
+        ]
     );
 
 
-  await query(
-    `
-      UPDATE tours
+    /*
+     * New DB record is now safe.
+     * Remove old MinIO object afterwards.
+     */
+    if (
+        oldObjectKey &&
+        oldObjectKey !==
+        newObjectKey
+    ) {
 
-      SET
-        image = '',
-        updated_at = NOW()
+      await deleteImage(
+          oldObjectKey
+      );
 
-      WHERE id = $1
-    `,
-    [
-      tourId
-    ]
-  );
+    }
 
 
-  return Number(
-    result.rows[0].id
-  );
+    return imageId;
+
+  }
+
+  catch (error) {
+
+    /*
+     * Database update failed.
+     * Remove the newly uploaded orphan.
+     */
+    await deleteImage(
+        newObjectKey
+    );
+
+
+    throw error;
+
+  }
+
 }
 
 
 async function removeMainImage(
-  tourId
+    tourId
 ) {
 
+  const result =
+      await query(
+          `
+        DELETE FROM tour_images
+
+        WHERE
+          tour_id = $1
+          AND
+          image_kind = 'main'
+
+        RETURNING
+          object_key
+      `,
+          [
+            tourId
+          ]
+      );
+
+
+  const oldObjectKey =
+      result.rows[0]
+          ?.object_key ||
+      '';
+
+
+  if (oldObjectKey) {
+
+    await deleteImage(
+        oldObjectKey
+    );
+
+  }
+
+
   await query(
-    `
-      DELETE FROM tour_images
-
-      WHERE
-        tour_id = $1
-        AND
-        image_kind = 'main'
-    `,
-    [
-      tourId
-    ]
-  );
-
-
-  await query(
-    `
+      `
       UPDATE tours
 
       SET
@@ -844,25 +1126,30 @@ async function removeMainImage(
 
       WHERE id = $1
     `,
-    [
-      tourId
-    ]
+      [
+        tourId
+      ]
   );
 
 
   return getTour(
-    tourId
+      tourId
   );
+
 }
 
 
+/* =========================================================
+   GALLERY
+========================================================= */
+
 async function countGalleryImages(
-  tourId
+    tourId
 ) {
 
   const result =
-    await query(
-      `
+      await query(
+          `
         SELECT
           COUNT(*)::int AS count
 
@@ -873,117 +1160,148 @@ async function countGalleryImages(
           AND
           image_kind = 'gallery'
       `,
-      [
-        tourId
-      ]
-    );
+          [
+            tourId
+          ]
+      );
 
 
   return result
-    .rows[0]
-    .count;
+      .rows[0]
+      .count;
+
 }
 
 
 async function addGalleryImage(
-  tourId,
-  file
+    tourId,
+    file
 ) {
 
   const count =
-    await countGalleryImages(
-      tourId
-    );
+      await countGalleryImages(
+          tourId
+      );
 
 
   if (
-    count >=
-    MAX_GALLERY_IMAGES
+      count >=
+      MAX_GALLERY_IMAGES
   ) {
 
     throw new Error(
-      `A tour can have at most ${MAX_GALLERY_IMAGES} catalog images.`
+        `A tour can have at most ${MAX_GALLERY_IMAGES} catalog images.`
     );
 
   }
 
 
-  const result =
-    await query(
-      `
-        INSERT INTO tour_images (
-          tour_id,
-          image_kind,
-          file_name,
-          content_type,
-          image_data,
-          sort_order
-        )
-
-        VALUES (
-          $1,
+  const objectKey =
+      await uploadImage(
+          tourId,
           'gallery',
-          $2,
-          $3,
-          $4,
+          file
+      );
 
-          COALESCE(
-            (
-              SELECT
-                MAX(sort_order) + 1
 
-              FROM tour_images
+  try {
 
-              WHERE
-                tour_id = $1
-                AND
-                image_kind = 'gallery'
-            ),
-            0
+    const result =
+        await query(
+            `
+          INSERT INTO tour_images (
+            tour_id,
+            image_kind,
+            file_name,
+            content_type,
+            object_key,
+            image_data,
+            sort_order
           )
-        )
 
-        RETURNING
-          id,
-          sort_order
-      `,
-      [
-        tourId,
-        file.filename || '',
-        file.mimeType,
-        file.data
-      ]
+          VALUES (
+            $1,
+            'gallery',
+            $2,
+            $3,
+            $4,
+            NULL,
+
+            COALESCE(
+              (
+                SELECT
+                  MAX(sort_order) + 1
+
+                FROM tour_images
+
+                WHERE
+                  tour_id = $1
+                  AND
+                  image_kind = 'gallery'
+              ),
+              0
+            )
+          )
+
+          RETURNING
+            id,
+            sort_order
+        `,
+            [
+              tourId,
+              file.filename || '',
+              file.mimeType,
+              objectKey
+            ]
+        );
+
+
+    return {
+
+      id:
+          Number(
+              result.rows[0].id
+          ),
+
+      url:
+          `/api/tour-images/${result.rows[0].id}`,
+
+      sortOrder:
+          Number(
+              result.rows[0].sort_order ||
+              0
+          )
+
+    };
+
+  }
+
+  catch (error) {
+
+    /*
+     * Do not leave an unused MinIO object
+     * if PostgreSQL insert failed.
+     */
+    await deleteImage(
+        objectKey
     );
 
 
-  return {
+    throw error;
 
-    id:
-      Number(
-        result.rows[0].id
-      ),
+  }
 
-    url:
-      `/api/tour-images/${result.rows[0].id}`,
-
-    sortOrder:
-      Number(
-        result.rows[0].sort_order ||
-        0
-      )
-
-  };
 }
 
 
 async function deleteGalleryImage(
-  tourId,
-  imageId
+    tourId,
+    imageId
 ) {
 
   const result =
-    await query(
-      `
+      await query(
+          `
         DELETE FROM tour_images
 
         WHERE
@@ -993,45 +1311,127 @@ async function deleteGalleryImage(
           AND
           image_kind = 'gallery'
 
-        RETURNING id
+        RETURNING
+          id,
+          object_key
       `,
-      [
-        tourId,
-        imageId
-      ]
+          [
+            tourId,
+            imageId
+          ]
+      );
+
+
+  const removed =
+      result.rows[0];
+
+
+  if (!removed) {
+
+    return false;
+
+  }
+
+
+  if (
+      removed.object_key
+  ) {
+
+    await deleteImage(
+        removed.object_key
     );
 
+  }
 
-  return Boolean(
-    result.rows[0]
+
+  return true;
+
+}
+
+
+/* =========================================================
+   IMAGE DELIVERY
+========================================================= */
+
+function streamToBuffer(
+    stream
+) {
+
+  return new Promise(
+      (
+          resolve,
+          reject
+      ) => {
+
+        const chunks =
+            [];
+
+
+        stream.on(
+            'data',
+            (chunk) => {
+
+              chunks.push(
+                  Buffer.from(
+                      chunk
+                  )
+              );
+
+            }
+        );
+
+
+        stream.on(
+            'end',
+            () => {
+
+              resolve(
+                  Buffer.concat(
+                      chunks
+                  )
+              );
+
+            }
+        );
+
+
+        stream.on(
+            'error',
+            reject
+        );
+
+      }
   );
+
 }
 
 
 async function getImage(
-  imageId
+    imageId
 ) {
 
   const result =
-    await query(
-      `
+      await query(
+          `
         SELECT
           id,
           content_type,
+          object_key,
           image_data
 
         FROM tour_images
 
-        WHERE id = $1
+        WHERE
+          id = $1
       `,
-      [
-        imageId
-      ]
-    );
+          [
+            imageId
+          ]
+      );
 
 
   const row =
-    result.rows[0];
+      result.rows[0];
 
 
   if (!row) {
@@ -1041,22 +1441,97 @@ async function getImage(
   }
 
 
-  return {
+  /*
+   * NEW IMAGE:
+   * stored in MinIO.
+   */
+  if (
+      row.object_key
+  ) {
 
-    id:
-      Number(
-        row.id
-      ),
+    try {
 
-    contentType:
+      const stream =
+          await getImageStream(
+              row.object_key
+          );
+
+
+      const data =
+          await streamToBuffer(
+              stream
+          );
+
+
+      return {
+
+        id:
+            Number(
+                row.id
+            ),
+
+        contentType:
+        row.content_type,
+
+        data
+
+      };
+
+    }
+
+    catch (error) {
+
+      console.error(
+          'Could not read image from MinIO:',
+          row.object_key,
+          error.message
+      );
+
+
+      return null;
+
+    }
+
+  }
+
+
+  /*
+   * OLD IMAGE:
+   * still stored in PostgreSQL BYTEA.
+   *
+   * This fallback prevents old photos
+   * from disappearing during migration.
+   */
+  if (
+      row.image_data
+  ) {
+
+    return {
+
+      id:
+          Number(
+              row.id
+          ),
+
+      contentType:
       row.content_type,
 
-    data:
+      data:
       row.image_data
 
-  };
+    };
+
+  }
+
+
+  return null;
+
 }
 
+
+/* =========================================================
+   EXPORTS
+========================================================= */
 
 module.exports = {
 

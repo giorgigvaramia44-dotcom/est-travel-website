@@ -9,6 +9,7 @@
     "db:up": "docker compose up -d"
   },
   "dependencies": {
+    "minio": "^8.0.7",
     "pg": "^8.16.3"
   }
 }
